@@ -1,60 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
+using AmongUs.Data;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static UnityEngine.UI.Button;
 using Object = UnityEngine.Object;
-using TheOtherRoles.Patches;
 
 namespace TheOtherRoles.Modules
 {
     [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
     public class MainMenuPatch
     {
-        private static bool horseButtonState = MapOptions.enableHorseMode;
-        private static Sprite horseModeOffSprite = null;
-        private static Sprite horseModeOnSprite = null;
+        private static bool horseButtonState = TORMapOptions.enableHorseMode;
         private static GameObject bottomTemplate;
         private static AnnouncementPopUp popUp;
 
-        private static void Prefix(MainMenuManager __instance) {
+        private static void Prefix(MainMenuManager __instance)
+        {
             CustomHatLoader.LaunchHatFetcher();
             var template = GameObject.Find("ExitGameButton");
             if (template == null) return;
 
-            // Horse mode stuff
-            var horseModeSelectionBehavior = new SelectionBehaviour(new TranslationInfo("MainMenu", 1), () => MapOptions.enableHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value = !TheOtherRolesPlugin.EnableHorseMode.Value, TheOtherRolesPlugin.EnableHorseMode.Value);
+            var buttonDiscord = UnityEngine.Object.Instantiate(template, null);
+            buttonDiscord.transform.localPosition = new Vector3(buttonDiscord.transform.localPosition.x, buttonDiscord.transform.localPosition.y + 0.6f, buttonDiscord.transform.localPosition.z);
+
+            var textDiscord = buttonDiscord.transform.GetChild(0).GetComponent<TMPro.TMP_Text>();
+            __instance.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) =>
+            {
+                textDiscord.SetText("Discord");
+            })));
+
+            PassiveButton passiveButtonDiscord = buttonDiscord.GetComponent<PassiveButton>();
+            SpriteRenderer buttonSpriteDiscord = buttonDiscord.GetComponent<SpriteRenderer>();
+
+            passiveButtonDiscord.OnClick = new Button.ButtonClickedEvent();
+            passiveButtonDiscord.OnClick.AddListener((System.Action)(() => Application.OpenURL("https://discord.gg/77RkMJHWsM")));
+
+            Color discordColor = new Color32(88, 101, 242, byte.MaxValue);
+            buttonSpriteDiscord.color = textDiscord.color = discordColor;
+            passiveButtonDiscord.OnMouseOut.AddListener((System.Action)delegate
+            {
+                buttonSpriteDiscord.color = textDiscord.color = discordColor;
+            });
+
 
             bottomTemplate = GameObject.Find("InventoryButton");
-            if (bottomTemplate == null) return;
-            var horseButton = Object.Instantiate(bottomTemplate, bottomTemplate.transform.parent);
-            var passiveHorseButton = horseButton.GetComponent<PassiveButton>();
-            var spriteHorseButton = horseButton.GetComponent<SpriteRenderer>();
-
-            horseModeOffSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.HorseModeButtonOff.png", 75f);
-            horseModeOnSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.HorseModeButtonOn.png", 75f);
-
-            spriteHorseButton.sprite = horseButtonState ? horseModeOnSprite : horseModeOffSprite;
-
-            passiveHorseButton.OnClick = new ButtonClickedEvent();
-            passiveHorseButton.OnClick.AddListener((Action)(() => {
-                horseButtonState = horseModeSelectionBehavior.onClick();
-                if (horseButtonState) {
-                    if (horseModeOnSprite == null) horseModeOnSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.HorseModeButtonOn.png", 75f);
-                    spriteHorseButton.sprite = horseModeOnSprite;
-                } else {
-                    if (horseModeOffSprite == null) horseModeOffSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.HorseModeButtonOff.png", 75f);
-                    spriteHorseButton.sprite = horseModeOffSprite;
-                }
-                CredentialsPatch.LogoPatch.updateSprite();
-                // Avoid wrong Player Particles floating around in the background
-                var particles = GameObject.FindObjectOfType<PlayerParticles>();
-                if (particles != null) {
-                    particles.pool.ReclaimAll();
-                    particles.Start();
-                }
-            }));
 
             // TOR credits button
             if (bottomTemplate == null) return;
@@ -66,21 +57,34 @@ namespace TheOtherRoles.Modules
 
             passiveCreditsButton.OnClick = new ButtonClickedEvent();
 
-            passiveCreditsButton.OnClick.AddListener((System.Action)delegate {
+            passiveCreditsButton.OnClick.AddListener((System.Action)delegate
+            {
                 // do stuff
                 if (popUp != null) Object.Destroy(popUp);
                 popUp = Object.Instantiate(Object.FindObjectOfType<AnnouncementPopUp>(true));
                 popUp.gameObject.SetActive(true);
-                popUp.Init();
-                //SelectableHyperLinkHelper.DestroyGOs(popUp.selectableHyperLinks, "test");
+
+                Assets.InnerNet.Announcement creditsAnnouncement = new Assets.InnerNet.Announcement();
+                creditsAnnouncement.Id = "torCredits";
+                creditsAnnouncement.Language = 0;
+                creditsAnnouncement.Number = 500;
+                creditsAnnouncement.Title = "The Other Roles Credits & Resources";
+                creditsAnnouncement.ShortTitle = "TOR Credits";
+                creditsAnnouncement.SubTitle = "";
+                creditsAnnouncement.PinState = false;
+                creditsAnnouncement.Date = "03.07.2020";
                 string creditsString = @$"<align=""center"">Github Contributors:
 Alex2911    amsyarasyiq    MaximeGillot
 Psynomit    probablyadnf    JustASysAdmin
 
 Discord Moderators:
 Streamblox    Draco Cordraconis
-
 Thanks to all our discord helpers!
+
+Thanks to miniduikboot & GD for hosting modded servers
+
+Translation:
+Japanese: miru-y  Chinese: FangKuai
 
 ";
                 creditsString += $@"<size=60%> Other Credits & Resources:
@@ -102,42 +106,89 @@ Ottomated - Idea for the Morphling, Snitch and Camouflager role came from Ottoma
 Crowded-Mod - Our implementation for 10+ player lobbies was inspired by the one from the Crowded Mod Team
 Goose-Goose-Duck - Idea for the Vulture role came from Slushiegoose</size>";
                 creditsString += "</align>";
-                popUp.AnnounceTextMeshPro.text = creditsString;
-                __instance.StartCoroutine(Effects.Lerp(0.01f, new Action<float>((p) => {
-                    if (p == 1) {
+                creditsAnnouncement.Text = creditsString;
+                __instance.StartCoroutine(Effects.Lerp(0.01f, new Action<float>((p) =>
+                {
+                    if (p == 1)
+                    {
+                        var backup = DataManager.Player.Announcements.allAnnouncements;
+                        popUp.Init(false);
+                        DataManager.Player.Announcements.allAnnouncements = new();
+                        DataManager.Player.Announcements.allAnnouncements.Insert(0, creditsAnnouncement);
+                        foreach (var item in popUp.visibleAnnouncements) Object.Destroy(item);
+                        foreach (var item in Object.FindObjectsOfType<AnnouncementPanel>())
+                        {
+                            if (item != popUp.ErrorPanel) Object.Destroy(item.gameObject);
+                        }
+                        popUp.CreateAnnouncementList();
+                        popUp.visibleAnnouncements[0].PassiveButton.OnClick.RemoveAllListeners();
+                        DataManager.Player.Announcements.allAnnouncements = backup;
                         var titleText = GameObject.Find("Title_Text").GetComponent<TMPro.TextMeshPro>();
-                        if (titleText != null) titleText.text = "Credits and Contributors";
+                        if (titleText != null) titleText.text = "";
                     }
                 })));
             });
-            
+
         }
 
-        public static void Postfix(MainMenuManager __instance) {
-            __instance.StartCoroutine(Effects.Lerp(0.01f, new Action<float>((p) => {
-                if (p == 1) {
+        public static void Postfix(MainMenuManager __instance)
+        {
+            __instance.StartCoroutine(Effects.Lerp(0.01f, new Action<float>((p) =>
+            {
+                if (p == 1)
+                {
                     bottomTemplate = GameObject.Find("InventoryButton");
-                    foreach (Transform tf in bottomTemplate.transform.parent.GetComponentsInChildren<Transform>()) {
+                    foreach (Transform tf in bottomTemplate.transform.parent.GetComponentsInChildren<Transform>())
+                    {
                         tf.localPosition = new Vector2(tf.localPosition.x * 0.8f, tf.localPosition.y);
                     }
                 }
             })));
 
         }
-    }
 
-    [HarmonyPatch(typeof(AnnouncementPopUp), nameof(AnnouncementPopUp.UpdateAnnounceText))]
-    public static class Announcement
-    {
-        public static ModUpdateBehaviour.UpdateData updateData = null;
-        public static bool Prefix(AnnouncementPopUp __instance)
+        public static void addSceneChangeCallbacks()
         {
-            if (ModUpdateBehaviour.showPopUp || updateData == null) return true;
+            SceneManager.add_sceneLoaded((Action<Scene, LoadSceneMode>)((scene, _) =>
+            {
+                if (!scene.name.Equals("MatchMaking", StringComparison.Ordinal)) return;
+                TORMapOptions.gameMode = CustomGamemodes.Classic;
+                // Add buttons For Guesser Mode, Hide N Seek in this scene.
+                // find "HostLocalGameButton"
+                var template = GameObject.FindObjectOfType<HostLocalGameButton>();
+                var gameButton = template.transform.FindChild("CreateGameButton");
+                var gameButtonPassiveButton = gameButton.GetComponentInChildren<PassiveButton>();
 
-            var text = __instance.AnnounceTextMeshPro;
-            text.text = $"<size=150%><color=#FC0303>THE OTHER ROLES MR</color></size> {(updateData.Version)}\n{(updateData.Content)}";
+                var guesserButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                guesserButton.transform.localPosition += new Vector3(0f, -0.5f);
+                var guesserButtonText = guesserButton.GetComponentInChildren<TMPro.TextMeshPro>();
+                var guesserButtonPassiveButton = guesserButton.GetComponentInChildren<PassiveButton>();
 
-            return false;
+                guesserButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
+                guesserButtonPassiveButton.OnClick.AddListener((System.Action)(() =>
+                {
+                    TORMapOptions.gameMode = CustomGamemodes.Guesser;
+                    template.OnClick();
+                }));
+
+                var HideNSeekButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                HideNSeekButton.transform.localPosition += new Vector3(1.7f, -0.5f);
+                var HideNSeekButtonText = HideNSeekButton.GetComponentInChildren<TMPro.TextMeshPro>();
+                var HideNSeekButtonPassiveButton = HideNSeekButton.GetComponentInChildren<PassiveButton>();
+
+                HideNSeekButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
+                HideNSeekButtonPassiveButton.OnClick.AddListener((System.Action)(() =>
+                {
+                    TORMapOptions.gameMode = CustomGamemodes.HideNSeek;
+                    template.OnClick();
+                }));
+
+                template.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) =>
+                {
+                    guesserButtonText.SetText("TOR Guesser");
+                    HideNSeekButtonText.SetText("TOR Hide N Seek");
+                })));
+            }));
         }
     }
 }

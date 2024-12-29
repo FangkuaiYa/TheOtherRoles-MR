@@ -1,12 +1,8 @@
 using HarmonyLib;
-using System;
-using static TheOtherRoles.TheOtherRoles;
-using UnityEngine;
-using System.Linq;
-using TheOtherRoles.Objects;
 using TheOtherRoles.Utilities;
 
-namespace TheOtherRoles.Patches {
+namespace TheOtherRoles.Patches
+{
     [HarmonyPatch(typeof(HeliSabotageSystem), nameof(HeliSabotageSystem.Detoriorate))]
     public static class HeliSabotageSystemPatch
     {

@@ -1,17 +1,14 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using UnityEngine;
-using System.Linq;
 
 namespace TheOtherRoles
 {
     // Class to preload all audio/sound effects that are contained in the embedded resources.
     // The effects are made available through the soundEffects Dict / the get and the play methods.
     public static class SoundEffectsManager
-        
+
     {
         private static Dictionary<string, AudioClip> soundEffects;
 
@@ -38,20 +35,48 @@ namespace TheOtherRoles
         }
 
 
-        public static void play(string path, float volume=0.8f)
+        public static void play(string path, float volume = 0.8f)
         {
-            if (!MapOptions.enableSoundEffects) return;
+            if (!TORMapOptions.enableSoundEffects) return;
             AudioClip clipToPlay = get(path);
             // if (false) clipToPlay = get("exampleClip"); for april fools?
             stop(path);
             if (Constants.ShouldPlaySfx()) SoundManager.Instance.PlaySound(clipToPlay, false, volume);
         }
 
-        public static void stop(string path) {
+        public static void playAtPosition(string path, Vector2 position, float maxDuration = 15f, float range = 5f, bool loop = false)
+        {
+            if (!TORMapOptions.enableSoundEffects || !Constants.ShouldPlaySfx()) return;
+            AudioClip clipToPlay = get(path);
+
+            AudioSource source = SoundManager.Instance.PlaySound(clipToPlay, false, 1f);
+            source.loop = loop;
+            HudManager.Instance.StartCoroutine(Effects.Lerp(maxDuration, new Action<float>((p) =>
+            {
+                if (source != null)
+                {
+                    if (p == 1)
+                    {
+                        source.Stop();
+                    }
+                    float distance, volume;
+                    distance = Vector2.Distance(position, Players.CachedPlayer.LocalPlayer.PlayerControl.GetTruePosition());
+                    if (distance < range)
+                        volume = (1f - distance / range);
+                    else
+                        volume = 0f;
+                    source.volume = volume;
+                }
+            })));
+        }
+
+        public static void stop(string path)
+        {
             if (Constants.ShouldPlaySfx()) SoundManager.Instance.StopSound(get(path));
         }
 
-        public static void stopAll() {
+        public static void stopAll()
+        {
             if (soundEffects == null) return;
             foreach (var path in soundEffects.Keys) stop(path);
         }
