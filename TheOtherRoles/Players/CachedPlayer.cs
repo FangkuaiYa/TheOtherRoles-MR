@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using InnerNet;
 using UnityEngine;
 
 namespace TheOtherRoles.Players;
@@ -18,17 +19,14 @@ public class CachedPlayer
     public PlayerControl PlayerControl;
     public PlayerPhysics PlayerPhysics;
     public CustomNetworkTransform NetTransform;
-    public GameData.PlayerInfo Data;
+    public GameData.PlayerInfo Data => PlayerControl.Data;
     public byte PlayerId;
 
-    public static implicit operator bool(CachedPlayer player)
-    {
-        return player != null && player.PlayerControl;
-    }
+    public static implicit operator bool(CachedPlayer player) => player != null && player.PlayerControl;
 
     public static implicit operator PlayerControl(CachedPlayer player) => player.PlayerControl;
-    public static implicit operator PlayerPhysics(CachedPlayer player) => player.PlayerPhysics;
 
+    public static implicit operator PlayerPhysics(CachedPlayer player) => player.PlayerPhysics;
 }
 
 [HarmonyPatch]
@@ -104,7 +102,7 @@ public static class CachedPlayerPatches
     {
         foreach (CachedPlayer cachedPlayer in CachedPlayer.AllPlayers)
         {
-            cachedPlayer.Data = cachedPlayer.PlayerControl.Data;
+            //cachedPlayer.Data = cachedPlayer.PlayerControl.Data;
             cachedPlayer.PlayerId = cachedPlayer.PlayerControl.PlayerId;
         }
     }
@@ -115,7 +113,7 @@ public static class CachedPlayerPatches
     {
         foreach (CachedPlayer cachedPlayer in CachedPlayer.AllPlayers)
         {
-            cachedPlayer.Data = cachedPlayer.PlayerControl.Data;
+            //cachedPlayer.Data = cachedPlayer.PlayerControl.Data;
             cachedPlayer.PlayerId = cachedPlayer.PlayerControl.PlayerId;
         }
     }
