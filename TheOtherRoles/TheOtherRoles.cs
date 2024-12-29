@@ -67,7 +67,7 @@ namespace TheOtherRoles
             Bomber.clearAndReload();
             Yasuna.clearAndReload();
             YasunaJr.clearAndReload();
-            DoorHacker.clearAndReload();
+            //DoorHacker.clearAndReload();
             Kataomoi.clearAndReload();
             KillerCreator.clearAndReload();
             MadmateKiller.clearAndReload();
@@ -2084,7 +2084,7 @@ namespace TheOtherRoles
         }
     }
 
-    public static class DoorHacker
+    /*public static class DoorHacker
     {
         public static PlayerControl doorHacker;
         public static Color color = Palette.ImpostorRed;
@@ -2149,7 +2149,7 @@ namespace TheOtherRoles
 
             ResetDoors();
         }
-    }
+    }*/
 
     [HarmonyPatch]
     public static class Kataomoi

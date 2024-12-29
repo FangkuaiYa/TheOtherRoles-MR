@@ -70,7 +70,7 @@ namespace TheOtherRoles
         Yasuna,
         YasunaJr,
         TaskMaster,
-        DoorHacker,
+        //DoorHacker,
         Kataomoi,
         KillerCreator,
         MadmateKiller,
@@ -185,7 +185,7 @@ namespace TheOtherRoles
         YasunaSpecialVote_DoCastVote,
         TaskMasterSetExTasks,
         TaskMasterUpdateExTasks,
-        DoorHackerDone,
+        //DoorHackerDone,
         KataomoiSetTarget,
         KataomoiWin,
         KataomoiStalking,
@@ -442,9 +442,9 @@ namespace TheOtherRoles
                         case RoleId.TaskMaster:
                             TaskMaster.taskMaster = player;
                             break;
-                        case RoleId.DoorHacker:
-                            DoorHacker.doorHacker = player;
-                            break;
+                        //case RoleId.DoorHacker:
+                        //    DoorHacker.doorHacker = player;
+                        //    break;
                         case RoleId.Kataomoi:
                             Kataomoi.kataomoi = player;
                             break;
@@ -1001,7 +1001,7 @@ namespace TheOtherRoles
             if (player == Witch.witch) Witch.clearAndReload();
             if (player == Ninja.ninja) Ninja.clearAndReload();
             if (player == Bomber.bomber) Bomber.clearAndReload();
-            if (player == DoorHacker.doorHacker) DoorHacker.clearAndReload();
+            //if (player == DoorHacker.doorHacker) DoorHacker.clearAndReload();
             if (player == KillerCreator.killerCreator) KillerCreator.clearAndReload();
             if (player == MadmateKiller.madmateKiller) MadmateKiller.clearAndReload();
 
@@ -1546,12 +1546,12 @@ namespace TheOtherRoles
             TaskMaster.allExTasks = allExTasks;
         }
 
-        public static void doorHackerDone(byte playerId)
+        /*public static void doorHackerDone(byte playerId)
         {
             PlayerControl player = Helpers.playerById(playerId);
             if (DoorHacker.doorHacker == null || DoorHacker.doorHacker != player) return;
             DoorHacker.DisableDoors(playerId);
-        }
+        }*/
 
         public static void kataomoiSetTarget(byte playerId)
         {
@@ -2004,10 +2004,10 @@ namespace TheOtherRoles
                     byte allExTasks = reader.ReadByte();
                     RPCProcedure.taskMasterUpdateExTasks(clearExTasks, allExTasks);
                     break;
-                case (byte)CustomRPC.DoorHackerDone:
+                /*case (byte)CustomRPC.DoorHackerDone:
                     playerId = reader.ReadByte();
                     RPCProcedure.doorHackerDone(playerId);
-                    break;
+                    break;*/
                 case (byte)CustomRPC.KataomoiSetTarget:
                     playerId = reader.ReadByte();
                     RPCProcedure.kataomoiSetTarget(playerId);
