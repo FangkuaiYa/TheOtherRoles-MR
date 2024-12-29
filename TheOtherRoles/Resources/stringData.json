@@ -3944,6 +3944,18 @@
         "0": " - bombed by {0}",
         "13": " - \u88ab{0}\u70b8\u6b7b"
     },
+    "Opt-GhostInfo,21": {
+        "0": " - burnt by {0}",
+        "13": " - \u88ab{0}\u70e7\u6b7b"
+    },
+    "Opt-GhostInfo,22": {
+        "0": "   Alive",
+        "13": "   \u5b58\u6d3b"
+    },
+    "Opt-GhostInfo,23": {
+        "0": "   Die  ",
+        "13": "   \u6b7b\u4ea1"
+    },
     "Opt-Medium,5": {
         "0": "Yikes, that Sheriff shot backfired.",
         "13": "\u54ce\u5440\uff0c\u67aa\u8d70\u706b\u4e86\uff01[\u8b66\u957f\u81ea\u6740]."

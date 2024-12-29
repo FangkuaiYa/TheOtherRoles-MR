@@ -169,6 +169,7 @@ namespace TheOtherRoles.Patches
                     {
                         PlayerName = playerControl.Data.PlayerName,
                         Roles = roles,
+                        RoleNames = roleString,
                         TasksTotal = isTaskMasterExTasks ? allTasks : tasksTotal,
                         TasksCompleted = isTaskMasterExTasks ? allTasks : tasksCompleted,
                         ExTasksTotal = isTaskMasterExTasks ? TaskMaster.allExTasks : isTaskMaster ? TaskMasterTaskHelper.GetTaskMasterTasks() : 0,
@@ -697,7 +698,8 @@ namespace TheOtherRoles.Patches
                         roleSummaryText.AppendLine(ModTranslation.GetString("EndGame", 20));
                         foreach (var data in AdditionalTempData.playerRoles)
                         {
-                            var roles = string.Join(" ", data.Roles.Select(x => Helpers.cs(x.color, x.name)));
+                            //var roles = string.Join(" ", data.Roles.Select(x => Helpers.cs(x.color, x.name)));
+                            string roles = data.RoleNames;
                             if (data.IsGuesser) roles += ModTranslation.GetString("EndGame", 21);
                             var taskInfo = data.TasksTotal > 0 ? $"<color=#FAD934FF>({data.TasksCompleted}/{data.TasksTotal})</color>" : "";
                             var killInfo = data.Kills != null ? string.Format(ModTranslation.GetString("EndGame", 22), data.Kills) : "";

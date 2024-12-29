@@ -16,7 +16,7 @@ namespace TheOtherRoles.Modules
         {
             static bool Prefix(ChatController __instance)
             {
-                string text = __instance.TextArea.text;
+                string text = __instance.freeChatField.Text;
                 bool handled = false;
                 if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started)
                 {
@@ -85,8 +85,8 @@ namespace TheOtherRoles.Modules
 
                 if (handled)
                 {
-                    __instance.TextArea.Clear();
-                    __instance.quickChatMenu.ResetGlyphs();
+                    __instance.freeChatField.Clear();
+                    __instance.quickChatMenu.Clear();
                 }
                 return !handled;
             }

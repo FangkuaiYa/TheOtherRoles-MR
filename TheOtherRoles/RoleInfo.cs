@@ -283,6 +283,7 @@ namespace TheOtherRoles
         public static String GetRolesString(PlayerControl p, bool useColors, bool showModifier, bool isDead, bool suppressGhostInfo = false)
         {
             string roleName;
+            string deathReasonString = "";
 
             // Task Vs Mode
             if (TaskRacer.isValid())
@@ -333,7 +334,6 @@ namespace TheOtherRoles
                         // Death Reason on Ghosts
                         if (p.Data.IsDead)
                         {
-                            string deathReasonString = "";
                             var deadPlayer = GameHistory.deadPlayers.FirstOrDefault(x => x.player.PlayerId == p.PlayerId);
 
                             Color killerColor = new();
@@ -376,14 +376,17 @@ namespace TheOtherRoles
                                     case DeadPlayer.CustomDeathReason.Bomb:
                                         deathReasonString = string.Format(ModTranslation.GetString("Opt-GhostInfo", 20), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
                                         break;
+                                    case DeadPlayer.CustomDeathReason.Arson:
+                                        deathReasonString = string.Format(ModTranslation.GetString("Opt-GhostInfo", 21), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                                        break;
                                 }
-                                roleName = roleName + deathReasonString;
+                                //roleName = roleName + aliveOrDie + deathReasonString;
                             }
                         }
                     }
                 }
             }
-            return roleName;
+            return roleName + (p.Data.IsDead ? ModTranslation.GetString("Opt-GhostInfo", 23) : ModTranslation.GetString("Opt-GhostInfo", 22)) + deathReasonString;
         }
     }
 }

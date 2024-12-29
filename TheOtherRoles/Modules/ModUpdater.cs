@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using AmongUs.Data;
+using Assets.InnerNet;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Unity.IL2CPP;
@@ -133,12 +134,10 @@ namespace TheOtherRoles.Modules
 
             var button = Instantiate(template, null);
             var buttonTransform = button.transform;
-            var pos = buttonTransform.localPosition;
-            pos.y += 1.2f;
-            buttonTransform.localPosition = pos;
+            //buttonTransform.localPosition = new Vector3(-2f, -2f);
+            button.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.458f, 0.124f);
 
             PassiveButton passiveButton = button.GetComponent<PassiveButton>();
-            SpriteRenderer buttonSprite = button.GetComponent<SpriteRenderer>();
             passiveButton.OnClick = new Button.ButtonClickedEvent();
             passiveButton.OnClick.AddListener((Action)(() =>
             {
@@ -146,14 +145,14 @@ namespace TheOtherRoles.Modules
                 button.SetActive(false);
             }));
 
-            var text = button.transform.GetChild(0).GetComponent<TMP_Text>();
+            var text = button.transform.GetComponentInChildren<TMPro.TMP_Text>();
             string t = ModTranslation.GetString("Mod-Updater", 1);
             if (TORUpdate is null && SubmergedUpdate is not null) t = SubmergedCompatibility.Loaded ? ModTranslation.GetString("Mod-Updater", 2) : ModTranslation.GetString("Mod-Updater", 3);
 
             StartCoroutine(Effects.Lerp(0.1f, (System.Action<float>)(p => text.SetText(t))));
 
-            buttonSprite.color = text.color = Color.red;
-            passiveButton.OnMouseOut.AddListener((Action)(() => buttonSprite.color = text.color = Color.red));
+            passiveButton.OnMouseOut.AddListener((Action)(() => text.color = Color.red));
+            passiveButton.OnMouseOver.AddListener((Action)(() => text.color = Color.white));
 
             var isSubmerged = TORUpdate == null;
             var mgr = FindObjectOfType<MainMenuManager>(true);
@@ -218,25 +217,43 @@ namespace TheOtherRoles.Modules
 
         private static int announcementNumber = 501;
         [HideFromIl2Cpp]
-        public IEnumerator CoShowAnnouncement(string announcement, bool show = true, string shortTitle = "TOR Update", string date = "")
+        public IEnumerator CoShowAnnouncement(string announcement, bool show = true, string shortTitle = "TOR Update", string title = "", string date = "")
         {
-            var popUp = Instantiate(FindObjectOfType<AnnouncementPopUp>(true));
-            popUp.gameObject.SetActive(show);
-            yield return popUp.Init(show);
+            var mgr = FindObjectOfType<MainMenuManager>(true);
+            var popUpTemplate = UnityEngine.Object.FindObjectOfType<AnnouncementPopUp>(true);
+            if (popUpTemplate == null)
+            {
+                TheOtherRolesPlugin.Logger.LogError("couldnt show credits, popUp is null");
+                yield return null;
+            }
+            var popUp = UnityEngine.Object.Instantiate(popUpTemplate);
 
-            var announcementS = new Assets.InnerNet.Announcement();
-            announcementS.Title = "TOR Announcement";
-            announcementS.Text = announcement;    // Can add clickable urls like this: "[https://www.google.de/]Text[]"
-            announcementS.ShortTitle = shortTitle;
-            announcementS.Id = "torUpdateAnnouncement_" + announcementNumber.ToString();
-            announcementS.Language = 0;
-            announcementS.Number = announcementNumber++;
-            announcementS.SubTitle = "";
-            announcementS.PinState = true;
-            announcementS.Date = date == "" ? DateTime.Today.ToString() : date;
-
-            DataManager.Player.Announcements.allAnnouncements.Insert(0, announcementS);
-            popUp.CreateAnnouncementList();
+            popUp.gameObject.SetActive(true);
+            Assets.InnerNet.Announcement creditsAnnouncement = new()
+            {
+                Id = "torAnnouncement",
+                Language = 0,
+                Number = announcementNumber++,
+                Title = title == "" ? "The Other Roles Announcement" : title,
+                ShortTitle = shortTitle,
+                SubTitle = "",
+                PinState = false,
+                Date = date == "" ? DateTime.Now.Date.ToString() : date,
+                Text = announcement,
+            };
+            mgr.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
+                if (p == 1)
+                {
+                    var backup = DataManager.Player.Announcements.allAnnouncements;
+                    DataManager.Player.Announcements.allAnnouncements = new();
+                    popUp.Init(false);
+                    DataManager.Player.Announcements.SetAnnouncements(new Announcement[] { creditsAnnouncement });
+                    popUp.CreateAnnouncementList();
+                    popUp.UpdateAnnouncementText(creditsAnnouncement.Number);
+                    popUp.visibleAnnouncements[0].PassiveButton.OnClick.RemoveAllListeners();
+                    DataManager.Player.Announcements.allAnnouncements = backup;
+                }
+            })));
         }
 
         [HideFromIl2Cpp]

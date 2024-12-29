@@ -2,6 +2,7 @@
 using HarmonyLib;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
+using TMPro;
 using UnityEngine;
 using static UnityEngine.UI.Button;
 
@@ -32,13 +33,11 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to K3ndo & Smeggy</color></size>";
             {
                 var amongUsLogo = GameObject.Find("bannerLogo_AmongUs");
                 if (amongUsLogo == null) return;
-
                 var credentials = UnityEngine.Object.Instantiate<TMPro.TextMeshPro>(__instance.text);
                 credentials.transform.position = new Vector3(0, 0, 0);
-                credentials.SetText($"{ModTranslation.GetString("Credentials", 3)} v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n<size=30f%>\n</size>{mainMenuCredentials}\n<size=30%>\n</size>{contributorsCredentials}");
+                credentials.SetText($"v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n<size=30f%>\n</size>{mainMenuCredentials}\n<size=30%>\n</size>{contributorsCredentials}");
                 credentials.alignment = TMPro.TextAlignmentOptions.Center;
                 credentials.fontSize *= 0.75f;
-
                 credentials.transform.SetParent(amongUsLogo.transform);
             }
         }
@@ -56,6 +55,7 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to K3ndo & Smeggy</color></size>";
                     var rend = modStamp.AddComponent<SpriteRenderer>();
                     rend.sprite = TheOtherRolesPlugin.GetModStamp();
                     rend.color = new Color(1, 1, 1, 0.5f);
+                    ModManager.Instance.ModStamp.enabled = false;
                     modStamp.transform.parent = __instance.transform.parent;
                     modStamp.transform.localScale *= SubmergedCompatibility.Loaded ? 0 : 0.6f;
                 }
@@ -138,32 +138,55 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to K3ndo & Smeggy</color></size>";
             public static Sprite horseBannerSprite;
             public static Sprite banner2Sprite;
             private static PingTracker instance;
+
+            public static GameObject motdObject;
+            public static TextMeshPro motdText;
+
             static void Postfix(PingTracker __instance)
             {
-                var amongUsLogo = GameObject.Find("bannerLogo_AmongUs");
-                if (amongUsLogo != null)
-                {
-                    amongUsLogo.transform.localScale *= 0.6f;
-                    amongUsLogo.transform.position += Vector3.up * 0.25f;
-                }
-
                 var torLogo = new GameObject("bannerLogo_TOR");
-                torLogo.transform.position = Vector3.up;
+                torLogo.transform.SetParent(GameObject.Find("RightPanel").transform, false);
+                torLogo.transform.localPosition = new Vector3(-0.4f, 1f, 5f);
+
                 renderer = torLogo.AddComponent<SpriteRenderer>();
                 loadSprites();
                 renderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner.png", 300f);
 
                 instance = __instance;
                 loadSprites();
+                // renderer.sprite = TORMapOptions.enableHorseMode ? horseBannerSprite : bannerSprite;
                 renderer.sprite = EventUtility.isEnabled ? banner2Sprite : bannerSprite;
-                // Task Vs Mode
-                TaskRacer.clearAndReload();
+                var credentialObject = new GameObject("credentialsTOR");
+                var credentials = credentialObject.AddComponent<TextMeshPro>();
+                credentials.SetText($"v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n<size=30f%>\n</size>{mainMenuCredentials}\n<size=30%>\n</size>{contributorsCredentials}");
+                credentials.alignment = TMPro.TextAlignmentOptions.Center;
+                credentials.fontSize *= 0.05f;
+
+                credentials.transform.SetParent(torLogo.transform);
+                credentials.transform.localPosition = Vector3.down * 1.25f;
+                motdObject = new GameObject("torMOTD");
+                motdText = motdObject.AddComponent<TextMeshPro>();
+                motdText.alignment = TMPro.TextAlignmentOptions.Center;
+                motdText.fontSize *= 0.04f;
+
+                motdText.transform.SetParent(torLogo.transform);
+                motdText.enableWordWrapping = true;
+                var rect = motdText.gameObject.GetComponent<RectTransform>();
+                rect.sizeDelta = new Vector2(5.2f, 0.25f);
+
+                motdText.transform.localPosition = Vector3.down * 2.25f;
+                motdText.color = new Color(1, 53f / 255, 31f / 255);
+                Material mat = motdText.fontSharedMaterial;
+                mat.shaderKeywords = new string[] { "OUTLINE_ON" };
+                motdText.SetOutlineColor(Color.white);
+                motdText.SetOutlineThickness(0.025f);
             }
 
             public static void loadSprites()
             {
                 if (bannerSprite == null) bannerSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner.png", 300f);
                 if (banner2Sprite == null) banner2Sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner2.png", 300f);
+                if (horseBannerSprite == null) horseBannerSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.bannerTheHorseRoles.png", 300f);
             }
 
             public static void updateSprite()
@@ -172,14 +195,12 @@ $@"<size=60%> <color=#FCCE03FF>Special thanks to K3ndo & Smeggy</color></size>";
                 if (renderer != null)
                 {
                     float fadeDuration = 1f;
-                    instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) =>
-                    {
+                    instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) => {
                         renderer.color = new Color(1, 1, 1, 1 - p);
                         if (p == 1)
                         {
                             renderer.sprite = TORMapOptions.enableHorseMode ? horseBannerSprite : bannerSprite;
-                            instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) =>
-                            {
+                            instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) => {
                                 renderer.color = new Color(1, 1, 1, p);
                             })));
                         }

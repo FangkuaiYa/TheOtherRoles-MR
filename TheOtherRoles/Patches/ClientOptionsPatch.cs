@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using HarmonyLib;
 using TheOtherRoles.Utilities;
 using TMPro;
@@ -248,7 +249,7 @@ namespace TheOtherRoles.Patches
         static SelectionBehaviour nextPresetPageInfo = null;
         static SelectionBehaviour createNewPresetInfo = null;
         static GameObject createNewPresetPopUp = null;
-        static EditName createNewPresetEditName = null;
+        public static EditName createNewPresetEditName = null;
         static GameObject renamePresetPopUp = null;
         static EditName renamePresetEditName = null;
 
@@ -526,7 +527,6 @@ namespace TheOtherRoles.Patches
             createNewPresetInfo = new SelectionBehaviour(new TranslationInfo("MainMenu", 11), () => { return OnCreateNewPreset(); });
             prevPresetPageInfo = new SelectionBehaviour(new TranslationInfo("MainMenu", 12), () => { return OnPrevPresetPage(); });
             nextPresetPageInfo = new SelectionBehaviour(new TranslationInfo("MainMenu", 13), () => { return OnNextPresetPage(); });
-
             UpdatePresetButtons();
 
             presetInfoPageNow = 1;
@@ -539,6 +539,9 @@ namespace TheOtherRoles.Patches
                 isOpenPreset = false;
                 presetTabInfo.Select();
             }
+            OnCreateNewPreset();
+            Thread.Sleep(1);
+            createNewPresetEditName.Close();
         }
 
         static void UpdateOptionContents()
@@ -590,7 +593,7 @@ namespace TheOtherRoles.Patches
             nextPresetPageInfo.Initialize(presetButtonDesc);
         }
 
-        static bool OnCreateNewPreset()
+        public static bool OnCreateNewPreset()
         {
             if (createNewPresetPopUp)
             {
