@@ -144,7 +144,7 @@ namespace TheOtherRoles.Patches
                     int addCount = roleCount - roleCountMax;
                     string text = addCount.ToString();
                     if (isJapanese)
-                        text = Regex.Replace(text, "[0-9]", p => ((char)(p.Value[0] - '0' + '‚O')).ToString());
+                        text = Regex.Replace(text, "[0-9]", p => ((char)(p.Value[0] - '0' + '9')).ToString());
                     description += string.Format(ModTranslation.GetString("MainMenu", 17), text);
                 }
                 else if (roleCount == 0)
