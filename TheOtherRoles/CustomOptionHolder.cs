@@ -828,14 +828,14 @@ namespace TheOtherRoles
             portalmakerCanPortalFromAnywhere = CustomOption.Create(395, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 5), true, portalmakerSpawnRate);
 
             securityGuardSpawnRate = CustomOption.Create(280, Types.Crewmate, new TranslationInfo(RoleId.SecurityGuard, SecurityGuard.color), rates, null, true);
-            securityGuardCooldown = CustomOption.Create(281, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 1), 30f, 10f, 60f, 2.5f, securityGuardSpawnRate);
-            securityGuardTotalScrews = CustomOption.Create(282, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 2), 7f, 1f, 15f, 1f, securityGuardSpawnRate);
-            securityGuardCamPrice = CustomOption.Create(283, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 3), 2f, 1f, 15f, 1f, securityGuardSpawnRate);
-            securityGuardVentPrice = CustomOption.Create(284, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 4), 1f, 1f, 15f, 1f, securityGuardSpawnRate);
-            securityGuardCamDuration = CustomOption.Create(285, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 5), 10f, 2.5f, 60f, 2.5f, securityGuardSpawnRate);
-            securityGuardCamMaxCharges = CustomOption.Create(286, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 6), 5f, 1f, 30f, 1f, securityGuardSpawnRate);
-            securityGuardCamRechargeTasksNumber = CustomOption.Create(287, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 7), 3f, 1f, 10f, 1f, securityGuardSpawnRate);
-            securityGuardNoMove = CustomOption.Create(288, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 8), true, securityGuardSpawnRate);
+            securityGuardCooldown = CustomOption.Create(281, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 1), 30f, 10f, 60f, 2.5f, securityGuardSpawnRate);
+            securityGuardTotalScrews = CustomOption.Create(282, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 2), 7f, 1f, 15f, 1f, securityGuardSpawnRate);
+            securityGuardCamPrice = CustomOption.Create(283, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 3), 2f, 1f, 15f, 1f, securityGuardSpawnRate);
+            securityGuardVentPrice = CustomOption.Create(284, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 4), 1f, 1f, 15f, 1f, securityGuardSpawnRate);
+            securityGuardCamDuration = CustomOption.Create(285, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 5), 10f, 2.5f, 60f, 2.5f, securityGuardSpawnRate);
+            securityGuardCamMaxCharges = CustomOption.Create(286, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 6), 5f, 1f, 30f, 1f, securityGuardSpawnRate);
+            securityGuardCamRechargeTasksNumber = CustomOption.Create(287, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 7), 3f, 1f, 10f, 1f, securityGuardSpawnRate);
+            securityGuardNoMove = CustomOption.Create(288, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 8), true, securityGuardSpawnRate);
 
             mediumSpawnRate = CustomOption.Create(360, Types.Crewmate, new TranslationInfo(RoleId.Medium, Medium.color), rates, null, true);
             mediumCooldown = CustomOption.Create(361, Types.Crewmate, new TranslationInfo("Opt-Medium", 1), 30f, 5f, 120f, 5f, mediumSpawnRate);
