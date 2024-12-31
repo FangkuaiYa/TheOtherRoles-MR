@@ -137,6 +137,8 @@ namespace TheOtherRoles
 
             BasicOptions.Init();
             InheritCustomPreset();
+
+            TheOtherRolesPlugin.Logger.LogInfo("Loading TOR completed!");
         }
 
         public static void InheritCustomPreset()

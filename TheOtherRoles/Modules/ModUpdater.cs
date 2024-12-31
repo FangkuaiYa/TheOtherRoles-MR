@@ -259,6 +259,9 @@ namespace TheOtherRoles.Modules
         [HideFromIl2Cpp]
         public static IEnumerator CoCheckUpdates()
         {
+            // Since running the update check task causes a crash for some users, allow the user to disable the updater by creating a file called noupdater.txt
+            // in their Among Us folder (root)
+            if (Il2CppSystem.IO.File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\noupdater.txt")) yield break;
             var torUpdateCheck = Task.Run(() => Instance.GetGithubUpdate("miru-y", "TheOtherRoles-MR"));
             while (!torUpdateCheck.IsCompleted) yield return null;
             if (torUpdateCheck.Result != null && torUpdateCheck.Result.IsNewer(Version.Parse(TheOtherRolesPlugin.VersionString)))
