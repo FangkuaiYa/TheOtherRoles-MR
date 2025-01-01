@@ -11,6 +11,7 @@ using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
+using TMPro;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 using static TheOtherRoles.TORMapOptions;
@@ -189,18 +190,30 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.BloopAVoteIcon))]
         class MeetingHudBloopAVoteIconPatch
         {
-            public static bool Prefix(MeetingHud __instance, [HarmonyArgument(0)] GameData.PlayerInfo voterPlayer, [HarmonyArgument(1)] int index, [HarmonyArgument(2)] Transform parent)
+            public static bool Prefix(MeetingHud __instance, GameData.PlayerInfo voterPlayer, int index, Transform parent)
             {
-                SpriteRenderer spriteRenderer = UnityEngine.Object.Instantiate<SpriteRenderer>(__instance.PlayerVotePrefab);
-                int cId = voterPlayer.DefaultOutfit.ColorId;
-                if (!(!GameOptionsManager.Instance.currentNormalGameOptions.AnonymousVotes || (CachedPlayer.LocalPlayer.Data.IsDead && TORMapOptions.ghostsSeeVotes) || Mayor.mayor != null && CachedPlayer.LocalPlayer.PlayerControl == Mayor.mayor && Mayor.canSeeVoteColors && TasksHandler.taskInfo(CachedPlayer.LocalPlayer.Data).Item1 >= Mayor.tasksNeededToSeeVoteColors))
-                    voterPlayer.Object.SetColor(6);
-                voterPlayer.Object.SetPlayerMaterialColors(spriteRenderer);
-                spriteRenderer.transform.SetParent(parent);
-                spriteRenderer.transform.localScale = Vector3.zero;
-                __instance.StartCoroutine(Effects.Bloop((float)index * 0.3f, spriteRenderer.transform, 1f, 0.5f));
+                var spriteRenderer = UnityEngine.Object.Instantiate<SpriteRenderer>(__instance.PlayerVotePrefab);
+                var showVoteColors = !GameManager.Instance.LogicOptions.GetAnonymousVotes() ||
+                                      (CachedPlayer.LocalPlayer.Data.IsDead && TORMapOptions.ghostsSeeVotes) ||
+                                      (Mayor.mayor != null && Mayor.mayor == CachedPlayer.LocalPlayer.PlayerControl && Mayor.canSeeVoteColors && TasksHandler.taskInfo(CachedPlayer.LocalPlayer.Data).Item1 >= Mayor.tasksNeededToSeeVoteColors);
+                if (showVoteColors)
+                {
+                    PlayerMaterial.SetColors(voterPlayer.DefaultOutfit.ColorId, spriteRenderer);
+                }
+                else
+                {
+                    PlayerMaterial.SetColors(Palette.DisabledGrey, spriteRenderer);
+                }
+                var transform = spriteRenderer.transform;
+                transform.SetParent(parent);
+                transform.localScale = Vector3.zero;
+                var component = parent.GetComponent<PlayerVoteArea>();
+                if (component != null)
+                {
+                    spriteRenderer.material.SetInt(PlayerMaterial.MaskLayer, component.MaskLayer);
+                }
+                __instance.StartCoroutine(Effects.Bloop(index * 0.3f, transform));
                 parent.GetComponent<VoteSpreader>().AddVote(spriteRenderer);
-                voterPlayer.Object.SetColor(cId);
                 return false;
             }
         }
@@ -208,8 +221,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.PopulateResults))]
         class MeetingHudPopulateVotesPatch
         {
-
-            static bool Prefix(MeetingHud __instance, Il2CppStructArray<MeetingHud.VoterState> states)
+            private static bool Prefix(MeetingHud __instance, Il2CppStructArray<MeetingHud.VoterState> states)
             {
                 // Swapper swap
 
@@ -638,7 +650,7 @@ namespace TheOtherRoles.Patches
             if (YasunaJr.yasunaJr != null && YasunaJr.yasunaJr.Data.IsDead) return;
             if (!(__instance.state == MeetingHud.VoteStates.Voted || __instance.state == MeetingHud.VoteStates.NotVoted)) return;
             if (__instance.playerStates[buttonTarget].AmDead) return;
-            SoundManager.Instance.PlaySound(ModUpdateBehaviour.selectSfx, false, 1f, null).volume = 0.8f;
+            SoundManager.Instance.PlaySound(AccountManager.Instance.accountTab.resendEmailButton.GetComponent<PassiveButton>().ClickSound, false, 1f, null).volume = 0.8f;
             for (int i = 0; i < __instance.playerStates.Length; i++)
             {
                 PlayerVoteArea voteArea = __instance.playerStates[i];
@@ -791,14 +803,6 @@ namespace TheOtherRoles.Patches
                 })));
             }
 
-            //Fix visor in Meetings 
-            /**
-            foreach (PlayerVoteArea pva in __instance.playerStates) {
-                if(pva.PlayerIcon != null && pva.PlayerIcon.VisorSlot != null){
-                    pva.PlayerIcon.VisorSlot.transform.position += new Vector3(0, 0, -1f);
-                }
-            } */
-
             bool isGuesser = HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerId);
 
             // Add overlay for spelled players
@@ -943,11 +947,12 @@ namespace TheOtherRoles.Patches
                     // Reset Bait list
                     Bait.active = new Dictionary<DeadPlayer, float>();
                     // Save AntiTeleport position, if the player is able to move (i.e. not on a ladder or a gap thingy)
-                    if (CachedPlayer.LocalPlayer.PlayerPhysics.enabled && CachedPlayer.LocalPlayer.PlayerControl.moveable || CachedPlayer.LocalPlayer.PlayerControl.inVent
+                    if (CachedPlayer.LocalPlayer.PlayerPhysics.enabled && (CachedPlayer.LocalPlayer.PlayerControl.moveable || CachedPlayer.LocalPlayer.PlayerControl.inVent
                         || HudManagerStartPatch.hackerVitalsButton.isEffectActive || HudManagerStartPatch.hackerAdminTableButton.isEffectActive || HudManagerStartPatch.securityGuardCamButton.isEffectActive
-                        || Portal.isTeleporting && Portal.teleportedPlayers.Last().playerId == CachedPlayer.LocalPlayer.PlayerId)
+                    || Portal.isTeleporting && Portal.teleportedPlayers.Last().playerId == CachedPlayer.LocalPlayer.PlayerId))
                     {
-                        AntiTeleport.position = CachedPlayer.LocalPlayer.transform.position;
+                        if (!CachedPlayer.LocalPlayer.PlayerControl.inMovingPlat)
+                            AntiTeleport.position = CachedPlayer.LocalPlayer.transform.position;
                     }
 
                     // Medium meeting start time
@@ -1021,7 +1026,7 @@ namespace TheOtherRoles.Patches
 
                 {
                     bool flag = target == null;
-                    DestroyableSingleton<Telemetry>.Instance.WriteMeetingStarted(flag);
+                    DestroyableSingleton<UnityTelemetry>.Instance.WriteMeetingStarted(flag);
                     StartMeeting(__instance, target);
                     if (__instance.AmOwner)
                     {
@@ -1224,6 +1229,34 @@ namespace TheOtherRoles.Patches
                 ControllerManager.Instance.AddSelectableUiElement(playerVoteArea2.PlayerButton, false);
             }
             __instance.SortButtons();
+        }
+        [HarmonyPatch]
+        public class ShowHost
+        {
+            private static TextMeshPro Text = null;
+            [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
+            [HarmonyPostfix]
+            public static void Setup(MeetingHud __instance)
+            {
+                if (AmongUsClient.Instance.NetworkMode != NetworkModes.OnlineGame) return;
+                __instance.ProceedButton.gameObject.transform.localPosition = new(-2.5f, 2.2f, 0);
+                __instance.ProceedButton.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+                __instance.ProceedButton.GetComponent<PassiveButton>().enabled = false;
+                __instance.HostIcon.gameObject.SetActive(true);
+                __instance.ProceedButton.gameObject.SetActive(true);
+            }
+            [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Update))]
+            [HarmonyPostfix]
+            public static void Postfix(MeetingHud __instance)
+            {
+                var host = GameData.Instance.GetHost();
+                if (host != null)
+                {
+                    PlayerMaterial.SetColors(host.DefaultOutfit.ColorId, __instance.HostIcon);
+                    if (Text == null) Text = __instance.ProceedButton.gameObject.GetComponentInChildren<TextMeshPro>();
+                    Text.text = $"{ModTranslation.GetString("Credentials", 8)}: {host.PlayerName}";
+                }
+            }
         }
     }
 }

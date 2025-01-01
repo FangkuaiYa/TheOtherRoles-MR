@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using HarmonyLib;
+using Hazel;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 
@@ -22,7 +23,7 @@ namespace TheOtherRoles.Modules
                 {
                     if (text.ToLower().StartsWith("/kick "))
                     {
-                        string playerName = text.Substring(6);
+                        string playerName = text.Substring(5);
                         PlayerControl target = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data.PlayerName.Equals(playerName));
                         if (target != null && AmongUsClient.Instance != null && AmongUsClient.Instance.CanBan())
                         {
@@ -47,6 +48,37 @@ namespace TheOtherRoles.Modules
                                 handled = true;
                             }
                         }
+                    }
+                    else if (text.ToLower().StartsWith("/gm"))
+                    {
+                        string gm = text.Substring(4).ToLower();
+                        CustomGamemodes gameMode = CustomGamemodes.Classic;
+                        if (gm.StartsWith("prop") || gm.StartsWith("ph"))
+                        {
+                            gameMode = CustomGamemodes.PropHunt;
+                        }
+                        else if (gm.StartsWith("guess") || gm.StartsWith("gm"))
+                        {
+                            gameMode = CustomGamemodes.Guesser;
+                        }
+                        else if (gm.StartsWith("hide") || gm.StartsWith("hn"))
+                        {
+                            gameMode = CustomGamemodes.HideNSeek;
+                        }
+                        // else its classic!
+                        if (AmongUsClient.Instance.AmHost)
+                        {
+                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGamemode, Hazel.SendOption.Reliable, -1);
+                            writer.Write((byte)TORMapOptions.gameMode);
+                            AmongUsClient.Instance.FinishRpcImmediately(writer);
+                            RPCProcedure.shareGamemode((byte)gameMode);
+                            RPCProcedure.shareGamemode((byte)TORMapOptions.gameMode);
+                        }
+                        else
+                        {
+                            __instance.AddChat(CachedPlayer.LocalPlayer.PlayerControl, ModTranslation.GetString("GameStart", 10));
+                        }
+                        handled = true;
                     }
                 }
 

@@ -17,6 +17,7 @@ using Hazel;
 using Il2CppSystem.Security.Cryptography;
 using Il2CppSystem.Text;
 using TheOtherRoles.Modules;
+using TheOtherRoles.Modules.CustomHats;
 using TheOtherRoles.Patches;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
@@ -55,6 +56,7 @@ namespace TheOtherRoles
         public static ConfigEntry<bool> ShowLighterDarker { get; set; }
         public static ConfigEntry<bool> EnableSoundEffects { get; set; }
         public static ConfigEntry<bool> EnableHorseMode { get; set; }
+        public static ConfigEntry<bool> ShowVentsOnMap { get; set; }
         public static ConfigEntry<string> Ip { get; set; }
         public static ConfigEntry<ushort> Port { get; set; }
         public static ConfigEntry<string> ShowPopUpVersion { get; set; }
@@ -93,7 +95,6 @@ namespace TheOtherRoles
                 Logger.LogDebug("Resetting previous region");
                 serverManager.SetRegion(currentRegion);
             }
-            Modules.MainMenuPatch.addSceneChangeCallbacks();
         }
 
         public override void Load()
@@ -114,6 +115,7 @@ namespace TheOtherRoles
             EnableSoundEffects = Config.Bind("Custom", "Enable Sound Effects", true);
             EnableHorseMode = Config.Bind("Custom", "Enable Horse Mode", false);
             ShowPopUpVersion = Config.Bind("Custom", "Show PopUp", "0");
+            ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", false);
 
             Ip = Config.Bind("Custom", "Custom Server IP", "127.0.0.1");
             Port = Config.Bind("Custom", "Custom Server Port", (ushort)22023);
@@ -124,6 +126,7 @@ namespace TheOtherRoles
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             Harmony.PatchAll();
 
+            CustomHatManager.LoadHats();
             CustomOptionHolder.Load();
             CustomColors.Load();
 
@@ -132,13 +135,14 @@ namespace TheOtherRoles
                 AddComponent<BepInExUpdater>();
                 return;
             }
+            AddComponent<ModUpdater>();
             EventUtility.Load();
             SubmergedCompatibility.Initialize();
-            AddComponent<ModUpdateBehaviour>();
-
+            AddComponent<ModUpdater>();
+            MainMenuPatch.addSceneChangeCallbacks();
             BasicOptions.Init();
             InheritCustomPreset();
-
+            AddToKillDistanceSetting.addKillDistance();
             TheOtherRolesPlugin.Logger.LogInfo("Loading TOR completed!");
         }
 

@@ -81,6 +81,7 @@ namespace TheOtherRoles
         public static RoleInfo ninja = new RoleInfo(Ninja.color, RoleId.Ninja);
         public static RoleInfo thief = new RoleInfo(Thief.color, RoleId.Thief, true);
         public static RoleInfo bomber = new RoleInfo(Bomber.color, RoleId.Bomber);
+        public static RoleInfo yoyo = new RoleInfo(Yoyo.color, RoleId.Yoyo);
 
         public static RoleInfo hunter = new RoleInfo(Palette.ImpostorRed, RoleId.Impostor, false, false, ModTranslation.GetRoleName(RoleId.Hunter, Palette.ImpostorRed), ModTranslation.GetRoleIntroDesc(RoleId.Hunter, Palette.ImpostorRed), ModTranslation.GetRoleShortDesc(RoleId.Hunter, Palette.ImpostorRed));
         public static RoleInfo hunted = new RoleInfo(Color.white, RoleId.Crewmate, false, false, ModTranslation.GetRoleName(RoleId.Hunted, Color.white), ModTranslation.GetRoleIntroDesc(RoleId.Hunted, Color.white), ModTranslation.GetRoleShortDesc(RoleId.Hunted, Color.white));
@@ -146,6 +147,7 @@ namespace TheOtherRoles
             mayor,
             portalmaker,
             engineer,
+            yoyo,
             sheriff,
             deputy,
             lighter,
@@ -234,6 +236,7 @@ namespace TheOtherRoles
             if (p == Witch.witch) infos.Add(witch);
             if (p == Ninja.ninja) infos.Add(ninja);
             if (p == Bomber.bomber) infos.Add(bomber);
+            if (p == Yoyo.yoyo) infos.Add(yoyo);
             if (p == Detective.detective) infos.Add(detective);
             if (p == TimeMaster.timeMaster) infos.Add(timeMaster);
             if (p == Medic.medic) infos.Add(medic);

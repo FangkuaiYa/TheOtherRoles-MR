@@ -1,14 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using HarmonyLib;
 using TheOtherRoles.Utilities;
 
 namespace TheOtherRoles.Patches
 {
-    [HarmonyPatch(typeof(NormalPlayerTask), nameof(NormalPlayerTask.PickRandomConsoles))]
-    class NormalPlayerTaskPatch
+    public class PatchInstaller
     {
-        static void Postfix(NormalPlayerTask __instance, TaskTypes taskType, byte[] consoleIds)
+        public void Install()
+        {
+            var harmony = new Harmony("com.example.patch");
+            var method = typeof(NormalPlayerTask).GetMethod(nameof(NormalPlayerTask.PickRandomConsoles), BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(TaskTypes), typeof(byte[]) }, null);
+            harmony.Patch(method, postfix: new HarmonyMethod(typeof(NormalPlayerTaskPatch).GetMethod(nameof(NormalPlayerTaskPatch.Postfix))));
+        }
+    }
+    public class NormalPlayerTaskPatch
+    {
+        public static void Postfix(NormalPlayerTask __instance, TaskTypes taskType, byte[] consoleIds)
         {
             if (!CustomOptionHolder.enableRandomizationInFixWiringTask.getBool() || taskType != TaskTypes.FixWiring)
             {

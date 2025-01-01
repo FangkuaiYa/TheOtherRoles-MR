@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AmongUs.GameOptions;
+using Assets.CoreScripts;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Hazel;
@@ -83,14 +84,8 @@ namespace TheOtherRoles.Patches
                 bool isMorphedMorphling = target == Morphling.morphling && Morphling.morphTarget != null && Morphling.morphTimer > 0f;
                 bool hasVisibleShield = false;
                 Color color = Medic.shieldedColor;
-                if (Camouflager.camouflageTimer <= 0f && Medic.shielded != null && ((target == Medic.shielded && !isMorphedMorphling) || (isMorphedMorphling && Morphling.morphTarget == Medic.shielded)))
-                {
-                    hasVisibleShield = Medic.showShielded == 0 || Helpers.shouldShowGhostInfo() // Everyone or Ghost info
-                        || (Medic.showShielded == 1 && (CachedPlayer.LocalPlayer.PlayerControl == Medic.shielded || CachedPlayer.LocalPlayer.PlayerControl == Medic.medic)) // Shielded + Medic
-                        || (Medic.showShielded == 2 && CachedPlayer.LocalPlayer.PlayerControl == Medic.medic); // Medic only
-                                                                                                               // Make shield invisible till after the next meeting if the option is set (the medic can already see the shield)
-                    hasVisibleShield = hasVisibleShield && (Medic.meetingAfterShielding || !Medic.showShieldAfterMeeting || CachedPlayer.LocalPlayer.PlayerControl == Medic.medic || Helpers.shouldShowGhostInfo());
-                }
+                if (Camouflager.camouflageTimer <= 0f && !Helpers.MushroomSabotageActive() && Medic.shieldVisible(target))
+                    hasVisibleShield = true;
 
                 if (Camouflager.camouflageTimer <= 0f && TORMapOptions.firstKillPlayer != null && TORMapOptions.shieldFirstKill && ((target == TORMapOptions.firstKillPlayer && !isMorphedMorphling) || (isMorphedMorphling && Morphling.morphTarget == TORMapOptions.firstKillPlayer)))
                 {
@@ -107,6 +102,15 @@ namespace TheOtherRoles.Patches
                 {
                     target.cosmetics.currentBodySprite.BodySprite.material.SetFloat("_Outline", 0f);
                 }
+            }
+        }
+        static void setPetVisibility()
+        {
+            bool localalive = !CachedPlayer.LocalPlayer.Data.IsDead;
+            foreach (var player in CachedPlayer.AllPlayers)
+            {
+                bool playeralive = !player.Data.IsDead;
+                player.PlayerControl.cosmetics.SetPetVisible((localalive && playeralive) || !localalive);
             }
         }
 
@@ -487,10 +491,11 @@ namespace TheOtherRoles.Patches
                 if (Tracker.tracker == null || CachedPlayer.LocalPlayer.PlayerControl != Tracker.tracker)
                 {
                     Tracker.arrow.arrow.SetActive(false);
+                    if (Tracker.DangerMeterParent) Tracker.DangerMeterParent.SetActive(false);
                     return;
                 }
 
-                if (Tracker.tracker != null && Tracker.tracked != null && CachedPlayer.LocalPlayer.PlayerControl == Tracker.tracker && !Tracker.tracker.Data.IsDead)
+                if (Tracker.tracked != null && !Tracker.tracker.Data.IsDead)
                 {
                     Tracker.timeUntilUpdate -= Time.fixedDeltaTime;
 
@@ -508,14 +513,23 @@ namespace TheOtherRoles.Patches
                             }
                         }
 
-                        Tracker.arrow.Update(position);
-                        Tracker.arrow.arrow.SetActive(trackedOnMap);
+                        if (Tracker.trackingMode == 1 || Tracker.trackingMode == 2) Arrow.UpdateProximity(position);
+                        if (Tracker.trackingMode == 0 || Tracker.trackingMode == 2)
+                        {
+                            Tracker.arrow.Update(position);
+                            Tracker.arrow.arrow.SetActive(trackedOnMap);
+                        }
                         Tracker.timeUntilUpdate = Tracker.updateIntervall;
                     }
                     else
                     {
-                        Tracker.arrow.Update();
+                        if (Tracker.trackingMode == 0 || Tracker.trackingMode == 2) Tracker.arrow.Update();
                     }
+                }
+                else if (Tracker.tracker.Data.IsDead)
+                {
+                    Tracker.DangerMeterParent?.SetActive(false);
+                    Tracker.Meter?.gameObject.SetActive(false);
                 }
             }
 
@@ -558,7 +572,7 @@ namespace TheOtherRoles.Patches
             collider.offset = Mini.defaultColliderOffset * Vector2.down;
 
             // Set adapted player size to Mini and Morphling
-            if (Mini.mini == null || Camouflager.camouflageTimer > 0f || Mini.mini == Morphling.morphling && Morphling.morphTimer > 0) return;
+            if (Mini.mini == null || Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive() || Mini.mini == Morphling.morphling && Morphling.morphTimer > 0) return;
 
             float growingProgress = Mini.growingProgress();
             float scale = growingProgress * 0.35f + 0.35f;
@@ -946,13 +960,18 @@ namespace TheOtherRoles.Patches
             Medium.target = target;
         }
 
+        static bool mushroomSaboWasActive = false;
         static void morphlingAndCamouflagerUpdate()
         {
+            bool mushRoomSaboIsActive = Helpers.MushroomSabotageActive();
+            if (!mushroomSaboWasActive) mushroomSaboWasActive = mushRoomSaboIsActive;
+
             float oldCamouflageTimer = Camouflager.camouflageTimer;
             float oldMorphTimer = Morphling.morphTimer;
             Camouflager.camouflageTimer = Mathf.Max(0f, Camouflager.camouflageTimer - Time.fixedDeltaTime);
             Morphling.morphTimer = Mathf.Max(0f, Morphling.morphTimer - Time.fixedDeltaTime);
 
+            if (mushRoomSaboIsActive) return;
 
             // Camouflage reset and set Morphling look if necessary
             if (oldCamouflageTimer > 0f && Camouflager.camouflageTimer <= 0f)
@@ -965,9 +984,25 @@ namespace TheOtherRoles.Patches
                 }
             }
 
+            // If the MushRoomSabotage ends while Morph is still active set the Morphlings look to the target's look
+            if (mushroomSaboWasActive)
+            {
+                if (Morphling.morphTimer > 0f && Morphling.morphling != null && Morphling.morphTarget != null)
+                {
+                    PlayerControl target = Morphling.morphTarget;
+                    Morphling.morphling.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
+                }
+                if (Camouflager.camouflageTimer > 0)
+                {
+                    foreach (PlayerControl player in CachedPlayer.AllPlayers)
+                        player.setLook("", 6, "", "", "", "");
+                }
+            }
+
             // Morphling reset (only if camouflage is inactive)
             if (Camouflager.camouflageTimer <= 0f && oldMorphTimer > 0f && Morphling.morphTimer <= 0f && Morphling.morphling != null)
                 Morphling.resetMorph();
+            mushroomSaboWasActive = false;
         }
 
         public static void lawyerUpdate()
@@ -1279,6 +1314,8 @@ namespace TheOtherRoles.Patches
 
                 // Update Player Info
                 updatePlayerInfo();
+                //Update pet visibility
+                setPetVisibility();
 
                 // Time Master
                 bendTimeUpdate();
@@ -1352,6 +1389,8 @@ namespace TheOtherRoles.Patches
                 ninjaUpdate();
                 // Thief
                 thiefSetTarget();
+                // yoyo
+                Silhouette.UpdateAll();
                 hackerUpdate();
                 swapperUpdate();
                 // Trapper
@@ -1470,7 +1509,7 @@ namespace TheOtherRoles.Patches
                         }
                         if (msg.IndexOf("who", StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            FastDestroyableSingleton<Assets.CoreScripts.Telemetry>.Instance.SendWho();
+                            FastDestroyableSingleton<UnityTelemetry>.Instance.SendWho();
                         }
                     }
                 }
@@ -1754,9 +1793,8 @@ namespace TheOtherRoles.Patches
         static void MurderPlayerEx(PlayerControl __instance, PlayerControl target)
         {
             GameData.PlayerInfo data = target.Data;
-            if (target.protectedByGuardian)
+            if (target.protectedByGuardianThisRound)
             {
-                target.protectedByGuardianThisRound = true;
                 bool flag = PlayerControl.LocalPlayer.Data.Role.Role == RoleTypes.GuardianAngel;
                 if (__instance.AmOwner || flag)
                 {
@@ -1789,7 +1827,7 @@ namespace TheOtherRoles.Patches
                     }
                     __instance.SetKillTimer(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown);
                 }
-                DestroyableSingleton<Assets.CoreScripts.Telemetry>.Instance.WriteMurder();
+                DestroyableSingleton<UnityTelemetry>.Instance.WriteMurder();
                 target.gameObject.layer = LayerMask.NameToLayer("Ghost");
                 if (target.AmOwner)
                 {
@@ -2028,12 +2066,14 @@ namespace TheOtherRoles.Patches
     {
         public static void Postfix(PlayerPhysics __instance)
         {
+            bool shouldInvert = Invert.invert.FindAll(x => x.PlayerId == CachedPlayer.LocalPlayer.PlayerId).Count > 0 && Invert.meetings > 0;
             if (__instance.AmOwner &&
                 AmongUsClient.Instance &&
                 AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started &&
                 !CachedPlayer.LocalPlayer.Data.IsDead &&
                 Invert.invert.FindAll(x => x.PlayerId == CachedPlayer.LocalPlayer.PlayerId).Count > 0 &&
                 Invert.meetings > 0 &&
+                shouldInvert &&
                 GameData.Instance &&
                 __instance.myPlayer.CanMove)
                 __instance.body.velocity *= -1;

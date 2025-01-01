@@ -25,6 +25,7 @@ namespace TheOtherRoles.Patches
             new SelectionBehaviour(new TranslationInfo("MainMenu", 6), () => TORMapOptions.showRoleSummary = TheOtherRolesPlugin.ShowRoleSummary.Value = !TheOtherRolesPlugin.ShowRoleSummary.Value, TheOtherRolesPlugin.ShowRoleSummary.Value),
             new SelectionBehaviour(new TranslationInfo("MainMenu", 7), () => TORMapOptions.showLighterDarker = TheOtherRolesPlugin.ShowLighterDarker.Value = !TheOtherRolesPlugin.ShowLighterDarker.Value, TheOtherRolesPlugin.ShowLighterDarker.Value),
             new SelectionBehaviour(new TranslationInfo("MainMenu", 8), () => TORMapOptions.enableSoundEffects = TheOtherRolesPlugin.EnableSoundEffects.Value = !TheOtherRolesPlugin.EnableSoundEffects.Value, TheOtherRolesPlugin.EnableSoundEffects.Value),
+            new SelectionBehaviour(new TranslationInfo("MainMenu", 29), () => TORMapOptions.ShowVentsOnMap = TheOtherRolesPlugin.ShowVentsOnMap.Value = !TheOtherRolesPlugin.ShowVentsOnMap.Value, TheOtherRolesPlugin.ShowVentsOnMap.Value),
         };
 
         public static bool isOpenPreset = false;
@@ -121,8 +122,8 @@ namespace TheOtherRoles.Patches
             {
                 string description = "";
                 int roleCount = 0;
-                bool isJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese;
-                int roleCountMax = isJapanese ? 6 : 8;
+                bool isSChineseJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese || AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.SChinese;
+                int roleCountMax = isSChineseJapanese ? 6 : 8;
                 foreach (var option in CustomOption.options)
                 {
                     if (option.id == 0) continue;
@@ -144,8 +145,6 @@ namespace TheOtherRoles.Patches
                 {
                     int addCount = roleCount - roleCountMax;
                     string text = addCount.ToString();
-                    if (isJapanese)
-                        text = Regex.Replace(text, "[0-9]", p => ((char)(p.Value[0] - '0' + '9')).ToString());
                     description += string.Format(ModTranslation.GetString("MainMenu", 17), text);
                 }
                 else if (roleCount == 0)
@@ -395,12 +394,14 @@ namespace TheOtherRoles.Patches
 
         static void OnMoreButton(OptionsMenuBehaviour __instance)
         {
+            bool closeUnderlying = false;
             if (!popUp) return;
 
             if (__instance.transform.parent && __instance.transform.parent == FastDestroyableSingleton<HudManager>.Instance.transform)
             {
                 popUp.transform.SetParent(FastDestroyableSingleton<HudManager>.Instance.transform);
                 popUp.transform.localPosition = new Vector3(0, 0, -800f);
+                closeUnderlying = true;
             }
             else
             {
@@ -409,6 +410,8 @@ namespace TheOtherRoles.Patches
             }
 
             RefreshOpen();
+            if (closeUnderlying)
+                __instance.Close();
         }
 
         static void SetUpOptions()
@@ -429,7 +432,7 @@ namespace TheOtherRoles.Patches
             }
             tabObservable.Clear();
 
-            bool isJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese;
+            bool isSChineseJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese || AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.SChinese;
 
             // Tab
             tabDesc = new SelectionBehaviour.InitDesc();
@@ -479,6 +482,7 @@ namespace TheOtherRoles.Patches
             presetTitle.GetComponent<RectTransform>().localPosition = new Vector3(0, 1.8f, -.5f);
             presetTitle.gameObject.SetActive(true);
             presetTitle.name = "PresetTitleText";
+            presetTitle.text = "";
 
             // Preset Contents
             // List
@@ -489,7 +493,7 @@ namespace TheOtherRoles.Patches
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            string[] fileNames = Directory.GetFiles(dir, "*.csv");
+            string[] fileNames = Directory.GetFiles(dir, $"*.csv");
             foreach (string path in fileNames)
             {
                 using (var sr = new StreamReader(path, Encoding.UTF8))
@@ -539,20 +543,21 @@ namespace TheOtherRoles.Patches
                 isOpenPreset = false;
                 presetTabInfo.Select();
             }
-            Thread.Sleep(10);
 
             OnCreateNewPreset();
-            Thread.Sleep(2);
+            Thread.Sleep(1);
             createNewPresetEditName.Close();
+            Thread.Sleep(3);
+            PlayerControl.LocalPlayer.transform.position = new Vector3(-01.58f, 02.37f, 00.00f);
         }
 
         static void UpdateOptionContents()
         {
             if (optionButtonDesc == null)
                 return;
-            bool isJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese;
-            optionButtonDesc.fontSize = isJapanese ? 1.5f : 1.8f;
-            optionButtonDesc.buttonScale = isJapanese ? 0.9f : 1.0f;
+            bool isSChineseJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese || AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.SChinese;
+            optionButtonDesc.fontSize = isSChineseJapanese ? 1.5f : 1.8f;
+            optionButtonDesc.buttonScale = isSChineseJapanese ? 0.9f : 1.0f;
             for (var i = 0; i < AllOptions.Length; i++)
             {
                 optionButtonDesc.pos = new Vector3(i % 2 == 0 ? -1.17f : 1.17f, 1.2f - i / 2 * 0.8f, -.5f);
@@ -564,8 +569,8 @@ namespace TheOtherRoles.Patches
         {
             if (tabDesc == null)
                 return;
-            bool isJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese;
-            tabDesc.fontSize = isJapanese ? 1.5f : 1.8f;
+            bool isSChineseJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese || AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.SChinese;
+            tabDesc.fontSize = isSChineseJapanese ? 1.5f : 1.8f;
 
             tabDesc.pos = new Vector3(-.7f, 2.35f, -.5f);
             optionTabInfo.Initialize(tabDesc);
@@ -578,8 +583,8 @@ namespace TheOtherRoles.Patches
             if (presetButtonDesc == null)
                 return;
 
-            bool isJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese;
-            presetButtonDesc.fontSize = isJapanese ? 2f : 1.5f;
+            bool isSChineseJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese || AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.SChinese;
+            presetButtonDesc.fontSize = isSChineseJapanese ? 2f : 1.5f;
             presetButtonDesc.pos = new Vector3(0f, -2.3f, -.5f);
             presetButtonDesc.buttonSize = new Vector2(2f, .5f);
             presetButtonDesc.colliderButtonSize = new Vector2(2f, .5f);
@@ -748,13 +753,13 @@ namespace TheOtherRoles.Patches
                     GameObject.Destroy(presetInfoObjList[i]);
             }
             presetInfoObjList.Clear();
-            bool isJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese;
+            bool isSChineseJapanese = AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese || AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.SChinese;
 
             SelectionBehaviour.InitDesc desc = new SelectionBehaviour.InitDesc();
             desc.buttonPrefab = buttonPrefab;
             desc.parent = presetRoot.transform;
             desc.font = titleText.font;
-            if (isJapanese)
+            if (isSChineseJapanese)
                 desc.fontSize = 1.5f;
             desc.selectColor = Color.white;
             desc.unselectColor = Color.white;
@@ -779,7 +784,7 @@ namespace TheOtherRoles.Patches
                 var info = presetInfoList[idx];
                 var presetInfo = new SelectionBehaviour(new TranslationInfo(info.presetName), () => { return false; });
                 desc.pos = new Vector3(0f, 1.18f - i * .75f, -.5f);
-                if (isJapanese)
+                if (isSChineseJapanese)
                     desc.buttonName = string.Format("{0}<size=65%>{1}", info.presetName, info.GetDescription(3));
                 else
                     desc.buttonName = string.Format("{0}\n<size=70%>{1}", info.presetName, info.GetDescription());

@@ -7,7 +7,7 @@ namespace TheOtherRoles.Patches
         public static void Postfix(ref int __result)
         {
             if (AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame)
-                __result = Constants.GetVersion(2222, 0, 0, 0);
+                __result += 25;
         }
     }
 }

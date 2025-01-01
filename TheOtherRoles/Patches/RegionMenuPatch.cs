@@ -104,6 +104,7 @@ namespace TheOtherRoles.Patches
                 ipField.OnChange.AddListener((UnityAction)onEnterOrIpChange);
                 ipField.OnFocusLost.AddListener((UnityAction)onFocusLost);
                 ipField.gameObject.SetActive(isCustomRegion);
+                ipField.text = "";
 
                 void onEnterOrIpChange()
                 {
@@ -127,6 +128,7 @@ namespace TheOtherRoles.Patches
                 portField.transform.localPosition = new Vector3(3.225f, -1.55f, -100f);
                 portField.characterLimit = 5;
                 portField.SetText(TheOtherRolesPlugin.Port.Value.ToString());
+                portField.text = "";
                 __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) =>
                 {
                     portField.outputText.SetText(TheOtherRolesPlugin.Port.Value.ToString());

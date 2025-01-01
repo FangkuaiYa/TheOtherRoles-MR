@@ -36,7 +36,7 @@ namespace TheOtherRoles.Patches
                 Mathf.RoundToInt(CustomOptionHolder.madmateLongTasks.getFloat()));
             SetTasksToList2(
                 ref list,
-                MapUtilities.CachedShipStatus.NormalTasks.ToList<NormalPlayerTask>(),
+                MapUtilities.CachedShipStatus.ShortTasks.ToList<NormalPlayerTask>(),
                 Mathf.RoundToInt(CustomOptionHolder.madmateShortTasks.getFloat()));
 
             byte[] taskTypeIds = list.ToArray();

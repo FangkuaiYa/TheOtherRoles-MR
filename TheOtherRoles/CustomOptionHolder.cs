@@ -29,8 +29,9 @@ namespace TheOtherRoles
         public static CustomOption modifiersCountMin;
         public static CustomOption modifiersCountMax;
 
-        public static CustomOption enableCodenameHorsemode;
-        public static CustomOption enableCodenameDisableHorses;
+        public static CustomOption anyPlayerCanStopStart;
+        public static CustomOption enableEventMode;
+        public static CustomOption deadImpsBlockSabotage;
 
         // MR ========================================================
         public static CustomOption enabledTaskVsMode;
@@ -120,11 +121,13 @@ namespace TheOtherRoles
         public static CustomOption jackalSpawnRate;
         public static CustomOption jackalKillCooldown;
         public static CustomOption jackalCreateSidekickCooldown;
+        public static CustomOption jackalCanSabotageLights;
         public static CustomOption jackalCanUseVents;
         public static CustomOption jackalCanCreateSidekick;
         public static CustomOption sidekickPromotesToJackal;
         public static CustomOption sidekickCanKill;
         public static CustomOption sidekickCanUseVents;
+        public static CustomOption sidekickCanSabotageLights;
         public static CustomOption jackalPromotedFromSidekickCanCreateSidekick;
         public static CustomOption jackalCanCreateSidekickFromImpostor;
         public static CustomOption jackalAndSidekickHaveImpostorVision;
@@ -233,6 +236,7 @@ namespace TheOtherRoles
         public static CustomOption trackerCanTrackCorpses;
         public static CustomOption trackerCorpsesTrackingCooldown;
         public static CustomOption trackerCorpsesTrackingDuration;
+        public static CustomOption trackerTrackingMethod;
 
         public static CustomOption snitchSpawnRate;
         public static CustomOption snitchLeftTasksForReveal;
@@ -322,6 +326,15 @@ namespace TheOtherRoles
         public static CustomOption bomberDefuseDuration;
         public static CustomOption bomberBombCooldown;
         public static CustomOption bomberBombActiveAfter;
+
+        public static CustomOption yoyoSpawnRate;
+        public static CustomOption yoyoBlinkDuration;
+        public static CustomOption yoyoMarkCooldown;
+        public static CustomOption yoyoMarkStaysOverMeeting;
+        public static CustomOption yoyoHasAdminTable;
+        public static CustomOption yoyoAdminTableCooldown;
+        public static CustomOption yoyoSilhouetteVisibility;
+
 
         // MR ========================================================
         public static CustomOption yasunaSpawnRate;
@@ -437,6 +450,7 @@ namespace TheOtherRoles
         public static CustomOption dynamicMapEnableMira;
         public static CustomOption dynamicMapEnablePolus;
         public static CustomOption dynamicMapEnableAirShip;
+        public static CustomOption dynamicMapEnableFungle;
         public static CustomOption dynamicMapEnableSubmerged;
         public static CustomOption dynamicMapSeparateSettings;
 
@@ -452,6 +466,7 @@ namespace TheOtherRoles
         public static CustomOption guesserGamemodeKillsThroughShield;
         public static CustomOption guesserGamemodeEvilCanKillSpy;
         public static CustomOption guesserGamemodeCantGuessSnitchIfTaksDone;
+        public static CustomOption guesserGamemodeSidekickIsAlwaysGuesser;
 
         // Hide N Seek Gamemode
         public static CustomOption hideNSeekHunterCount;
@@ -535,11 +550,9 @@ namespace TheOtherRoles
             // Role Options
             presetSelection = CustomOption.Create(0, Types.General, new TranslationInfo("Opt-General", 6, new Color(204f / 255f, 204f / 255f, 0, 1f)), presets, null, true);
             activateRoles = CustomOption.Create(1, Types.General, new TranslationInfo("Opt-General", 7, new Color(204f / 255f, 204f / 255f, 0, 1f)), true, null, true);
+            anyPlayerCanStopStart = CustomOption.Create(2, Types.General, new TranslationInfo("Opt-General", 97, new Color(204f / 255f, 204f / 255f, 0, 1f)), false, null, false);
 
-            if (Utilities.EventUtility.canBeEnabled) enableCodenameHorsemode = CustomOption.Create(10423, Types.General, new TranslationInfo("Opt-General", 97, Color.green), false, null, true);
-            if (Utilities.EventUtility.canBeEnabled) enableCodenameDisableHorses = CustomOption.Create(10424, Types.General, new TranslationInfo("Opt-General", 102, Color.green), false, enableCodenameHorsemode, false);
-            if (Utilities.EventUtility.canBeEnabled) enableCodenameDisableHorses = CustomOption.Create(10424, Types.General, new TranslationInfo("Opt-General", 102, Color.green), false, enableCodenameHorsemode, false);
-
+            if (Utilities.EventUtility.canBeEnabled) enableEventMode = CustomOption.Create(10423, Types.General, new TranslationInfo("Opt-General", 102, Color.green), true, null, true);
 
             // Using new id's for the options to not break compatibilty with older versions
             crewmateRolesCountMin = CustomOption.Create(300, Types.General, new TranslationInfo("Opt-General", 8, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f, null, true);
@@ -722,6 +735,15 @@ namespace TheOtherRoles
             bomberBombCooldown = CustomOption.Create(465, Types.Impostor, new TranslationInfo("Opt-Bomber", 5), 15f, 2.5f, 30f, 2.5f, bomberSpawnRate);
             bomberBombActiveAfter = CustomOption.Create(466, Types.Impostor, new TranslationInfo("Opt-Bomber", 6), 3f, 0.5f, 15f, 0.5f, bomberSpawnRate);
 
+            yoyoSpawnRate = CustomOption.Create(470, Types.Impostor, new TranslationInfo(RoleId.Yoyo, Yoyo.color), rates, null, true);
+            yoyoBlinkDuration = CustomOption.Create(471, Types.Impostor, new TranslationInfo("Opt-Yoyo", 1), 20f, 2.5f, 120f, 2.5f, yoyoSpawnRate);
+            yoyoMarkCooldown = CustomOption.Create(472, Types.Impostor, new TranslationInfo("Opt-Yoyo", 2), 20f, 2.5f, 120f, 2.5f, yoyoSpawnRate);
+            yoyoMarkStaysOverMeeting = CustomOption.Create(473, Types.Impostor, new TranslationInfo("Opt-Yoyo", 3), true, yoyoSpawnRate);
+            yoyoHasAdminTable = CustomOption.Create(474, Types.Impostor, new TranslationInfo("Opt-Yoyo", 4), true, yoyoSpawnRate);
+            yoyoAdminTableCooldown = CustomOption.Create(475, Types.Impostor, new TranslationInfo("Opt-Yoyo", 5), 20f, 2.5f, 120f, 2.5f, yoyoHasAdminTable);
+            yoyoSilhouetteVisibility = CustomOption.Create(476, Types.Impostor, new TranslationInfo("Opt-Yoyo", 6), new[] { new TranslationInfo("0%"), new TranslationInfo("10%"), new TranslationInfo("20%"), new TranslationInfo("30%"), new TranslationInfo("40%"), new TranslationInfo("50%") }, yoyoSpawnRate);
+
+
             guesserSpawnRate = CustomOption.Create(310, Types.Neutral, new TranslationInfo(RoleId.NiceGuesser, Guesser.color), rates, null, true);
             guesserIsImpGuesserRate = CustomOption.Create(311, Types.Neutral, new TranslationInfo("Opt-Guesser", 1), rates, guesserSpawnRate);
             guesserNumberOfShots = CustomOption.Create(312, Types.Neutral, new TranslationInfo("Opt-Guesser", 2), 2f, 1f, 15f, 1f, guesserSpawnRate);
@@ -743,11 +765,13 @@ namespace TheOtherRoles
             jackalKillCooldown = CustomOption.Create(221, Types.Neutral, new TranslationInfo("Opt-Jackal", 1), 30f, 10f, 60f, 2.5f, jackalSpawnRate);
             jackalCreateSidekickCooldown = CustomOption.Create(222, Types.Neutral, new TranslationInfo("Opt-Jackal", 2), 30f, 10f, 60f, 2.5f, jackalSpawnRate);
             jackalCanUseVents = CustomOption.Create(223, Types.Neutral, new TranslationInfo("Opt-Jackal", 3), true, jackalSpawnRate);
+            jackalCanSabotageLights = CustomOption.Create(431, Types.Neutral, new TranslationInfo("Opt-Jackal", 11), true, jackalSpawnRate);
             jackalCanCreateSidekick = CustomOption.Create(224, Types.Neutral, new TranslationInfo("Opt-Jackal", 4), false, jackalSpawnRate);
             sidekickPromotesToJackal = CustomOption.Create(225, Types.Neutral, new TranslationInfo("Opt-Jackal", 5), false, jackalCanCreateSidekick);
             sidekickCanKill = CustomOption.Create(226, Types.Neutral, new TranslationInfo("Opt-Jackal", 6), false, jackalCanCreateSidekick);
             sidekickCanUseVents = CustomOption.Create(227, Types.Neutral, new TranslationInfo("Opt-Jackal", 7), true, jackalCanCreateSidekick);
-            jackalPromotedFromSidekickCanCreateSidekick = CustomOption.Create(228, Types.Neutral, new TranslationInfo("Opt-Jackal", 8), true, sidekickPromotesToJackal);
+            sidekickCanSabotageLights = CustomOption.Create(432, Types.Neutral, new TranslationInfo("Opt-Jackal", 12), true, jackalCanCreateSidekick);
+            jackalPromotedFromSidekickCanCreateSidekick = CustomOption.Create(228, Types.Neutral, new TranslationInfo("Opt-Jackal", 8), true, jackalCanCreateSidekick);
             jackalCanCreateSidekickFromImpostor = CustomOption.Create(229, Types.Neutral, new TranslationInfo("Opt-Jackal", 9), true, jackalCanCreateSidekick);
             jackalAndSidekickHaveImpostorVision = CustomOption.Create(430, Types.Neutral, new TranslationInfo("Opt-Jackal", 10), false, jackalSpawnRate);
 
@@ -839,6 +863,7 @@ namespace TheOtherRoles
             trackerCanTrackCorpses = CustomOption.Create(203, Types.Crewmate, new TranslationInfo("Opt-Tracker", 3), true, trackerSpawnRate);
             trackerCorpsesTrackingCooldown = CustomOption.Create(204, Types.Crewmate, new TranslationInfo("Opt-Tracker", 4), 30f, 5f, 120f, 5f, trackerCanTrackCorpses);
             trackerCorpsesTrackingDuration = CustomOption.Create(205, Types.Crewmate, new TranslationInfo("Opt-Tracker", 5), 5f, 2.5f, 30f, 2.5f, trackerCanTrackCorpses);
+            trackerTrackingMethod = CustomOption.Create(206, Types.Crewmate, new TranslationInfo("Opt-Tracker", 6), new[] { new TranslationInfo("Opt-Tracker", 7), new TranslationInfo("Opt-Tracker", 8), new TranslationInfo("Opt-Tracker", 9) }, trackerSpawnRate);
 
             snitchSpawnRate = CustomOption.Create(210, Types.Crewmate, new TranslationInfo(RoleId.Snitch, Snitch.color), rates, null, true);
             snitchLeftTasksForReveal = CustomOption.Create(211, Types.Crewmate, new TranslationInfo("Opt-Snitch", 1), 1f, 0f, 5f, 1f, snitchSpawnRate);
@@ -952,6 +977,7 @@ namespace TheOtherRoles
             guesserGamemodeNeutralNumber = CustomOption.Create(2002, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 2, Guesser.color), 15f, 1f, 15f, 1f, null, true);
             guesserGamemodeImpNumber = CustomOption.Create(2003, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 3, Guesser.color), 15f, 1f, 15f, 1f, null, true);
             guesserForceJackalGuesser = CustomOption.Create(2007, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 4), false, null, true);
+            guesserGamemodeSidekickIsAlwaysGuesser = CustomOption.Create(2012, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 12), false, null);
             guesserForceThiefGuesser = CustomOption.Create(2011, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 11), false, null, true);
             guesserGamemodeHaveModifier = CustomOption.Create(2004, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 5), true, null);
             guesserGamemodeNumberOfShots = CustomOption.Create(2005, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 6), 3f, 1f, 15f, 1f, null);
@@ -959,9 +985,10 @@ namespace TheOtherRoles
             guesserGamemodeKillsThroughShield = CustomOption.Create(2008, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 8), true, null);
             guesserGamemodeEvilCanKillSpy = CustomOption.Create(2009, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 9), true, null);
             guesserGamemodeCantGuessSnitchIfTaksDone = CustomOption.Create(2010, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 10), true, null);
+            // Care: 2012 already taken!
 
             // Hide N Seek Gamemode (3000 - 3999)
-            hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new [] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = hideNSeekMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });
+            hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new [] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 104), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = hideNSeekMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });
             hideNSeekHunterCount = CustomOption.Create(3000, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 2, Color.yellow), 1f, 1f, 3f, 1f);
             hideNSeekKillCooldown = CustomOption.Create(3021, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 3, Color.yellow), 10f, 2.5f, 60f, 2.5f);
             hideNSeekHunterVision = CustomOption.Create(3001, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 4, Color.yellow), 0.5f, 0.25f, 2f, 0.25f);
@@ -991,7 +1018,7 @@ namespace TheOtherRoles
             huntedShieldNumber = CustomOption.Create(3026, Types.HideNSeekRoles, new TranslationInfo("Opt-HideNSeek-Roles", 14, Color.gray), 3f, 1f, 15f, 1f);
 
             // Prop Hunt General Options
-            propHuntMap = CustomOption.Create(4020, Types.PropHunt, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new[] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = propHuntMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });
+            propHuntMap = CustomOption.Create(4020, Types.PropHunt, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new[] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 104), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = propHuntMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });
             propHuntTimer = CustomOption.Create(4021, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 1, Color.yellow), 5f, 1f, 30f, 0.5f);
             propHuntUnstuckCooldown = CustomOption.Create(4011, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 2, Color.yellow), 30f, 2.5f, 60f, 2.5f);
             propHuntUnstuckDuration = CustomOption.Create(4012, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 3, Color.yellow), 2f, 1f, 60f, 1f);
@@ -1029,11 +1056,13 @@ namespace TheOtherRoles
             finishTasksBeforeHauntingOrZoomingOut = CustomOption.Create(510, Types.General, new TranslationInfo("Opt-General", 99), true);
             camsNightVision = CustomOption.Create(511, Types.General, new TranslationInfo("Opt-General", 100), false, null, true);
             camsNoNightVisionIfImpVision = CustomOption.Create(512, Types.General, new TranslationInfo("Opt-General", 101), false, camsNightVision, false);
+            deadImpsBlockSabotage = CustomOption.Create(13, Types.General, new TranslationInfo("Opt-General", 109, Palette.ImpostorRed), false, null, false);
             dynamicMap = CustomOption.Create(500, Types.General, new TranslationInfo("Opt-General", 63), true, null, false);
             dynamicMapEnableSkeld = CustomOption.Create(501, Types.General, new TranslationInfo("Opt-General", 64), rates, dynamicMap, false);
             dynamicMapEnableMira = CustomOption.Create(502, Types.General, new TranslationInfo("Opt-General", 65), rates, dynamicMap, false);
             dynamicMapEnablePolus = CustomOption.Create(503, Types.General, new TranslationInfo("Opt-General", 66), rates, dynamicMap, false);
             dynamicMapEnableAirShip = CustomOption.Create(504, Types.General, new TranslationInfo("Opt-General", 67), rates, dynamicMap, false);
+            dynamicMapEnableFungle = CustomOption.Create(506, Types.General, new TranslationInfo("Opt-General", 104), rates, dynamicMap, false);
             dynamicMapEnableSubmerged = CustomOption.Create(505, Types.General, new TranslationInfo("Opt-General", 68), rates, dynamicMap, false);
             dynamicMapSeparateSettings = CustomOption.Create(509, Types.General, new TranslationInfo("Opt-General", 96), false, dynamicMap, false);
 

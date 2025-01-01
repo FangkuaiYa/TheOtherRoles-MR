@@ -71,7 +71,8 @@ namespace TheOtherRoles.Patches
 
             static void Postfix(PingTracker __instance)
             {
-                __instance.text.alignment = TMPro.TextAlignmentOptions.TopRight;
+                __instance.text.alignment = TextAlignmentOptions.TopRight;
+                var position = __instance.GetComponent<AspectPosition>();
                 if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started)
                 {
                     string gameModeText = $"";
@@ -80,14 +81,7 @@ namespace TheOtherRoles.Patches
                     else if (PropHunt.isPropHuntGM) gameModeText = ModTranslation.GetString("Credentials", 4);
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
                     __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles MR</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n{gameModeText}" + __instance.text.text;
-                    if (CachedPlayer.LocalPlayer.Data.IsDead || (!(CachedPlayer.LocalPlayer.PlayerControl == null) && (CachedPlayer.LocalPlayer.PlayerControl == Lovers.lover1 || CachedPlayer.LocalPlayer.PlayerControl == Lovers.lover2)))
-                    {
-                        __instance.transform.localPosition = new Vector3(3.45f, __instance.transform.localPosition.y, __instance.transform.localPosition.z);
-                    }
-                    else
-                    {
-                        __instance.transform.localPosition = new Vector3(4.2f, __instance.transform.localPosition.y, __instance.transform.localPosition.z);
-                    }
+                    position.DistanceFromEdge = new Vector3(2.25f, 0.11f, 0);
                 }
                 else
                 {
@@ -96,10 +90,11 @@ namespace TheOtherRoles.Patches
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = ModTranslation.GetString("Credentials", 2);
                     else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) gameModeText = ModTranslation.GetString("Credentials", 4);
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
-
-                    __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles MR</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n  {gameModeText + ModTranslation.GetString("Credentials", 5)}\n {__instance.text.text}";
-                    __instance.transform.localPosition = new Vector3(3.5f, __instance.transform.localPosition.y, __instance.transform.localPosition.z);
+                    var host = $"Host: {GameData.Instance?.GetHost()?.PlayerName}";
+                    __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles MR</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n  {gameModeText + ModTranslation.GetString("Credentials", 5)}\n {host}\n {__instance.text.text}";
+                    position.DistanceFromEdge = new Vector3(3.5f, 0.1f, 0);
                 }
+                position.AdjustPosition();
             }
         }
 

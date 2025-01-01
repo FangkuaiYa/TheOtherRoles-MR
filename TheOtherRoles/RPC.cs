@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AmongUs.Data;
 using AmongUs.GameOptions;
+using Assets.CoreScripts;
 using HarmonyLib;
 using Hazel;
 using InnerNet;
@@ -75,6 +76,7 @@ namespace TheOtherRoles
         Kataomoi,
         KillerCreator,
         MadmateKiller,
+        Yoyo,
         Crewmate,
         Impostor,
         // Modifier ---
@@ -129,6 +131,7 @@ namespace TheOtherRoles
         TaskVsMode_AllTaskCompleted, // Task Vs Mode
         TaskVsMode_MakeItTheSameTaskAsTheHost, // Task Vs Mode
         TaskVsMode_MakeItTheSameTaskAsTheHostDetail, // Task Vs Mode
+        StopStart,
 
         // Role functionality
 
@@ -181,6 +184,8 @@ namespace TheOtherRoles
         PlaceBomb,
         DefuseBomb,
         ShareRoom,
+        YoyoMarkLocation,
+        YoyoBlink,
 
         YasunaSpecialVote,
         YasunaJrSpecialVote,
@@ -222,6 +227,7 @@ namespace TheOtherRoles
             Garlic.clearGarlics();
             JackInTheBox.clearJackInTheBoxes();
             NinjaTrace.clearTraces();
+            Silhouette.clearSilhouettes();
             Portal.clearPortals();
             Bloodytrail.resetSprites();
             Trap.clearTraps();
@@ -239,6 +245,7 @@ namespace TheOtherRoles
             GameStartManagerPatch.GameStartManagerUpdatePatch.startingTimer = 0;
             SurveillanceMinigamePatch.nightVisionOverlays = null;
             EventUtility.clearAndReload();
+            MapBehaviourPatch.clearAndReload();
         }
 
         public static void HandleShareOptions(byte numberOfOptions, MessageReader reader)
@@ -278,7 +285,14 @@ namespace TheOtherRoles
         {
             TORMapOptions.gameMode = (CustomGamemodes)gm;
         }
-
+        public static void stopStart(byte playerId)
+        {
+            if (AmongUsClient.Instance.AmHost && CustomOptionHolder.anyPlayerCanStopStart.getBool())
+            {
+                GameStartManager.Instance.ResetStartState();
+                PlayerControl.LocalPlayer.RpcSendChat(string.Format(ModTranslation.GetString("GameStart", 8), Helpers.playerById(playerId).Data.PlayerName));
+            }
+        }
         public static void workaroundSetRoles(byte numberOfRoles, MessageReader reader)
         {
             for (int i = 0; i < numberOfRoles; i++)
@@ -299,6 +313,7 @@ namespace TheOtherRoles
         public static void setRole(byte roleId, byte playerId)
         {
             foreach (PlayerControl player in CachedPlayer.AllPlayers)
+            {
                 if (player.PlayerId == playerId)
                 {
                     switch ((RoleId)roleId)
@@ -464,13 +479,22 @@ namespace TheOtherRoles
                         case RoleId.Bomber:
                             Bomber.bomber = player;
                             break;
+                        case RoleId.Yoyo:
+                            Yoyo.yoyo = player;
+                            break;
 
                         // Task Vs Mode
                         case RoleId.TaskRacer:
                             TaskRacer.addTaskRacer(player);
                             break;
                     }
+                    if (AmongUsClient.Instance.AmHost && Helpers.roleCanUseVents(player) && !player.Data.Role.IsImpostor)
+                    {
+                        player.RpcSetRole(RoleTypes.Engineer);
+                        player.SetRole(RoleTypes.Engineer);
+                    }
                 }
+            }
         }
 
         public static void setModifier(byte modifierId, byte playerId, byte flag)
@@ -849,6 +873,7 @@ namespace TheOtherRoles
             if (Camouflager.camouflager == null) return;
 
             Camouflager.camouflageTimer = Camouflager.duration;
+            if (Helpers.MushroomSabotageActive()) return; // Dont overwrite the fungle "camo"
             foreach (PlayerControl player in CachedPlayer.AllPlayers)
                 player.setLook("", 6, "", "", "", "");
         }
@@ -948,6 +973,8 @@ namespace TheOtherRoles
                 Sidekick.wasSpy = wasSpy;
                 Sidekick.wasImpostor = wasImpostor;
                 if (player == CachedPlayer.LocalPlayer.PlayerControl) SoundEffectsManager.play(AssetLoader.customAssets.jackalSidekick);
+                if (HandleGuesser.isGuesserGm && CustomOptionHolder.guesserGamemodeSidekickIsAlwaysGuesser.getBool() && !HandleGuesser.isGuesser(targetId))
+                    setGuesserGm(targetId);
             }
             Jackal.canCreateSidekick = false;
         }
@@ -1008,6 +1035,7 @@ namespace TheOtherRoles
             if (player == Witch.witch) Witch.clearAndReload();
             if (player == Ninja.ninja) Ninja.clearAndReload();
             if (player == Bomber.bomber) Bomber.clearAndReload();
+            if (player == Yoyo.yoyo) Yoyo.clearAndReload();
             //if (player == DoorHacker.doorHacker) DoorHacker.clearAndReload();
             if (player == KillerCreator.killerCreator) KillerCreator.clearAndReload();
             if (player == MadmateKiller.madmateKiller) MadmateKiller.clearAndReload();
@@ -1103,7 +1131,7 @@ namespace TheOtherRoles
                 target.cosmetics.currentBodySprite.BodySprite.color = Color.white;
                 target.cosmetics.colorBlindText.gameObject.SetActive(DataManager.Settings.Accessibility.ColorBlindMode);
                 target.cosmetics.colorBlindText.color = target.cosmetics.colorBlindText.color.SetAlpha(1f);
-                if (Camouflager.camouflageTimer <= 0) target.setDefaultLook();
+                if (Camouflager.camouflageTimer <= 0 && !Helpers.MushroomSabotageActive()) target.setDefaultLook();
                 Ninja.isInvisble = false;
                 return;
             }
@@ -1201,12 +1229,20 @@ namespace TheOtherRoles
             if (CachedPlayer.LocalPlayer.PlayerControl == SecurityGuard.securityGuard)
             {
                 PowerTools.SpriteAnim animator = vent.GetComponent<PowerTools.SpriteAnim>();
-                animator?.Stop();
                 vent.EnterVentAnim = vent.ExitVentAnim = null;
-                vent.myRend.sprite = animator == null ? SecurityGuard.getStaticVentSealedSprite() : SecurityGuard.getAnimatedVentSealedSprite();
+                Sprite newSprite = animator == null ? SecurityGuard.getStaticVentSealedSprite() : SecurityGuard.getAnimatedVentSealedSprite();
+                SpriteRenderer rend = vent.myRend;
+                if (Helpers.isFungle())
+                {
+                    newSprite = SecurityGuard.getFungleVentSealedSprite();
+                    rend = vent.transform.GetChild(3).GetComponent<SpriteRenderer>();
+                    animator = vent.transform.GetChild(3).GetComponent<PowerTools.SpriteAnim>();
+                }
+                animator?.Stop();
+                rend.sprite = newSprite;
                 if (SubmergedCompatibility.IsSubmerged && vent.Id == 0) vent.myRend.sprite = SecurityGuard.getSubmergedCentralUpperSealedSprite();
                 if (SubmergedCompatibility.IsSubmerged && vent.Id == 14) vent.myRend.sprite = SecurityGuard.getSubmergedCentralLowerSealedSprite();
-                vent.myRend.color = new Color(1f, 1f, 1f, 0.5f);
+                rend.color = new Color(1f, 1f, 1f, 0.5f);
                 vent.name = "FutureSealedVent_" + vent.name;
             }
 
@@ -1218,7 +1254,7 @@ namespace TheOtherRoles
             Arsonist.triggerArsonistWin = true;
             foreach (PlayerControl p in CachedPlayer.AllPlayers)
             {
-                if (p != Arsonist.arsonist)
+                if (p != Arsonist.arsonist && !p.Data.IsDead)
                 {
                     p.Exiled();
                     overrideDeathReasonAndKiller(p, DeadPlayer.CustomDeathReason.Arson, Arsonist.arsonist);
@@ -1262,6 +1298,16 @@ namespace TheOtherRoles
                 {
                     RPCProcedure.thiefStealsRole(dyingTarget.PlayerId);
                 }
+            }
+            if (Lawyer.lawyer != null && !Lawyer.isProsecutor && Lawyer.lawyer.PlayerId == killerId && Lawyer.target != null && Lawyer.target.PlayerId == dyingTargetId)
+            {
+                // Lawyer guessed client.
+                if (CachedPlayer.LocalPlayer.PlayerControl == Lawyer.lawyer)
+                {
+                    FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(Lawyer.lawyer.Data, Lawyer.lawyer.Data);
+                    if (MeetingHudPatch.guesserUI != null) MeetingHudPatch.guesserUIExitButton.OnClick.Invoke();
+                }
+                Lawyer.lawyer.Exiled();
             }
             dyingTarget.Exiled();
             GameHistory.overrideDeathReasonAndKiller(dyingTarget, DeadPlayer.CustomDeathReason.Guess, guesser);
@@ -1332,7 +1378,7 @@ namespace TheOtherRoles
                 if (AmongUsClient.Instance.AmClient && FastDestroyableSingleton<HudManager>.Instance)
                     FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(guesser, msg);
                 if (msg.IndexOf("who", StringComparison.OrdinalIgnoreCase) >= 0)
-                    FastDestroyableSingleton<Assets.CoreScripts.Telemetry>.Instance.SendWho();
+                    FastDestroyableSingleton<UnityTelemetry>.Instance.SendWho();
             }
         }
 
@@ -1378,6 +1424,8 @@ namespace TheOtherRoles
             {
                 Sidekick.sidekick = thief;
                 Jackal.formerJackals.Add(target);
+                if (HandleGuesser.isGuesserGm && CustomOptionHolder.guesserGamemodeSidekickIsAlwaysGuesser.getBool() && !HandleGuesser.isGuesser(thief.PlayerId))
+                    setGuesserGm(thief.PlayerId);
             }
             if (target == Guesser.evilGuesser) Guesser.evilGuesser = thief;
             if (target == Godfather.godfather) Godfather.godfather = thief;
@@ -1402,6 +1450,11 @@ namespace TheOtherRoles
             }
             if (target == Ninja.ninja) Ninja.ninja = thief;
             if (target == Bomber.bomber) Bomber.bomber = thief;
+            if (target == Yoyo.yoyo)
+            {
+                Yoyo.yoyo = thief;
+                Yoyo.markedLocation = null;
+            }
             if (target.Data.Role.IsImpostor)
             {
                 RoleManager.Instance.SetRole(Thief.thief, RoleTypes.Impostor);
@@ -1499,7 +1552,14 @@ namespace TheOtherRoles
             PlayerControl player = Helpers.playerById(playerId);
             var prop = PropHunt.FindPropByNameAndPos(propName, posX);
             if (prop == null) return;
-            player.GetComponent<SpriteRenderer>().sprite = prop.GetComponent<SpriteRenderer>().sprite;
+            try
+            {
+                player.GetComponent<SpriteRenderer>().sprite = prop.GetComponent<SpriteRenderer>().sprite;
+            }
+            catch
+            {
+                player.GetComponent<SpriteRenderer>().sprite = prop.transform.GetComponentInChildren<SpriteRenderer>().sprite;
+            }
             player.transform.localScale = prop.transform.lossyScale;
             player.Visible = false;
             PropHunt.currentObject[player.PlayerId] = new Tuple<string, float>(propName, posX);
@@ -1743,6 +1803,41 @@ namespace TheOtherRoles
             bomberButton.Timer = bomberButton.MaxTimer;
             bomberButton.isEffectActive = false;
             bomberButton.actionButton.cooldownTimerText.color = Palette.EnabledColor;
+        }
+        public static void yoyoMarkLocation(byte[] buff)
+        {
+            if (Yoyo.yoyo == null) return;
+            Vector3 position = Vector3.zero;
+            position.x = BitConverter.ToSingle(buff, 0 * sizeof(float));
+            position.y = BitConverter.ToSingle(buff, 1 * sizeof(float));
+            Yoyo.markLocation(position);
+            new Silhouette(position, -1, false);
+        }
+        public static void yoyoBlink(bool isFirstJump, byte[] buff)
+        {
+            TheOtherRolesPlugin.Logger.LogMessage($"blink fistjumpo: {isFirstJump}");
+            if (Yoyo.yoyo == null || Yoyo.markedLocation == null) return;
+            var markedPos = (Vector3)Yoyo.markedLocation;
+            Yoyo.yoyo.NetTransform.SnapTo(markedPos);
+            var markedSilhouette = Silhouette.silhouettes.FirstOrDefault(s => s.gameObject.transform.position.x == markedPos.x && s.gameObject.transform.position.y == markedPos.y);
+            if (markedSilhouette != null)
+                markedSilhouette.permanent = false;
+            Vector3 position = Vector3.zero;
+            position.x = BitConverter.ToSingle(buff, 0 * sizeof(float));
+            position.y = BitConverter.ToSingle(buff, 1 * sizeof(float));
+            // Create Silhoutte At Start Position:
+            if (isFirstJump)
+            {
+                Yoyo.markLocation(position);
+                new Silhouette(position, Yoyo.blinkDuration, true);
+            }
+            else
+            {
+                new Silhouette(position, 5, true);
+                Yoyo.markedLocation = null;
+            }
+            if (Chameleon.chameleon.Any(x => x.PlayerId == Yoyo.yoyo.PlayerId)) // Make the Yoyo visible if chameleon!
+                Chameleon.lastMoved[Yoyo.yoyo.PlayerId] = Time.time;
         }
     }
 
@@ -2097,6 +2192,15 @@ namespace TheOtherRoles
                 case (byte)CustomRPC.ShareGamemode:
                     byte gm = reader.ReadByte();
                     RPCProcedure.shareGamemode(gm);
+                    break;
+                case (byte)CustomRPC.StopStart:
+                    RPCProcedure.stopStart(reader.ReadByte());
+                    break;
+                case (byte)CustomRPC.YoyoMarkLocation:
+                    RPCProcedure.yoyoMarkLocation(reader.ReadBytesAndSize());
+                    break;
+                case (byte)CustomRPC.YoyoBlink:
+                    RPCProcedure.yoyoBlink(reader.ReadByte() == byte.MaxValue, reader.ReadBytesAndSize());
                     break;
 
                 // Game mode

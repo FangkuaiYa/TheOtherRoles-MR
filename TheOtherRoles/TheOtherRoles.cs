@@ -5,6 +5,7 @@ using System.Text;
 using AmongUs.Data;
 using HarmonyLib;
 using Hazel;
+using Innersloth.DebugTool;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
@@ -66,6 +67,7 @@ namespace TheOtherRoles
             Thief.clearAndReload();
             Trapper.clearAndReload();
             Bomber.clearAndReload();
+            Yoyo.clearAndReload();
             Yasuna.clearAndReload();
             YasunaJr.clearAndReload();
             //DoorHacker.clearAndReload();
@@ -301,6 +303,13 @@ namespace TheOtherRoles
             public static PlayerControl formerDeputy;  // Needed for keeping handcuffs + shifting
             public static PlayerControl formerSheriff;  // When deputy gets promoted...
 
+            private static Sprite buttonSprite;
+            public static Sprite getButtonSprite()
+            {
+                if (buttonSprite) return buttonSprite;
+                buttonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.SheriffKillButton.png", 115f);
+                return buttonSprite;
+            }
             public static void replaceCurrentSheriff(PlayerControl deputy)
             {
                 if (!formerSheriff) formerSheriff = sheriff;
@@ -517,7 +526,20 @@ namespace TheOtherRoles
             buttonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.ShieldButton.png", 115f);
             return buttonSprite;
         }
-
+        public static bool shieldVisible(PlayerControl target)
+        {
+            bool hasVisibleShield = false;
+            bool isMorphedMorphling = target == Morphling.morphling && Morphling.morphTarget != null && Morphling.morphTimer > 0f;
+            if (Medic.shielded != null && ((target == Medic.shielded && !isMorphedMorphling) || (isMorphedMorphling && Morphling.morphTarget == Medic.shielded)))
+            {
+                hasVisibleShield = Medic.showShielded == 0 || Helpers.shouldShowGhostInfo() // Everyone or Ghost info
+                    || (Medic.showShielded == 1 && (CachedPlayer.LocalPlayer.PlayerControl == Medic.shielded || CachedPlayer.LocalPlayer.PlayerControl == Medic.medic)) // Shielded + Medic
+                    || (Medic.showShielded == 2 && CachedPlayer.LocalPlayer.PlayerControl == Medic.medic); // Medic only
+                // Make shield invisible till after the next meeting if the option is set (the medic can already see the shield)
+                hasVisibleShield = hasVisibleShield && (Medic.meetingAfterShielding || !Medic.showShieldAfterMeeting || CachedPlayer.LocalPlayer.PlayerControl == Medic.medic || Helpers.shouldShowGhostInfo());
+            }
+            return hasVisibleShield;
+        }
         public static void clearAndReload()
         {
             medic = null;
@@ -766,9 +788,10 @@ namespace TheOtherRoles
 #if true
             byte mapId = GameOptionsManager.Instance.currentNormalGameOptions.MapId;
             UseButtonSettings button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.PolusAdminButton]; // Polus
-            if (mapId == 0 || mapId == 3) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.AdminMapButton]; // Skeld || Dleks
-            else if (mapId == 1) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.MIRAAdminButton]; // Mira HQ
-            else if (mapId == 4) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.AirshipAdminButton]; // Airship
+            if (Helpers.isSkeld() || mapId == 3) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.AdminMapButton]; // Skeld || Dleks
+            else if (Helpers.isMira()) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.MIRAAdminButton]; // Mira HQ
+            else if (Helpers.isAirship()) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.AirshipAdminButton]; // Airship
+            else if (Helpers.isFungle()) button = FastDestroyableSingleton<HudManager>.Instance.UseButton.fastUseSettings[ImageNames.AdminMapButton];  // Hacker can Access the Admin panel on Fungle
             buttonSprite = button.Image;
 #else
             buttonSprite = DestroyableSingleton<TranslationController>.Instance.GetImage(ImageNames.AirshipAdminButton);
@@ -870,7 +893,7 @@ namespace TheOtherRoles
     {
         public static PlayerControl tracker;
         public static Color color = new Color32(100, 58, 220, byte.MaxValue);
-        public static List<Arrow> localArrows = new List<Arrow>();
+        public static List<Arrow> localArrows = new();
 
         public static float updateIntervall = 5f;
         public static bool resetTargetAfterMeeting = false;
@@ -878,13 +901,16 @@ namespace TheOtherRoles
         public static float corpsesTrackingCooldown = 30f;
         public static float corpsesTrackingDuration = 5f;
         public static float corpsesTrackingTimer = 0f;
-        public static List<Vector3> deadBodyPositions = new List<Vector3>();
+        public static int trackingMode = 0;
+        public static List<Vector3> deadBodyPositions = new();
 
         public static PlayerControl currentTarget;
         public static PlayerControl tracked;
         public static bool usedTracker = false;
         public static float timeUntilUpdate = 0f;
-        public static Arrow arrow = new Arrow(Color.blue);
+        public static Arrow arrow = new(Color.blue);
+        public static GameObject DangerMeterParent;
+        public static DangerMeter Meter;
 
         private static Sprite trackCorpsesButtonSprite;
         public static Sprite getTrackCorpsesButtonSprite()
@@ -929,6 +955,12 @@ namespace TheOtherRoles
             corpsesTrackingCooldown = CustomOptionHolder.trackerCorpsesTrackingCooldown.getFloat();
             corpsesTrackingDuration = CustomOptionHolder.trackerCorpsesTrackingDuration.getFloat();
             canTrackCorpses = CustomOptionHolder.trackerCanTrackCorpses.getBool();
+            trackingMode = CustomOptionHolder.trackerTrackingMethod.getSelection();
+            if (DangerMeterParent)
+            {
+                Meter.gameObject.Destroy();
+                DangerMeterParent.Destroy();
+            }
         }
     }
 
@@ -1023,6 +1055,7 @@ namespace TheOtherRoles
         public static bool wasTeamRed;
         public static bool wasImpostor;
         public static bool wasSpy;
+        public static bool canSabotageLights;
 
         public static Sprite getSidekickButtonSprite()
         {
@@ -1039,6 +1072,7 @@ namespace TheOtherRoles
             fakeSidekick = null;
             cooldown = CustomOptionHolder.jackalKillCooldown.getFloat();
             createSidekickCooldown = CustomOptionHolder.jackalCreateSidekickCooldown.getFloat();
+            canSabotageLights = CustomOptionHolder.jackalCanSabotageLights.getBool();
         }
 
         public static void clearAndReload()
@@ -1075,6 +1109,7 @@ namespace TheOtherRoles
         public static bool canKill = true;
         public static bool promotesToJackal = true;
         public static bool hasImpostorVision = false;
+        public static bool canSabotageLights;
 
         public static void clearAndReload()
         {
@@ -1086,6 +1121,7 @@ namespace TheOtherRoles
             promotesToJackal = CustomOptionHolder.sidekickPromotesToJackal.getBool();
             hasImpostorVision = CustomOptionHolder.jackalAndSidekickHaveImpostorVision.getBool();
             wasTeamRed = wasImpostor = wasSpy = false;
+            canSabotageLights = CustomOptionHolder.sidekickCanSabotageLights.getBool();
         }
     }
 
@@ -1315,6 +1351,13 @@ namespace TheOtherRoles
             if (staticVentSealedSprite) return staticVentSealedSprite;
             staticVentSealedSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.StaticVentSealed.png", 160f);
             return staticVentSealedSprite;
+        }
+        private static Sprite fungleVentSealedSprite;
+        public static Sprite getFungleVentSealedSprite()
+        {
+            if (fungleVentSealedSprite) return fungleVentSealedSprite;
+            fungleVentSealedSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.FungleVentSealed.png", 160f);
+            return fungleVentSealedSprite;
         }
 
         private static Sprite submergedCentralUpperVentSealedSprite;
@@ -1781,7 +1824,7 @@ namespace TheOtherRoles
             vision = CustomOptionHolder.lawyerVision.getFloat();
             lawyerKnowsRole = CustomOptionHolder.lawyerKnowsRole.getBool();
             targetCanBeJester = CustomOptionHolder.lawyerTargetCanBeJester.getBool();
-            canCallEmergency = CustomOptionHolder.jesterCanCallEmergency.getBool();
+            canCallEmergency = CustomOptionHolder.lawyerCanCallEmergency.getBool();
         }
     }
 
@@ -2409,11 +2452,11 @@ namespace TheOtherRoles
                 if (kataomoi.cosmetics.colorBlindText != null)
                     kataomoi.cosmetics.colorBlindText.color = color;
 
-                if (kataomoi.cosmetics.currentPet?.rend != null)
-                    kataomoi.cosmetics.currentPet.rend.color = color;
+                foreach (var rend in kataomoi.cosmetics.currentPet.renderers)
+                    rend.color = rend.color = color;
 
-                if (kataomoi.cosmetics.currentPet?.shadowRend != null)
-                    kataomoi.cosmetics.currentPet.shadowRend.color = color;
+                foreach (var shadowRend in kataomoi.cosmetics.currentPet.shadows)
+                    shadowRend.color = shadowRend.color = color;
 
                 if (kataomoi.cosmetics.visor != null)
                     kataomoi.cosmetics.visor.Alpha = alpha;
@@ -2651,8 +2694,8 @@ namespace TheOtherRoles
                 if (timeSecOld != t)
                 {
                     timeSecOld = t;
-                    if (Modules.ModUpdateBehaviour.selectSfx != null)
-                        SoundManager.Instance.PlaySound(Modules.ModUpdateBehaviour.selectSfx, false, 1.0f);
+                    if (AccountManager.Instance.accountTab.resendEmailButton.GetComponent<PassiveButton>().ClickSound != null)
+                        SoundManager.Instance.PlaySound(AccountManager.Instance.accountTab.resendEmailButton.GetComponent<PassiveButton>().ClickSound, false, 1.0f);
                 }
                 startText.text = t.ToString();
                 float scale = Mathf.Lerp(1.0f, 1.5f, 1.0f - (startTime % 1.0f));
@@ -2863,7 +2906,7 @@ namespace TheOtherRoles
 
         public static List<byte> generateBurgerTasks(int numBurgerTasks)
         {
-            var task = MapUtilities.CachedShipStatus.NormalTasks.FirstOrDefault((t) => t.TaskType == TaskTypes.MakeBurger);
+            var task = MapUtilities.CachedShipStatus.ShortTasks.FirstOrDefault((t) => t.TaskType == TaskTypes.MakeBurger);
             if (task == null) return null;
             numBurgerTasks = Mathf.Min(numBurgerTasks, 1);
             var tasks = new Il2CppSystem.Collections.Generic.List<byte>();
@@ -3041,7 +3084,7 @@ namespace TheOtherRoles
         public static Sprite getKillerReserveButtonSprite()
         {
             if (killerReserveButtonSprite) return killerReserveButtonSprite;
-            killerReserveButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.SidekickButton.png", 115f);
+            killerReserveButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.KillerCreatorButton.png", 115f);
             return killerReserveButtonSprite;
         }
 
@@ -3128,6 +3171,49 @@ namespace TheOtherRoles
             Bomb.clearBackgroundSprite();
         }
     }
+    public static class Yoyo
+    {
+        public static PlayerControl yoyo = null;
+        public static Color color = Palette.ImpostorRed;
+        public static float blinkDuration = 0;
+        public static float markCooldown = 0;
+        public static bool markStaysOverMeeting = false;
+        public static bool hasAdminTable = false;
+        public static float adminCooldown = 0;
+        public static float SilhouetteVisibility => (silhouetteVisibility == 0 && (PlayerControl.LocalPlayer == yoyo || PlayerControl.LocalPlayer.Data.IsDead)) ? 0.1f : silhouetteVisibility;
+        public static float silhouetteVisibility = 0;
+        public static Vector3? markedLocation = null;
+        private static Sprite markButtonSprite;
+        public static Sprite getMarkButtonSprite()
+        {
+            if (markButtonSprite) return markButtonSprite;
+            markButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.YoyoMarkButtonSprite.png", 115f);
+            return markButtonSprite;
+        }
+        private static Sprite blinkButtonSprite;
+        public static Sprite getBlinkButtonSprite()
+        {
+            if (blinkButtonSprite) return blinkButtonSprite;
+            blinkButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.YoyoBlinkButtonSprite.png", 115f);
+            return blinkButtonSprite;
+        }
+        public static void markLocation(Vector3 position)
+        {
+            markedLocation = position;
+        }
+        public static void clearAndReload()
+        {
+            blinkDuration = CustomOptionHolder.yoyoBlinkDuration.getFloat();
+            markCooldown = CustomOptionHolder.yoyoMarkCooldown.getFloat();
+            markStaysOverMeeting = CustomOptionHolder.yoyoMarkStaysOverMeeting.getBool();
+            hasAdminTable = CustomOptionHolder.yoyoHasAdminTable.getBool();
+            adminCooldown = CustomOptionHolder.yoyoAdminTableCooldown.getFloat();
+            silhouetteVisibility = CustomOptionHolder.yoyoSilhouetteVisibility.getSelection() / 10f;
+            markedLocation = null;
+
+        }
+    }
+
 
     // Modifier
     public static class Bait
@@ -3339,8 +3425,10 @@ namespace TheOtherRoles
                     chameleonPlayer.SetHatAndVisorAlpha(visibility);
                     chameleonPlayer.cosmetics.skin.layer.color = chameleonPlayer.cosmetics.skin.layer.color.SetAlpha(visibility);
                     chameleonPlayer.cosmetics.nameText.color = chameleonPlayer.cosmetics.nameText.color.SetAlpha(visibility);
-                    chameleonPlayer.cosmetics.currentPet.rend.color = chameleonPlayer.cosmetics.currentPet.rend.color.SetAlpha(petVisibility);
-                    chameleonPlayer.cosmetics.currentPet.shadowRend.color = chameleonPlayer.cosmetics.currentPet.shadowRend.color.SetAlpha(petVisibility);
+                    foreach (var rend in chameleonPlayer.cosmetics.currentPet.renderers)
+                        rend.color = rend.color.SetAlpha(petVisibility);
+                    foreach (var shadowRend in chameleonPlayer.cosmetics.currentPet.shadows)
+                        shadowRend.color = shadowRend.color.SetAlpha(petVisibility);
                 }
                 catch { }
             }

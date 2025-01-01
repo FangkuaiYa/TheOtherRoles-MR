@@ -237,6 +237,7 @@ namespace TheOtherRoles
                 case RoleId.Hunter: id = 68; break;
                 case RoleId.Hunted: id = 69; break;
                 case RoleId.Prop: id = 70; break;
+                case RoleId.Yoyo: id = 71; break;
             }
 
             return id;

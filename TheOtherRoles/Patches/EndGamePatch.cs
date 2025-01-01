@@ -497,13 +497,14 @@ namespace TheOtherRoles.Patches
                     poolablePlayer.UpdateFromPlayerOutfit((GameData.PlayerOutfit)winningPlayerData2, PlayerMaterial.MaskType.ComplexUI, winningPlayerData2.IsDead, true);
                     if (winningPlayerData2.IsDead)
                     {
-                        poolablePlayer.cosmetics.currentBodySprite.BodySprite.sprite = poolablePlayer.cosmetics.currentBodySprite.GhostSprite;
+                        poolablePlayer.SetBodyAsGhost();
                         poolablePlayer.SetDeadFlipX(i % 2 == 0);
                     }
                     else
                     {
                         poolablePlayer.SetFlipX(i % 2 == 0);
                     }
+                    poolablePlayer.UpdateFromPlayerOutfit(winningPlayerData2, PlayerMaterial.MaskType.None, winningPlayerData2.IsDead, true);
 
                     if (!isHappyBirthdayMode)
                     {

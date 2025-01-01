@@ -58,7 +58,7 @@ namespace TheOtherRoles.Objects
 
             int colorId = playerControl.Data.DefaultOutfit.ColorId;
 
-            if (Camouflager.camouflageTimer > 0)
+            if (Camouflager.camouflageTimer > 0 || Helpers.MushroomSabotageActive())
             {
                 playerNameDisplay = ModTranslation.GetString("Game-Obj-Portal", 2);
                 colorId = 6;

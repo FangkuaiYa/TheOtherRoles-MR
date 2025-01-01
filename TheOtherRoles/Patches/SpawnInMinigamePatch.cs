@@ -380,7 +380,7 @@ namespace TheOtherRoles.Patches
                             {
                                 true
                             });
-                            saboSystem.ForceSabTime(0f);
+                            //saboSystem.ForceSabTime(0f);
                             saboSystem.Timer = initialSabotageCooldown;
                             DoorsSystemType doorSystem = MapUtilities.CachedShipStatus.Systems[SystemTypes.Doors].Cast<DoorsSystemType>();
                             AccessTools.PropertySetter(typeof(DoorsSystemType), "IsDirty").Invoke(doorSystem, new object[]
