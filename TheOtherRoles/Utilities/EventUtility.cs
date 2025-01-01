@@ -167,7 +167,7 @@ namespace TheOtherRoles.Utilities
                     })));
                     break;
                 case EventTypes.KnockKnock:
-                    SoundEffectsManager.play("knockKnock");
+                    SoundEffectsManager.play(AssetLoader.customAssets.knockKnock);
                     knocked = true;
                     break;
 

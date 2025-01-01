@@ -231,6 +231,38 @@
         "0": "Arrow",
         "13": "\u7bad\u5934"
     },
+    "Button,56": {
+        "0": "Disguise",
+        "13": "\u53d8\u5f62"
+    },
+    "Button,57": {
+        "0": "Unstuck",
+        "13": "\u7a7f\u5899"
+    },
+    "Button,58": {
+        "0": "Reveal",
+        "13": "\u63ed\u793a"
+    },
+    "Button,59": {
+        "0": "Invis",
+        "13": "\u9690\u8eab"
+    },
+    "Button,60": {
+        "0": "Boost",
+        "13": "\u52a0\u901f"
+    },
+    "GameModeText,1": {
+        "0": "TOR Guesser",
+        "13": "\u8d4c\u602a\u6a21\u5f0f"
+    },
+    "GameModeText,2": {
+        "0": "TOR Hide N Seek",
+        "13": "\u6349\u8ff7\u85cf\u6a21\u5f0f"
+    },
+    "GameModeText,3": {
+        "0": "TOR Prop Hunt",
+        "13": "\u53d8\u5f62\u72e9\u730e\u6a21\u5f0f"
+    },
     "MainMenu,1": {
         "0": "Enable Horse Mode",
         "11": "\u30db\u30fc\u30b9\u30e2\u30fc\u30c9\u6709\u52b9\u5316",
@@ -764,6 +796,10 @@
         "0": "Hide 'N Seek Settings",
         "11": "\u304b\u304f\u308c\u3093\u307c\u8a2d\u5b9a",
         "13": "\u6349\u8ff7\u85cf\u6a21\u5f0f\u8bbe\u7f6e"
+    },
+    "Opt-General,103": {
+        "0": "Prop Hunt Settings",
+        "13": "\u53d8\u5f62\u72e9\u730e\u6a21\u5f0f\u8bbe\u7f6e"
     },
     "Opt-General,78": {
         "0": "1 Evil:",
@@ -1956,35 +1992,47 @@
         "11": "\u8ab0\u3088\u308a\u3082\u65e9\u304f\u30bf\u30b9\u30af\u3092\u7d42\u308f\u3089\u305b\u30661\u4f4d\u3092\u76ee\u6307\u305b\uff01",
         "13": "\u5b8c\u6210\u4efb\u52a1\uff0c\u5e76\u4ee5\u7b2c\u4e00\u4e3a\u76ee\u6807!"
     },
-    "Role-Name,10000": {
+    "Role-Name,68": {
         "0": "Hunter",
         "11": "\u72e9\u30eb\u30e2\u30ce",
         "13": "\u730e\u4eba"
     },
-    "Role-IntroDesc,10000": {
+    "Role-IntroDesc,68": {
         "0": "<color=#FF1919FF>Seek and kill everyone</color>",
         "11": "<color=#FF1919FF>\u63a2\u3057\u3066\u30ad\u30eb\u3057\u3088\u3046</color>",
-        "13": "<color=#FF1919FF>\u5bfb\u627e\u5e76\u51fb\u6740\u591a\u85cf\u8005</color>"
+        "13": "<color=#FF1919FF>\u5bfb\u627e\u5e76\u51fb\u6740\u8eb2\u85cf\u8005</color>"
     },
-    "Role-ShortDesc,10000": {
+    "Role-ShortDesc,68": {
         "0": "Seek and kill everyone",
         "11": "\u63a2\u3057\u3066\u30ad\u30eb\u3057\u3088\u3046",
-        "13": "\u5bfb\u627e\u5e76\u51fb\u6740\u591a\u85cf\u8005"
+        "13": "\u5bfb\u627e\u5e76\u51fb\u6740\u8eb2\u85cf\u8005"
     },
-    "Role-Name,10001": {
+    "Role-Name,69": {
         "0": "Hunted",
         "11": "\u72e9\u30e9\u30ec\u30eb\u30e2\u30ce",
         "13": "\u8eb2\u85cf\u8005"
     },
-    "Role-IntroDesc,10001": {
+    "Role-IntroDesc,69": {
         "0": "Hide",
         "11": "\u96a0\u308c\u3088\u3046",
         "13": "\u5feb\u8eb2\u597d!"
     },
-    "Role-ShortDesc,10001": {
+    "Role-ShortDesc,69": {
         "0": "Hide",
         "11": "\u96a0\u308c\u3088\u3046",
         "13": "\u5feb\u8eb2\u597d!"
+    },
+    "Role-Name,70": {
+        "0": "Prop",
+        "13": "\u9053\u5177"
+    },
+    "Role-IntroDesc,70": {
+        "0": "Disguise As An Object and Survive",
+        "13": "\u4f2a\u88c5\u6210\u4e00\u4e2a\u7269\u54c1\u5e76\u5b58\u6d3b\u4e0b\u53bb"
+    },
+    "Role-ShortDesc,70": {
+        "0": "Disguise As An Object",
+        "13": "\u4f2a\u88c5\u6210\u4e00\u4e2a\u7269\u54c1"
     },
     "Opt-Yasuna,1": {
         "0": "Chance That The Yasuna Is An Impostor",
@@ -3369,6 +3417,98 @@
         "11": "Hunted Shield Number",
         "13": "\u9003\u8131\u8005\u62a4\u76fe\u6b21\u6570"
     },
+    "Opt-PropHunt-General,1": {
+        "0": "Timer In Min",
+        "13": "\u6700\u5c11\u8eb2\u85cf\u65f6\u95f4"
+    },
+    "Opt-PropHunt-General,2": {
+        "0": "Unstuck Cooldown",
+        "13": "\u7a7f\u5899\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-General,3": {
+        "0": "Unstuck Duration",
+        "13": "\u7a7f\u5899\u6301\u7eed\u65f6\u95f4"
+    },
+    "Opt-PropHunt-General,4": {
+        "0": "Hunter Vision",
+        "13": "\u6293\u6355\u8005\u89c6\u91ce"
+    },
+    "Opt-PropHunt-General,5": {
+        "0": "Prop Vision",
+        "13": "\u9053\u5177\u89c6\u91ce"
+    },
+    "Opt-PropHunt-Hunter,1": {
+        "0": "Number Of Hunters",
+        "13": "\u6293\u6355\u8005\u6570\u91cf"
+    },
+    "Opt-PropHunt-Hunter,2": {
+        "0": "Hunter Initial Blackout Duration",
+        "13": "\u5f00\u5c40\u6293\u6355\u8005\u7acb\u6b63\u7b49\u5f85\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,3": {
+        "0": "Kill Cooldown After Miss",
+        "13": "\u7a7a\u8fc7\u540e\u51fb\u6740\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,4": {
+        "0": "Kill Cooldown After Hit",
+        "13": "\u51fb\u4e2d\u540e\u51fb\u6740\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,5": {
+        "0": "Reveal Prop Cooldown",
+        "13": "\u63ed\u793a\u9053\u5177\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,6": {
+        "0": "Reveal Prop Duration",
+        "13": "\u63ed\u793a\u9053\u5177\u6301\u7eed\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,7": {
+        "0": "Reveal Time Punish",
+        "13": "\u4f7f\u7528\u63ed\u793a\u6240\u51cf\u5c11\u7684\u8eb2\u85cf\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,8": {
+        "0": "Hunter Admin Cooldown",
+        "13": "\u6293\u6355\u8005\u7ba1\u7406\u5730\u56fe\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,9": {
+        "0": "Find Cooldown",
+        "13": "\u96f7\u8fbe\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Hunter,10": {
+        "0": "Find Duration",
+        "13": "\u96f7\u8fbe\u6301\u7eed\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Prop,1": {
+        "0": "Props Become Hunters When Found",
+        "13": "\u9053\u5177\u88ab\u51fb\u6740\u540e\u53d8\u6210\u6293\u6355\u8005"
+    },
+    "Opt-PropHunt-Prop,2": {
+        "0": "Invisibility Enabled",
+        "13": "\u730e\u7269\u9690\u8eab\u6280\u80fd"
+    },
+    "Opt-PropHunt-Prop,3": {
+        "0": "Invisibility Cooldown",
+        "13": "\u9690\u8eab\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Prop,4": {
+        "0": "Invisibility Duration",
+        "13": "\u9690\u8eab\u6301\u7eed\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Prop,5": {
+        "0": "Speedboost Enabled",
+        "13": "\u730e\u7269\u75be\u8dd1\u6280\u80fd"
+    },
+    "Opt-PropHunt-Prop,6": {
+        "0": "Speedboost Cooldown",
+        "13": "\u75be\u8dd1\u51b7\u5374\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Prop,7": {
+        "0": "Speedboost Duration",
+        "13": "\u75be\u8dd1\u6301\u7eed\u65f6\u95f4"
+    },
+    "Opt-PropHunt-Prop,8": {
+        "0": "Speedboost Ratio",
+        "13": "\u75be\u8dd1\u65f6\u901f\u5ea6\u63d0\u5347\u500d\u6570"
+    },
     "Game-General,1": {
         "0": "Admin: {0:#0.0} sec remaining",
         "11": "\u30a2\u30c9\u30df\u30f3: \u6b8b\u308a{0:#0.0}\u79d2",
@@ -3856,6 +3996,22 @@
         "11": "MR\u30a8\u30c7\u30a3\u30b7\u30e7\u30f3",
         "13": "MR\u7248\u672c"
     },
+    "Credentials,4": {
+        "0": "Prop Hunt",
+        "13": "\u53d8\u5f62\u72e9\u730e"
+    },
+    "Credentials,5": {
+        "0": "<size=60%>Modded by <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color></size>",
+        "13": "<size=60%>Modded by <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color></size>"
+    },
+    "Credentials,6": {
+        "0": "<size=60%> <color=#FCCE03FF>Special thanks to K3ndo, Smeggy & <b>Imp11</b></color></size>",
+        "13": "<size=60%> <color=#FCCE03FF>Special thanks to K3ndo, Smeggy & <b>Imp11</b></color></size>"
+    },
+    "Credentials,7": {
+        "0": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c Design by <color=#FCCE03FF>Bavari</color>",
+        "13": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c Design by <color=#FCCE03FF>Bavari</color>"
+    },
     "startText,1": {
         "0": "GO!!",
         "13": "\u51fa\u53d1!!"
@@ -4005,7 +4161,7 @@
         "13": "\u5982\u679c\u6211\u6ca1\u8bb0\u9519\u7684\u8bdd, \u6211\u5728\u4f1a\u8bae\u524d{0}\u79d2\u5c31\u5bc4\u4e86."
     },
     "Opt-Medium,17": {
-        "0": "It seems like my killer was the {0}.",
+        "0": "It seems like my killer is the {0}.",
         "13": "\u6211\u60f3\u90a3\u6740\u6211\u7684\u51f6\u624b\u804c\u4e1a\u5e94\u8be5\u662f{0}."
     }
 }

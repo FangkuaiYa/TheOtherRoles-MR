@@ -28,7 +28,8 @@ namespace TheOtherRoles
     {
         Classic,
         Guesser,
-        HideNSeek
+        HideNSeek,
+        PropHunt
     }
 
     public enum MapId
@@ -58,17 +59,17 @@ namespace TheOtherRoles
             return Sprite.Create(texture, textureRect, pivot, pixelsPerUnit);
         }
 
-        public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit)
+        public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit, bool cache = true)
         {
             try
             {
-                if (CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
+                if (cache && CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
                 Texture2D texture = loadTextureFromResources(path);
                 sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), pixelsPerUnit);
                 sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
                 return CachedSprites[path + pixelsPerUnit] = sprite;
             }
-            catch
+            catch (Exception e)
             {
                 System.Console.WriteLine("Error loading sprite from path: " + path);
             }
@@ -117,7 +118,13 @@ namespace TheOtherRoles
             }
             return null;
         }
-
+        public static string readTextFromResources(string path)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            Stream stream = assembly.GetManifestResourceStream(path);
+            StreamReader textStreamReader = new StreamReader(stream);
+            return textStreamReader.ReadToEnd();
+        }
         public static AudioClip loadAudioClipFromResources(string path, string clipName = "UNNAMED_TOR_AUDIO_CLIP")
         {
             // must be "raw (headerless) 2-channel signed 32 bit pcm (le)" (can e.g. use Audacity?to export)
@@ -280,9 +287,13 @@ namespace TheOtherRoles
             return cs(roleInfo.color, $"{roleInfo.name}: {roleInfo.shortDescription}");
         }
 
-        public static bool isLighterColor(int colorId)
+        public static bool isD(byte playerId)
         {
-            return CustomColors.lighterColors.Contains(colorId);
+            return playerId % 2 == 0;
+        }
+        public static bool isLighterColor(PlayerControl target)
+        {
+            return isD(target.PlayerId);
         }
 
         public static bool isCustomServer()
@@ -325,9 +336,9 @@ namespace TheOtherRoles
                 player.Data.Tasks.Clear();
         }
 
-        public static void setSemiTransparent(this PoolablePlayer player, bool value)
+        public static void setSemiTransparent(this PoolablePlayer player, bool value, float alpha = 0.25f)
         {
-            float alpha = value ? 0.25f : 1f;
+            alpha = value ? alpha : 1f;
             foreach (SpriteRenderer r in player.gameObject.GetComponentsInChildren<SpriteRenderer>())
                 r.color = new Color(r.color.r, r.color.g, r.color.b, alpha);
             player.cosmetics.nameText.color = new Color(player.cosmetics.nameText.color.r, player.cosmetics.nameText.color.g, player.cosmetics.nameText.color.b, alpha);
@@ -528,7 +539,7 @@ namespace TheOtherRoles
             if (AmongUsClient.Instance.IsGameOver) return MurderAttemptResult.SuppressKill;
             if (killer == null || killer.Data == null || (killer.Data.IsDead && !ignoreIfKillerIsDead) || killer.Data.Disconnected) return MurderAttemptResult.SuppressKill; // Allow non Impostor kills compared to vanilla code
             if (target == null || target.Data == null || target.Data.IsDead || target.Data.Disconnected) return MurderAttemptResult.SuppressKill; // Allow killing players in vents compared to vanilla code
-            if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return MurderAttemptResult.PerformKill;
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek || PropHunt.isPropHuntGM) return MurderAttemptResult.PerformKill;
 
             // Handle first kill attempt
             if (TORMapOptions.shieldFirstKill && TORMapOptions.firstKillPlayer == target) return MurderAttemptResult.SuppressKill;
@@ -551,7 +562,7 @@ namespace TheOtherRoles
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)CustomRPC.ShieldedMurderAttempt, Hazel.SendOption.Reliable, -1);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
                 RPCProcedure.shieldedMurderAttempt();
-                SoundEffectsManager.play("fail");
+                SoundEffectsManager.play(AssetLoader.customAssets.fail);
                 return MurderAttemptResult.SuppressKill;
             }
 

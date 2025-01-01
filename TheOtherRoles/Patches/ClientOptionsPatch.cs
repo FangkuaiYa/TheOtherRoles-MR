@@ -539,8 +539,10 @@ namespace TheOtherRoles.Patches
                 isOpenPreset = false;
                 presetTabInfo.Select();
             }
+            Thread.Sleep(10);
+
             OnCreateNewPreset();
-            Thread.Sleep(1);
+            Thread.Sleep(2);
             createNewPresetEditName.Close();
         }
 

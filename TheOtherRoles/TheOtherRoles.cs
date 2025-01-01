@@ -6,6 +6,7 @@ using AmongUs.Data;
 using HarmonyLib;
 using Hazel;
 using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
@@ -72,6 +73,7 @@ namespace TheOtherRoles
             KillerCreator.clearAndReload();
             MadmateKiller.clearAndReload();
             TaskMaster.clearAndReload();
+            PropHunt.clearAndReload();
 
             // Modifier
             Bait.clearAndReload();
@@ -379,7 +381,7 @@ namespace TheOtherRoles
                 if (playerId == CachedPlayer.LocalPlayer.PlayerId)
                 {
                     HudManagerStartPatch.setAllButtonsHandcuffedStatus(active);
-                    SoundEffectsManager.play("deputyHandcuff");
+                    SoundEffectsManager.play(AssetLoader.customAssets.deputyHandcuff);
                 }
 
             }
@@ -1664,11 +1666,18 @@ namespace TheOtherRoles
             else
             {
                 int randomNumber = rnd.Next(4);
-                string typeOfColor = Helpers.isLighterColor(Medium.target.killerIfExisting.Data.DefaultOutfit.ColorId) ? ModTranslation.GetString("Button", 5) : ModTranslation.GetString("Button", 6);
+                string typeOfColor = Helpers.isLighterColor(Medium.target.killerIfExisting) ? ModTranslation.GetString("Button", 5) : ModTranslation.GetString("Button", 6);
                 float timeSinceDeath = ((float)(Medium.meetingStartTime - Medium.target.timeOfDeath).TotalMilliseconds);
 
-                if (randomNumber == 0) msg = string.Format(ModTranslation.GetString("Opt-Medium", 14), RoleInfo.GetRolesString(Medium.target.player, false, false, false));
-                else if (randomNumber == 1) msg = string.Format(ModTranslation.GetString("Opt-Medium", 15), typeOfColor);
+                var roleString = RoleInfo.GetRolesString(Medium.target.player, false, false, false);
+                if (randomNumber == 0)
+                {
+                    if (!roleString.Contains(ModTranslation.GetRoleName(RoleId.Impostor).GetString()) && !roleString.Contains(ModTranslation.GetRoleName(RoleId.Crewmate).GetString()))
+                        msg = string.Format(ModTranslation.GetString("Opt-Medium", 14), roleString);
+                    else
+                        msg = string.Format(ModTranslation.GetString("Opt-Medium", 15), typeOfColor);
+                }
+                else if (randomNumber == 1) msg = "I'm not sure, but I guess a " + typeOfColor + " color killed me.";
                 else if (randomNumber == 2) msg = string.Format(ModTranslation.GetString("Opt-Medium", 16), Math.Round(timeSinceDeath / 1000));
                 else msg = string.Format(ModTranslation.GetString("Opt-Medium", 17), RoleInfo.GetRolesString(Medium.target.killerIfExisting, false, false, true));
             }
@@ -3100,7 +3109,7 @@ namespace TheOtherRoles
             }
             isPlanted = false;
             isActive = false;
-            if (flag) SoundEffectsManager.stop("bombFuseBurning");
+            if (flag) SoundEffectsManager.stop(AssetLoader.customAssets.bombFuseBurning);
         }
 
         public static void clearAndReload()

@@ -234,8 +234,9 @@ namespace TheOtherRoles
                 case RoleId.Shifter: id = 65; break;
                 case RoleId.TaskRacer: id = 66; break;
                 case RoleId.Bomber: id = 67; break;
-                case RoleId.Hunter: id = 10000; break;
-                case RoleId.Hunted: id = 10001; break;
+                case RoleId.Hunter: id = 68; break;
+                case RoleId.Hunted: id = 69; break;
+                case RoleId.Prop: id = 70; break;
             }
 
             return id;

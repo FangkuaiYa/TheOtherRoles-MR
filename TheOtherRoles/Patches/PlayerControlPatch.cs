@@ -1261,7 +1261,7 @@ namespace TheOtherRoles.Patches
             if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return;
 
             // Mini and Morphling shrink
-            playerSizeUpdate(__instance);
+            if (!PropHunt.isPropHuntGM) playerSizeUpdate(__instance);
 
             // set position of colorblind text
             foreach (var pc in PlayerControl.AllPlayerControls)
@@ -1386,6 +1386,7 @@ namespace TheOtherRoles.Patches
                 Bomb.update();
                 // -- GAME MODE --
                 hunterUpdate();
+                PropHunt.update();
             }
         }
     }
@@ -1411,7 +1412,7 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(PlayerControl __instance)
         {
-            if (HideNSeek.isHideNSeekGM) return false;
+            if (HideNSeek.isHideNSeekGM || PropHunt.isPropHuntGM) return false;
             Helpers.handleVampireBiteOnBodyReport();
             return true;
         }
@@ -1446,7 +1447,7 @@ namespace TheOtherRoles.Patches
                         }
                         else if (timeSinceDeath < Detective.reportColorDuration * 1000)
                         {
-                            var typeOfColor = ModTranslation.GetString("Button", Helpers.isLighterColor(deadPlayer.killerIfExisting.Data.DefaultOutfit.ColorId) ? 5 : 6);
+                            var typeOfColor = ModTranslation.GetString("Button", Helpers.isLighterColor(deadPlayer.killerIfExisting) ? 5 : 6);
                             msg = string.Format(ModTranslation.GetString("Game-Detective", 2), typeOfColor);
                         }
                         else

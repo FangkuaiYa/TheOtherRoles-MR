@@ -7,6 +7,7 @@ using HarmonyLib;
 using Hazel;
 using InnerNet;
 using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Patches;
 using TheOtherRoles.Players;
@@ -88,6 +89,7 @@ namespace TheOtherRoles
         Invert,
         Chameleon,
         Shifter,
+        Prop,
         // Task Vs Mode ---
         TaskRacer,
 
@@ -197,6 +199,11 @@ namespace TheOtherRoles
         SetGuesserGm,
         HuntedShield,
         HuntedRewindTime,
+        SetProp,
+        SetRevealed,
+        PropHuntStartTimer,
+        PropHuntSetInvis,
+        PropHuntSetSpeedboost,
 
         // Other functionality
         ShareTimer,
@@ -736,7 +743,7 @@ namespace TheOtherRoles
         public static void timeMasterRewindTime()
         {
             TimeMaster.shieldActive = false; // Shield is no longer active when rewinding
-            SoundEffectsManager.stop("timemasterShield");  // Shield sound stopped when rewinding
+            SoundEffectsManager.stop(AssetLoader.customAssets.timemasterShield);  // Shield sound stopped when rewinding
             if (TimeMaster.timeMaster != null && TimeMaster.timeMaster == CachedPlayer.LocalPlayer.PlayerControl)
             {
                 resetTimeMasterButton();
@@ -940,7 +947,7 @@ namespace TheOtherRoles
                 if (wasSpy || wasImpostor) Sidekick.wasTeamRed = true;
                 Sidekick.wasSpy = wasSpy;
                 Sidekick.wasImpostor = wasImpostor;
-                if (player == CachedPlayer.LocalPlayer.PlayerControl) SoundEffectsManager.play("jackalSidekick");
+                if (player == CachedPlayer.LocalPlayer.PlayerControl) SoundEffectsManager.play(AssetLoader.customAssets.jackalSidekick);
             }
             Jackal.canCreateSidekick = false;
         }
@@ -1446,7 +1453,7 @@ namespace TheOtherRoles
         public static void huntedRewindTime(byte playerId)
         {
             Hunted.timeshieldActive.Remove(playerId); // Shield is no longer active when rewinding
-            SoundEffectsManager.stop("timemasterShield");  // Shield sound stopped when rewinding
+            SoundEffectsManager.stop(AssetLoader.customAssets.timemasterShield);  // Shield sound stopped when rewinding
             if (playerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId)
             {
                 resetHuntedRewindButton();
@@ -1468,6 +1475,47 @@ namespace TheOtherRoles
             if (Minigame.Instance)
                 Minigame.Instance.ForceClose();
             CachedPlayer.LocalPlayer.PlayerControl.moveable = false;
+        }
+        public static void propHuntStartTimer(bool blackout = false)
+        {
+            if (blackout)
+            {
+                PropHunt.blackOutTimer = PropHunt.initialBlackoutTime;
+                PropHunt.transformLayers();
+            }
+            else
+            {
+                PropHunt.timerRunning = true;
+                PropHunt.blackOutTimer = 0f;
+            }
+            PropHunt.startTime = DateTime.UtcNow;
+            foreach (var pc in PlayerControl.AllPlayerControls.ToArray().Where(x => x.Data.Role.IsImpostor))
+            {
+                pc.MyPhysics.SetBodyType(PlayerBodyTypes.Seeker);
+            }
+        }
+        public static void propHuntSetProp(byte playerId, string propName, float posX)
+        {
+            PlayerControl player = Helpers.playerById(playerId);
+            var prop = PropHunt.FindPropByNameAndPos(propName, posX);
+            if (prop == null) return;
+            player.GetComponent<SpriteRenderer>().sprite = prop.GetComponent<SpriteRenderer>().sprite;
+            player.transform.localScale = prop.transform.lossyScale;
+            player.Visible = false;
+            PropHunt.currentObject[player.PlayerId] = new Tuple<string, float>(propName, posX);
+        }
+        public static void propHuntSetRevealed(byte playerId)
+        {
+            PropHunt.isCurrentlyRevealed.Add(playerId, PropHunt.revealDuration);
+            PropHunt.timer -= PropHunt.revealPunish;
+        }
+        public static void propHuntSetInvis(byte playerId)
+        {
+            PropHunt.invisPlayers.Add(playerId, PropHunt.invisDuration);
+        }
+        public static void propHuntSetSpeedboost(byte playerId)
+        {
+            PropHunt.speedboostActive.Add(playerId, PropHunt.speedboostDuration);
         }
 
         public static void yasunaSpecialVote(byte playerid, byte targetid)
@@ -1593,7 +1641,7 @@ namespace TheOtherRoles
                     MadmateKiller.madmateKiller = player;
 
                     if (player == CachedPlayer.LocalPlayer.PlayerControl)
-                        SoundEffectsManager.play("jackalSidekick");
+                        SoundEffectsManager.play(AssetLoader.customAssets.jackalSidekick);
 
                     DestroyableSingleton<RoleManager>.Instance.SetRole(player, RoleTypes.Crewmate);
                     break;
@@ -1688,7 +1736,7 @@ namespace TheOtherRoles
         {
             try
             {
-                SoundEffectsManager.playAtPosition("bombDefused", Bomber.bomb.bomb.transform.position, range: Bomber.hearRange);
+                SoundEffectsManager.playAtPosition(AssetLoader.customAssets.bombDefused, Bomber.bomb.bomb.transform.position, range: Bomber.hearRange);
             }
             catch { }
             Bomber.clearBomb();
@@ -2068,6 +2116,24 @@ namespace TheOtherRoles
                 case (byte)CustomRPC.HuntedRewindTime:
                     byte rewindPlayer = reader.ReadByte();
                     RPCProcedure.huntedRewindTime(rewindPlayer);
+                    break;
+                case (byte)CustomRPC.PropHuntStartTimer:
+                    RPCProcedure.propHuntStartTimer(reader.ReadBoolean());
+                    break;
+                case (byte)CustomRPC.SetProp:
+                    byte targetPlayer = reader.ReadByte();
+                    string propName = reader.ReadString();
+                    float posX = reader.ReadSingle();
+                    RPCProcedure.propHuntSetProp(targetPlayer, propName, posX);
+                    break;
+                case (byte)CustomRPC.SetRevealed:
+                    RPCProcedure.propHuntSetRevealed(reader.ReadByte());
+                    break;
+                case (byte)CustomRPC.PropHuntSetInvis:
+                    RPCProcedure.propHuntSetInvis(reader.ReadByte());
+                    break;
+                case (byte)CustomRPC.PropHuntSetSpeedboost:
+                    RPCProcedure.propHuntSetSpeedboost(reader.ReadByte());
                     break;
                 case (byte)CustomRPC.ShareGhostInfo:
                     RPCProcedure.receiveGhostInfo(reader.ReadByte(), reader);

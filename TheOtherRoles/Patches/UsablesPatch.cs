@@ -5,6 +5,7 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
 using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
@@ -157,7 +158,7 @@ namespace TheOtherRoles.Patches
                 writer.Write(isEnter ? byte.MaxValue : (byte)0);
                 writer.EndMessage();
                 RPCProcedure.useUncheckedVent(__instance.Id, CachedPlayer.LocalPlayer.PlayerId, isEnter ? byte.MaxValue : (byte)0);
-                SoundEffectsManager.play("tricksterUseBoxVent");
+                SoundEffectsManager.play(AssetLoader.customAssets.tricksterUseBoxVent);
                 return false;
             }
 
@@ -252,6 +253,11 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(KillButton __instance)
         {
+            if (PropHunt.isPropHuntGM)
+            {
+                KillAnimationCoPerformKillPatch.hideNextAnimation = true;  // dont jump out of bounds!
+                return false;
+            }
             if (__instance.isActiveAndEnabled && __instance.currentTarget && !__instance.isCoolingDown && !CachedPlayer.LocalPlayer.Data.IsDead && CachedPlayer.LocalPlayer.PlayerControl.CanMove)
             {
                 // Deputy handcuff update.
@@ -690,11 +696,11 @@ namespace TheOtherRoles.Patches
                                         {
                                             var color = Palette.PlayerColors[playerInfo.DefaultOutfit.ColorId];
                                             if (Hacker.onlyColorType)
-                                                color = Helpers.isLighterColor(playerInfo.DefaultOutfit.ColorId) ? Palette.PlayerColors[7] : Palette.PlayerColors[6];
+                                                color = Helpers.isD(playerInfo.PlayerId) ? Palette.PlayerColors[7] : Palette.PlayerColors[6];
                                             roomColors.Add(color);
                                         }
                                     }
-                                    else
+                                    else if (!collider2D.isTrigger)
                                     {
                                         PlayerControl component = collider2D.GetComponent<PlayerControl>();
                                         if (component && component.Data != null && !component.Data.Disconnected && !component.Data.IsDead && (__instance.showLivePlayerPosition || !component.AmOwner) && hashSet.Add((int)component.PlayerId))
@@ -705,8 +711,7 @@ namespace TheOtherRoles.Patches
                                                 Color color = component.cosmetics.currentBodySprite.BodySprite.material.GetColor("_BodyColor");
                                                 if (Hacker.onlyColorType)
                                                 {
-                                                    var id = Mathf.Max(0, Palette.PlayerColors.IndexOf(color));
-                                                    color = Helpers.isLighterColor((byte)id) ? Palette.PlayerColors[7] : Palette.PlayerColors[6];
+                                                    color = Helpers.isLighterColor(component) ? Palette.PlayerColors[7] : Palette.PlayerColors[6];
                                                 }
                                                 roomColors.Add(color);
                                             }
@@ -1151,6 +1156,7 @@ namespace TheOtherRoles.Patches
         {
             if (HideNSeek.isHideNSeekGM)
                 return HideNSeek.canSabotage;
+            if (PropHunt.isPropHuntGM) return false;
 
             // Task Vs Mode
             if (TaskRacer.isValid())

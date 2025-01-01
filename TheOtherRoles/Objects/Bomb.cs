@@ -1,5 +1,6 @@
 using System;
 using Hazel;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
@@ -71,7 +72,7 @@ namespace TheOtherRoles.Objects
                 {
                     bomb.SetActive(true);
                     background.SetActive(true);
-                    SoundEffectsManager.playAtPosition("bombFuseBurning", p, Bomber.destructionTime, Bomber.hearRange, true);
+                    playAtPosition(AssetLoader.customAssets.bombFuseBurning, p, Bomber.destructionTime, Bomber.hearRange, true);
                     Bomber.isActive = true;
 
                     FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Bomber.destructionTime, new Action<float>((x) =>
@@ -107,11 +108,36 @@ namespace TheOtherRoles.Objects
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     GameHistory.overrideDeathReasonAndKiller(CachedPlayer.LocalPlayer, DeadPlayer.CustomDeathReason.Bomb, killer: Bomber.bomber);
                 }
-                SoundEffectsManager.playAtPosition("bombExplosion", position, range: Bomber.hearRange);
+                playAtPosition(AssetLoader.customAssets.bombExplosion, position, range: Bomber.hearRange);
             }
             Bomber.clearBomb();
             canDefuse = false;
             Bomber.isActive = false;
+        }
+        public static void playAtPosition(AudioClip audioClip, Vector2 position, float maxDuration = 15f, float range = 5f, bool loop = false)
+        {
+            if (!TORMapOptions.enableSoundEffects || !Constants.ShouldPlaySfx()) return;
+            AudioClip clipToPlay = audioClip;
+
+            AudioSource source = SoundManager.Instance.PlaySound(clipToPlay, false, 1f);
+            source.loop = loop;
+            HudManager.Instance.StartCoroutine(Effects.Lerp(maxDuration, new Action<float>((p) =>
+            {
+                if (source != null)
+                {
+                    if (p == 1)
+                    {
+                        source.Stop();
+                    }
+                    float distance, volume;
+                    distance = Vector2.Distance(position, CachedPlayer.LocalPlayer.PlayerControl.GetTruePosition());
+                    if (distance < range)
+                        volume = 1f - (distance / range);
+                    else
+                        volume = 0f;
+                    source.volume = volume;
+                }
+            })));
         }
 
         public static void update()

@@ -98,6 +98,7 @@ namespace TheOtherRoles
 
         public override void Load()
         {
+            AssetLoader.LoadAssets();
             Logger = Log;
             Instance = this;
             //_ = Helpers.checkBeta(); // Exit if running an expired beta

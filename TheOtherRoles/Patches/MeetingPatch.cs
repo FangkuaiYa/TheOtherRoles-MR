@@ -451,7 +451,7 @@ namespace TheOtherRoles.Patches
                 var mayorPVA = __instance.playerStates.FirstOrDefault(x => x.TargetPlayerId == Mayor.mayor.PlayerId);
                 if (mayorPVA != null && mayorPVA.DidVote)
                 {
-                    SoundEffectsManager.play("fail");
+                    SoundEffectsManager.play(AssetLoader.customAssets.fail);
                     return;
                 }
             }
@@ -570,7 +570,7 @@ namespace TheOtherRoles.Patches
                             MessageWriter murderAttemptWriter = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShieldedMurderAttempt, Hazel.SendOption.Reliable, -1);
                             AmongUsClient.Instance.FinishRpcImmediately(murderAttemptWriter);
                             RPCProcedure.shieldedMurderAttempt();
-                            SoundEffectsManager.play("fail");
+                            SoundEffectsManager.play(AssetLoader.customAssets.fail);
                             return;
                         }
 

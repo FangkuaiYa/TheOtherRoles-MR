@@ -484,6 +484,33 @@ namespace TheOtherRoles
         public static CustomOption huntedShieldRewindTime;
         public static CustomOption huntedShieldNumber;
 
+        // Prop Hunt Settings
+        public static CustomOption propHuntMap;
+        public static CustomOption propHuntTimer;
+        public static CustomOption propHuntNumberOfHunters;
+        public static CustomOption hunterInitialBlackoutTime;
+        public static CustomOption hunterMissCooldown;
+        public static CustomOption hunterHitCooldown;
+        public static CustomOption hunterMaxMissesBeforeDeath;
+        public static CustomOption propBecomesHunterWhenFound;
+        public static CustomOption propHunterVision;
+        public static CustomOption propVision;
+        public static CustomOption propHuntRevealCooldown;
+        public static CustomOption propHuntRevealDuration;
+        public static CustomOption propHuntRevealPunish;
+        public static CustomOption propHuntUnstuckCooldown;
+        public static CustomOption propHuntUnstuckDuration;
+        public static CustomOption propHuntInvisCooldown;
+        public static CustomOption propHuntInvisDuration;
+        public static CustomOption propHuntSpeedboostCooldown;
+        public static CustomOption propHuntSpeedboostDuration;
+        public static CustomOption propHuntSpeedboostSpeed;
+        public static CustomOption propHuntSpeedboostEnabled;
+        public static CustomOption propHuntInvisEnabled;
+        public static CustomOption propHuntAdminCooldown;
+        public static CustomOption propHuntFindCooldown;
+        public static CustomOption propHuntFindDuration;
+
         internal static Dictionary<byte, byte[]> blockedRolePairings = new Dictionary<byte, byte[]>();
 
         public static string cs(Color c, string s)
@@ -495,6 +522,10 @@ namespace TheOtherRoles
         {
             f = Mathf.Clamp01(f);
             return (byte)(f * 255);
+        }
+        public static bool isMapSelectionOption(CustomOption option)
+        {
+            return option == CustomOptionHolder.propHuntMap && option == CustomOptionHolder.hideNSeekMap;
         }
 
         public static void Load()
@@ -930,7 +961,7 @@ namespace TheOtherRoles
             guesserGamemodeCantGuessSnitchIfTaksDone = CustomOption.Create(2010, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 10), true, null);
 
             // Hide N Seek Gamemode (3000 - 3999)
-            hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new[] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true);
+            hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new [] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = hideNSeekMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });
             hideNSeekHunterCount = CustomOption.Create(3000, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 2, Color.yellow), 1f, 1f, 3f, 1f);
             hideNSeekKillCooldown = CustomOption.Create(3021, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 3, Color.yellow), 10f, 2.5f, 60f, 2.5f);
             hideNSeekHunterVision = CustomOption.Create(3001, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 4, Color.yellow), 0.5f, 0.25f, 2f, 0.25f);
@@ -938,7 +969,7 @@ namespace TheOtherRoles
             hideNSeekCommonTasks = CustomOption.Create(3023, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 6, Color.yellow), 1f, 0f, 4f, 1f);
             hideNSeekShortTasks = CustomOption.Create(3024, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 7, Color.yellow), 3f, 1f, 23f, 1f);
             hideNSeekLongTasks = CustomOption.Create(3025, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 8, Color.yellow), 3f, 0f, 15f, 1f);
-            hideNSeekTimer = CustomOption.Create(3003, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 9, Color.yellow), 5f, 1f, 30f, 1f);
+            hideNSeekTimer = CustomOption.Create(3003, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 9, Color.yellow), 5f, 1f, 30f, 0.5f);
             hideNSeekTaskWin = CustomOption.Create(3004, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 10, Color.yellow), false);
             hideNSeekTaskPunish = CustomOption.Create(3017, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 11, Color.yellow), 10f, 0f, 30f, 1f);
             hideNSeekCanSabotage = CustomOption.Create(3019, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 12, Color.yellow), false);
@@ -958,6 +989,35 @@ namespace TheOtherRoles
             huntedShieldDuration = CustomOption.Create(3016, Types.HideNSeekRoles, new TranslationInfo("Opt-HideNSeek-Roles", 12, Color.gray), 5f, 1f, 60f, 1f);
             huntedShieldRewindTime = CustomOption.Create(3018, Types.HideNSeekRoles, new TranslationInfo("Opt-HideNSeek-Roles", 13, Color.gray), 3f, 1f, 10f, 1f);
             huntedShieldNumber = CustomOption.Create(3026, Types.HideNSeekRoles, new TranslationInfo("Opt-HideNSeek-Roles", 14, Color.gray), 3f, 1f, 15f, 1f);
+
+            // Prop Hunt General Options
+            propHuntMap = CustomOption.Create(4020, Types.PropHunt, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new[] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = propHuntMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });
+            propHuntTimer = CustomOption.Create(4021, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 1, Color.yellow), 5f, 1f, 30f, 0.5f);
+            propHuntUnstuckCooldown = CustomOption.Create(4011, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 2, Color.yellow), 30f, 2.5f, 60f, 2.5f);
+            propHuntUnstuckDuration = CustomOption.Create(4012, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 3, Color.yellow), 2f, 1f, 60f, 1f);
+            propHunterVision = CustomOption.Create(4006, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 4, Color.yellow), 0.5f, 0.25f, 2f, 0.25f);
+            propVision = CustomOption.Create(4007, Types.PropHunt, new TranslationInfo("Opt-PropHunt-General", 5, Color.yellow), 2f, 0.25f, 5f, 0.25f);
+            // Hunter Options
+            propHuntNumberOfHunters = CustomOption.Create(4000, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 1, Color.red), 1f, 1f, 5f, 1f, null, true);
+            hunterInitialBlackoutTime = CustomOption.Create(4001, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 2, Color.red), 10f, 5f, 20f, 1f);
+            hunterMissCooldown = CustomOption.Create(4004, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 3, Color.red), 10f, 2.5f, 60f, 2.5f);
+            hunterHitCooldown = CustomOption.Create(4005, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 4, Color.red), 10f, 2.5f, 60f, 2.5f);
+            propHuntRevealCooldown = CustomOption.Create(4008, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 5, Color.red), 30f, 10f, 90f, 2.5f);
+            propHuntRevealDuration = CustomOption.Create(4009, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 6, Color.red), 5f, 1f, 60f, 1f);
+            propHuntRevealPunish = CustomOption.Create(4010, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 7, Color.red), 10f, 0f, 1800f, 5f);
+            propHuntAdminCooldown = CustomOption.Create(4022, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 8, Color.red), 30f, 2.5f, 1800f, 2.5f);
+            propHuntFindCooldown = CustomOption.Create(4023, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 9, Color.red), 60f, 2.5f, 1800f, 2.5f);
+            propHuntFindDuration = CustomOption.Create(4024, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Hunter", 10, Color.red), 5f, 1f, 15f, 1f);
+            // Prop Options
+            propBecomesHunterWhenFound = CustomOption.Create(4003, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 1, Palette.CrewmateBlue), false, null, true);
+            propHuntInvisEnabled = CustomOption.Create(4013, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 2, Palette.CrewmateBlue), true, null, true);
+            propHuntInvisCooldown = CustomOption.Create(4014, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 3, Palette.CrewmateBlue), 120f, 10f, 1800f, 2.5f, propHuntInvisEnabled);
+            propHuntInvisDuration = CustomOption.Create(4015, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 4, Palette.CrewmateBlue), 5f, 1f, 30f, 1f, propHuntInvisEnabled);
+            propHuntSpeedboostEnabled = CustomOption.Create(4016, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 5, Palette.CrewmateBlue), true, null, true);
+            propHuntSpeedboostCooldown = CustomOption.Create(4017, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 6, Palette.CrewmateBlue), 60f, 2.5f, 1800f, 2.5f, propHuntSpeedboostEnabled);
+            propHuntSpeedboostDuration = CustomOption.Create(4018, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 7, Palette.CrewmateBlue), 5f, 1f, 15f, 1f, propHuntSpeedboostEnabled);
+            propHuntSpeedboostSpeed = CustomOption.Create(4019, Types.PropHunt, new TranslationInfo("Opt-PropHunt-Prop", 8, Palette.CrewmateBlue), 2f, 1.25f, 5f, 0.25f, propHuntSpeedboostEnabled);
+
 
             // Other options
             maxNumberOfMeetings = CustomOption.Create(3, Types.General, new TranslationInfo("Opt-General", 57), 10, 0, 15, 1, null, true);
