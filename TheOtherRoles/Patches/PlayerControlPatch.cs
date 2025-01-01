@@ -2077,6 +2077,8 @@ namespace TheOtherRoles.Patches
                 GameData.Instance &&
                 __instance.myPlayer.CanMove)
                 __instance.body.velocity *= -1;
+
+            Kataomoi.fixedUpdate(__instance);
         }
     }
 }

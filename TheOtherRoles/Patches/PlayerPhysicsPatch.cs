@@ -15,26 +15,6 @@ namespace TheOtherRoles.Patches
             __instance.body.interpolation = RigidbodyInterpolation2D.Interpolate;
         }
     }
-
-    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.FixedUpdate))]
-    public static class PlayerPhysicsFixedUpdatePatch
-    {
-        public static void Postfix(PlayerPhysics __instance)
-        {
-            bool shouldInvert = Invert.invert.FindAll(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId).Count > 0 && Invert.meetings > 0;
-            if (__instance.AmOwner &&
-                AmongUsClient.Instance &&
-                AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started &&
-                !PlayerControl.LocalPlayer.Data.IsDead &&
-                shouldInvert &&
-                GameData.Instance &&
-                __instance.myPlayer.CanMove)
-                __instance.body.velocity *= -1;
-
-            Kataomoi.fixedUpdate(__instance);
-        }
-    }
-
     [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.WalkPlayerTo))]
     class PlayerPhysicsWalkPlayerToPatch
     {
