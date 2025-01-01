@@ -56,7 +56,7 @@ namespace TheOtherRoles.Patches
                 switch (__instance.Id)
                 {
                     case 9:  // Cannot enter vent 9 (Engine Room Exit Only Vent)!
-                        if (CachedPlayer.LocalPlayer.PlayerControl.inVent) break;
+                        if (PlayerControl.LocalPlayer.inVent) break;
                         __result = float.MaxValue;
                         return canUse = couldUse = false;
                     case 14: // Lower Central
@@ -77,7 +77,7 @@ namespace TheOtherRoles.Patches
             var usableDistance = __instance.UsableDistance;
             if (__instance.name.StartsWith("JackInTheBoxVent_"))
             {
-                if (Trickster.trickster != CachedPlayer.LocalPlayer.PlayerControl)
+                if (Trickster.trickster != PlayerControl.LocalPlayer)
                 {
                     // Only the Trickster can use the Jack-In-The-Boxes!
                     canUse = false;
@@ -112,7 +112,7 @@ namespace TheOtherRoles.Patches
         static bool Prefix(VentButton __instance)
         {
             // Manually modifying the VentButton to use Vent.Use again in order to trigger the Vent.Use prefix patch
-            if (__instance.currentTarget != null && !Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId)) __instance.currentTarget.Use();
+            if (__instance.currentTarget != null && !Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId)) __instance.currentTarget.Use();
             return false;
         }
     }
@@ -124,25 +124,25 @@ namespace TheOtherRoles.Patches
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return true;
             // Deputy handcuff disables the vents
-            if (Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerId))
+            if (Deputy.handcuffedPlayers.Contains(PlayerControl.LocalPlayer.PlayerId))
             {
                 Deputy.setHandcuffedKnows();
                 return false;
             }
-            if (Trapper.playersOnMap.Contains(CachedPlayer.LocalPlayer.PlayerControl)) return false;
+            if (Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer)) return false;
 
             bool canUse;
             bool couldUse;
-            __instance.CanUse(CachedPlayer.LocalPlayer.Data, out canUse, out couldUse);
+            __instance.CanUse(PlayerControl.LocalPlayer.Data, out canUse, out couldUse);
             if (!canUse) return false; // No need to execute the native method as using is disallowed anyways
 
-            bool isEnter = !CachedPlayer.LocalPlayer.PlayerControl.inVent;
-            bool canMoveInVents = CachedPlayer.LocalPlayer.PlayerControl != Spy.spy && !Trapper.playersOnMap.Contains(CachedPlayer.LocalPlayer.PlayerControl);
-            if (canMoveInVents) canMoveInVents = CachedPlayer.LocalPlayer.PlayerControl != Madmate.madmate;
+            bool isEnter = !PlayerControl.LocalPlayer.inVent;
+            bool canMoveInVents = PlayerControl.LocalPlayer != Spy.spy && !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer);
+            if (canMoveInVents) canMoveInVents = PlayerControl.LocalPlayer != Madmate.madmate;
             if (canMoveInVents)
             {
-                if (CachedPlayer.LocalPlayer.PlayerControl == MadmateKiller.madmateKiller &&
-                    CachedPlayer.LocalPlayer.PlayerControl.Data.RoleType == RoleTypes.Crewmate &&
+                if (PlayerControl.LocalPlayer == MadmateKiller.madmateKiller &&
+                    PlayerControl.LocalPlayer.Data.RoleType == RoleTypes.Crewmate &&
                     !MadmateKiller.canMoveVents)
                 {
                     canMoveInVents = false;
@@ -152,12 +152,12 @@ namespace TheOtherRoles.Patches
             if (__instance.name.StartsWith("JackInTheBoxVent_"))
             {
                 __instance.SetButtons(isEnter && canMoveInVents);
-                MessageWriter writer = AmongUsClient.Instance.StartRpc(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UseUncheckedVent, Hazel.SendOption.Reliable);
+                MessageWriter writer = AmongUsClient.Instance.StartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UseUncheckedVent, Hazel.SendOption.Reliable);
                 writer.WritePacked(__instance.Id);
-                writer.Write(CachedPlayer.LocalPlayer.PlayerId);
+                writer.Write(PlayerControl.LocalPlayer.PlayerId);
                 writer.Write(isEnter ? byte.MaxValue : (byte)0);
                 writer.EndMessage();
-                RPCProcedure.useUncheckedVent(__instance.Id, CachedPlayer.LocalPlayer.PlayerId, isEnter ? byte.MaxValue : (byte)0);
+                RPCProcedure.useUncheckedVent(__instance.Id, PlayerControl.LocalPlayer.PlayerId, isEnter ? byte.MaxValue : (byte)0);
                 SoundEffectsManager.play(AssetLoader.customAssets.tricksterUseBoxVent);
                 return false;
             }
@@ -197,12 +197,12 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(Vent otherVent)
         {
-            bool b = !Trapper.playersOnMap.Contains(CachedPlayer.LocalPlayer.PlayerControl);
-            if (b && CachedPlayer.LocalPlayer.PlayerControl.cosmetics.Visible)
+            bool b = !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer);
+            if (b && PlayerControl.LocalPlayer.cosmetics.Visible)
             {
-                RPCProcedure.ventMoveInvisible(CachedPlayer.LocalPlayer.PlayerId);
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.VentMoveInvisible, Hazel.SendOption.Reliable, -1);
-                writer.Write(CachedPlayer.LocalPlayer.PlayerId);
+                RPCProcedure.ventMoveInvisible(PlayerControl.LocalPlayer.PlayerId);
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VentMoveInvisible, Hazel.SendOption.Reliable, -1);
+                writer.Write(PlayerControl.LocalPlayer.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
             return b;
@@ -228,7 +228,7 @@ namespace TheOtherRoles.Patches
         static void Postfix(VentButton __instance)
         {
             // Trickster render special vent button
-            if (Trickster.trickster != null && Trickster.trickster == CachedPlayer.LocalPlayer.PlayerControl)
+            if (Trickster.trickster != null && Trickster.trickster == PlayerControl.LocalPlayer)
             {
                 if (defaultVentSprite == null) defaultVentSprite = __instance.graphic.sprite;
                 bool isSpecialVent = __instance.currentTarget != null && __instance.currentTarget.gameObject != null && __instance.currentTarget.gameObject.name.StartsWith("JackInTheBoxVent_");
@@ -258,30 +258,30 @@ namespace TheOtherRoles.Patches
                 KillAnimationCoPerformKillPatch.hideNextAnimation = true;  // dont jump out of bounds!
                 return false;
             }
-            if (__instance.isActiveAndEnabled && __instance.currentTarget && !__instance.isCoolingDown && !CachedPlayer.LocalPlayer.Data.IsDead && CachedPlayer.LocalPlayer.PlayerControl.CanMove)
+            if (__instance.isActiveAndEnabled && __instance.currentTarget && !__instance.isCoolingDown && !PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.CanMove)
             {
                 // Deputy handcuff update.
-                if (Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerId))
+                if (Deputy.handcuffedPlayers.Contains(PlayerControl.LocalPlayer.PlayerId))
                 {
                     Deputy.setHandcuffedKnows();
                     return false;
                 }
 
                 // Use an unchecked kill command, to allow shorter kill cooldowns etc. without getting kicked
-                MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(CachedPlayer.LocalPlayer.PlayerControl, __instance.currentTarget);
+                MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(PlayerControl.LocalPlayer, __instance.currentTarget);
                 // Handle blank kill
                 if (res == MurderAttemptResult.BlankKill)
                 {
-                    CachedPlayer.LocalPlayer.PlayerControl.killTimer = GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown;
-                    if (CachedPlayer.LocalPlayer.PlayerControl == Cleaner.cleaner)
+                    PlayerControl.LocalPlayer.killTimer = GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown;
+                    if (PlayerControl.LocalPlayer == Cleaner.cleaner)
                         Cleaner.cleaner.killTimer = HudManagerStartPatch.cleanerCleanButton.Timer = HudManagerStartPatch.cleanerCleanButton.MaxTimer;
-                    else if (CachedPlayer.LocalPlayer.PlayerControl == Warlock.warlock)
+                    else if (PlayerControl.LocalPlayer == Warlock.warlock)
                         Warlock.warlock.killTimer = HudManagerStartPatch.warlockCurseButton.Timer = HudManagerStartPatch.warlockCurseButton.MaxTimer;
-                    else if (CachedPlayer.LocalPlayer.PlayerControl == Mini.mini && Mini.mini.Data.Role.IsImpostor)
+                    else if (PlayerControl.LocalPlayer == Mini.mini && Mini.mini.Data.Role.IsImpostor)
                         Mini.mini.SetKillTimer(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown * (Mini.isGrownUp() ? 0.66f : 2f));
-                    else if (CachedPlayer.LocalPlayer.PlayerControl == Witch.witch)
+                    else if (PlayerControl.LocalPlayer == Witch.witch)
                         Witch.witch.killTimer = HudManagerStartPatch.witchSpellButton.Timer = HudManagerStartPatch.witchSpellButton.MaxTimer;
-                    else if (CachedPlayer.LocalPlayer.PlayerControl == Ninja.ninja)
+                    else if (PlayerControl.LocalPlayer == Ninja.ninja)
                         Ninja.ninja.killTimer = HudManagerStartPatch.ninjaButton.Timer = HudManagerStartPatch.ninjaButton.MaxTimer;
                 }
                 __instance.SetTarget(null);
@@ -296,8 +296,8 @@ namespace TheOtherRoles.Patches
         static void Postfix()
         {
             // Mafia disable sabotage button for Janitor and sometimes for Mafioso
-            bool blockSabotageJanitor = (Janitor.janitor != null && Janitor.janitor == CachedPlayer.LocalPlayer.PlayerControl);
-            bool blockSabotageMafioso = (Mafioso.mafioso != null && Mafioso.mafioso == CachedPlayer.LocalPlayer.PlayerControl && Godfather.godfather != null && !Godfather.godfather.Data.IsDead);
+            bool blockSabotageJanitor = (Janitor.janitor != null && Janitor.janitor == PlayerControl.LocalPlayer);
+            bool blockSabotageMafioso = (Mafioso.mafioso != null && Mafioso.mafioso == PlayerControl.LocalPlayer && Godfather.godfather != null && !Godfather.godfather.Data.IsDead);
             if (blockSabotageJanitor || blockSabotageMafioso)
             {
                 FastDestroyableSingleton<HudManager>.Instance.SabotageButton.SetDisabled();
@@ -310,8 +310,8 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(ReportButton __instance)
         {
-            if (__instance.isActiveAndEnabled && Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerId) && __instance.graphic.color == Palette.EnabledColor) Deputy.setHandcuffedKnows();
-            return !Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId);
+            if (__instance.isActiveAndEnabled && Deputy.handcuffedPlayers.Contains(PlayerControl.LocalPlayer.PlayerId) && __instance.graphic.color == Palette.EnabledColor) Deputy.setHandcuffedKnows();
+            return !Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId);
         }
     }
 
@@ -324,19 +324,19 @@ namespace TheOtherRoles.Patches
             var statusText = "";
 
             // Deactivate emergency button for Swapper
-            if (Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl && !Swapper.canCallEmergency)
+            if (Swapper.swapper != null && Swapper.swapper == PlayerControl.LocalPlayer && !Swapper.canCallEmergency)
             {
                 roleCanCallEmergency = false;
                 statusText = ModTranslation.GetString("Game-Swapper", 1);
             }
             // Potentially deactivate emergency button for Jester
-            if (Jester.jester != null && Jester.jester == CachedPlayer.LocalPlayer.PlayerControl && !Jester.canCallEmergency)
+            if (Jester.jester != null && Jester.jester == PlayerControl.LocalPlayer && !Jester.canCallEmergency)
             {
                 roleCanCallEmergency = false;
                 statusText = ModTranslation.GetString("Game-Jester", 1);
             }
             // Potentially deactivate emergency button for Lawyer/Prosecutor
-            if (Lawyer.lawyer != null && Lawyer.lawyer == CachedPlayer.LocalPlayer.PlayerControl && !Lawyer.canCallEmergency)
+            if (Lawyer.lawyer != null && Lawyer.lawyer == PlayerControl.LocalPlayer && !Lawyer.canCallEmergency)
             {
                 roleCanCallEmergency = false;
                 statusText = ModTranslation.GetString("Game-Lawer", 1);
@@ -356,9 +356,9 @@ namespace TheOtherRoles.Patches
             // Handle max number of meetings
             if (__instance.state == 1)
             {
-                int localRemaining = CachedPlayer.LocalPlayer.PlayerControl.RemainingEmergencies;
+                int localRemaining = PlayerControl.LocalPlayer.RemainingEmergencies;
                 int teamRemaining = Mathf.Max(0, maxNumberOfMeetings - meetingsCount);
-                int remaining = Mathf.Min(localRemaining, (Mayor.mayor != null && Mayor.mayor == CachedPlayer.LocalPlayer.PlayerControl) ? 1 : teamRemaining);
+                int remaining = Mathf.Min(localRemaining, (Mayor.mayor != null && Mayor.mayor == PlayerControl.LocalPlayer) ? 1 : teamRemaining);
                 __instance.NumberText.text = string.Format(ModTranslation.GetString("Game-General", 7), localRemaining, teamRemaining);
                 __instance.ButtonActive = remaining > 0;
                 __instance.ClosedLid.gameObject.SetActive(!__instance.ButtonActive);
@@ -397,11 +397,11 @@ namespace TheOtherRoles.Patches
                 return false;
             }
 
-            if (Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl)
+            if (Swapper.swapper != null && Swapper.swapper == PlayerControl.LocalPlayer)
                 return !__instance.TaskTypes.Any(x => x == TaskTypes.FixLights || x == TaskTypes.FixComms);
-            if (Madmate.madmate != null && Madmate.madmate == CachedPlayer.LocalPlayer.PlayerControl && __instance.AllowImpostor)
+            if (Madmate.madmate != null && Madmate.madmate == PlayerControl.LocalPlayer && __instance.AllowImpostor)
                 return !__instance.TaskTypes.Any(x => x == TaskTypes.FixLights || x == TaskTypes.FixComms);
-            if (MadmateKiller.madmateKiller != null && MadmateKiller.madmateKiller == CachedPlayer.LocalPlayer.PlayerControl && MadmateKiller.madmateKiller.Data.RoleType == RoleTypes.Crewmate && __instance.AllowImpostor)
+            if (MadmateKiller.madmateKiller != null && MadmateKiller.madmateKiller == PlayerControl.LocalPlayer && MadmateKiller.madmateKiller.Data.RoleType == RoleTypes.Crewmate && __instance.AllowImpostor)
                 return !__instance.TaskTypes.Any(x => (!MadmateKiller.canFixLightsTask && x == TaskTypes.FixLights) || (!MadmateKiller.canFixCommsTask && x == TaskTypes.FixComms));
 
             if (__instance.AllowImpostor) return true;
@@ -417,9 +417,9 @@ namespace TheOtherRoles.Patches
         static void Postfix(TuneRadioMinigame __instance)
         {
             // Block Swapper from fixing comms. Still looking for a better way to do this, but deleting the task doesn't seem like a viable option since then the camera, admin table, ... work while comms are out
-            if ((Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl) ||
-                (Madmate.madmate != null && Madmate.madmate == CachedPlayer.LocalPlayer.PlayerControl) ||
-                (MadmateKiller.madmateKiller != null && MadmateKiller.madmateKiller == CachedPlayer.LocalPlayer.PlayerControl && MadmateKiller.madmateKiller.Data.RoleType == RoleTypes.Crewmate && !MadmateKiller.canFixCommsTask))
+            if ((Swapper.swapper != null && Swapper.swapper == PlayerControl.LocalPlayer) ||
+                (Madmate.madmate != null && Madmate.madmate == PlayerControl.LocalPlayer) ||
+                (MadmateKiller.madmateKiller != null && MadmateKiller.madmateKiller == PlayerControl.LocalPlayer && MadmateKiller.madmateKiller.Data.RoleType == RoleTypes.Crewmate && !MadmateKiller.canFixCommsTask))
             {
                 __instance.Close();
             }
@@ -432,9 +432,9 @@ namespace TheOtherRoles.Patches
         static void Postfix(SwitchMinigame __instance)
         {
             // Block Swapper from fixing lights. One could also just delete the PlayerTask, but I wanted to do it the same way as with coms for now.
-            if ((Swapper.swapper != null && Swapper.swapper == CachedPlayer.LocalPlayer.PlayerControl) ||
-                (Madmate.madmate != null && Madmate.madmate == CachedPlayer.LocalPlayer.PlayerControl) ||
-                (MadmateKiller.madmateKiller != null && MadmateKiller.madmateKiller == CachedPlayer.LocalPlayer.PlayerControl && MadmateKiller.madmateKiller.Data.RoleType == RoleTypes.Crewmate && !MadmateKiller.canFixLightsTask))
+            if ((Swapper.swapper != null && Swapper.swapper == PlayerControl.LocalPlayer) ||
+                (Madmate.madmate != null && Madmate.madmate == PlayerControl.LocalPlayer) ||
+                (MadmateKiller.madmateKiller != null && MadmateKiller.madmateKiller == PlayerControl.LocalPlayer && MadmateKiller.madmateKiller.Data.RoleType == RoleTypes.Crewmate && !MadmateKiller.canFixLightsTask))
             {
                 __instance.Close();
             }
@@ -451,7 +451,7 @@ namespace TheOtherRoles.Patches
         {
             static void Postfix(VitalsMinigame __instance)
             {
-                if (Hacker.hacker != null && CachedPlayer.LocalPlayer.PlayerControl == Hacker.hacker)
+                if (Hacker.hacker != null && PlayerControl.LocalPlayer == Hacker.hacker)
                 {
                     hackerTexts = new List<TMPro.TextMeshPro>();
                     foreach (VitalsPanel panel in __instance.vitals)
@@ -484,7 +484,7 @@ namespace TheOtherRoles.Patches
             static void Postfix(VitalsMinigame __instance)
             {
                 // Consume time to see vital if the player is alive
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (!PlayerControl.LocalPlayer.Data.IsDead)
                 {
                     if (CustomOptionHolder.enabledVitalsTimer.getBool())
                     {
@@ -503,7 +503,7 @@ namespace TheOtherRoles.Patches
                         // Consume the time via RPC
                         float delta = Time.unscaledDeltaTime;
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                            CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                            PlayerControl.LocalPlayer.NetId,
                             (byte)CustomRPC.ConsumeVitalTime,
                             Hazel.SendOption.Reliable,
                             -1);
@@ -515,7 +515,7 @@ namespace TheOtherRoles.Patches
 
                 // Hacker show time since death
 
-                if (Hacker.hacker != null && Hacker.hacker == CachedPlayer.LocalPlayer.PlayerControl && Hacker.hackerTimer > 0)
+                if (Hacker.hacker != null && Hacker.hacker == PlayerControl.LocalPlayer && Hacker.hackerTimer > 0)
                 {
                     for (int k = 0; k < __instance.vitals.Length; k++)
                     {
@@ -561,7 +561,7 @@ namespace TheOtherRoles.Patches
             if (CustomOptionHolder.enabledTaskVsMode.getBool())
                 return false;
 
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+            if (PlayerControl.LocalPlayer.Data.IsDead)
                 return true;
 
             // Vitals
@@ -596,7 +596,7 @@ namespace TheOtherRoles.Patches
                 if (CustomOptionHolder.enabledTaskVsMode.getBool())
                     return false;
 
-                if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (PlayerControl.LocalPlayer.Data.IsDead)
                     return true;
 
                 if (CustomOptionHolder.enabledAdminTimer.getBool())
@@ -619,8 +619,8 @@ namespace TheOtherRoles.Patches
                 }
 
                 // Consume time to see admin map if the player is alive
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead &&
-                    !(EvilHacker.evilHacker != null && EvilHacker.evilHacker == CachedPlayer.LocalPlayer.PlayerControl && EvilHacker.isMobile) &&
+                if (!PlayerControl.LocalPlayer.Data.IsDead &&
+                    !(EvilHacker.evilHacker != null && EvilHacker.evilHacker == PlayerControl.LocalPlayer && EvilHacker.isMobile) &&
                     CustomOptionHolder.enabledAdminTimer.getBool())
                 {
                     // Show the grey map if players ran out of admin time.
@@ -633,7 +633,7 @@ namespace TheOtherRoles.Patches
 
                     // Consume the time via RPC
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                        CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                        PlayerControl.LocalPlayer.NetId,
                         (byte)CustomRPC.ConsumeAdminTime,
                         Hazel.SendOption.Reliable,
                         -1);
@@ -645,7 +645,7 @@ namespace TheOtherRoles.Patches
                 __instance.timer = 0f;
                 players = new Dictionary<SystemTypes, List<Color>>();
                 bool commsActive = false;
-                foreach (PlayerTask task in CachedPlayer.LocalPlayer.PlayerControl.myTasks.GetFastEnumerator())
+                foreach (PlayerTask task in PlayerControl.LocalPlayer.myTasks.GetFastEnumerator())
                     if (task.TaskType == TaskTypes.FixComms) commsActive = true;
 
 
@@ -744,7 +744,7 @@ namespace TheOtherRoles.Patches
             static void Postfix(CounterArea __instance)
             {
                 // Hacker display saved colors on the admin panel
-                bool showHackerInfo = Hacker.hacker != null && Hacker.hacker == CachedPlayer.LocalPlayer.PlayerControl && Hacker.hackerTimer > 0;
+                bool showHackerInfo = Hacker.hacker != null && Hacker.hacker == PlayerControl.LocalPlayer && Hacker.hackerTimer > 0;
                 if (players.ContainsKey(__instance.RoomType))
                 {
                     List<Color> colors = players[__instance.RoomType];
@@ -827,7 +827,7 @@ namespace TheOtherRoles.Patches
             public static bool Prefix(SurveillanceMinigame __instance)
             {
                 // Consume time to see security camera if the player is alive
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (!PlayerControl.LocalPlayer.Data.IsDead)
                 {
                     if (CustomOptionHolder.enabledSecurityCameraTimer.getBool())
                     {
@@ -846,7 +846,7 @@ namespace TheOtherRoles.Patches
                         // Consume the time via RPC
                         float delta = Time.unscaledDeltaTime;
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                            CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                            PlayerControl.LocalPlayer.NetId,
                             (byte)CustomRPC.ConsumeSecurityCameraTime,
                             Hazel.SendOption.Reliable,
                             -1);
@@ -875,7 +875,7 @@ namespace TheOtherRoles.Patches
                     timer = 0f;
                 }
 
-                if ((__instance.isStatic || update) && !PlayerTask.PlayerHasTaskOfType<IHudOverrideTask>(CachedPlayer.LocalPlayer.PlayerControl))
+                if ((__instance.isStatic || update) && !PlayerTask.PlayerHasTaskOfType<IHudOverrideTask>(PlayerControl.LocalPlayer))
                 {
                     __instance.isStatic = false;
                     for (int i = 0; i < __instance.ViewPorts.Length; i++)
@@ -888,7 +888,7 @@ namespace TheOtherRoles.Patches
                             __instance.ViewPorts[i].sharedMaterial = __instance.StaticMaterial;
                     }
                 }
-                else if (!__instance.isStatic && PlayerTask.PlayerHasTaskOfType<HudOverrideTask>(CachedPlayer.LocalPlayer.PlayerControl))
+                else if (!__instance.isStatic && PlayerTask.PlayerHasTaskOfType<HudOverrideTask>(PlayerControl.LocalPlayer))
                 {
                     __instance.isStatic = true;
                     for (int j = 0; j < __instance.ViewPorts.Length; j++)
@@ -1002,8 +1002,8 @@ namespace TheOtherRoles.Patches
             }
 
 
-            isLightsOut = CachedPlayer.LocalPlayer.PlayerControl.myTasks.ToArray().Any(x => x.name.Contains("FixLightsTask")) || Trickster.lightsOutTimer > 0;
-            bool ignoreNightVision = CustomOptionHolder.camsNoNightVisionIfImpVision.getBool() && Helpers.hasImpVision(GameData.Instance.GetPlayerById(CachedPlayer.LocalPlayer.PlayerId)) || CachedPlayer.LocalPlayer.Data.IsDead;
+            isLightsOut = PlayerControl.LocalPlayer.myTasks.ToArray().Any(x => x.name.Contains("FixLightsTask")) || Trickster.lightsOutTimer > 0;
+            bool ignoreNightVision = CustomOptionHolder.camsNoNightVisionIfImpVision.getBool() && Helpers.hasImpVision(GameData.Instance.GetPlayerById(PlayerControl.LocalPlayer.PlayerId)) || PlayerControl.LocalPlayer.Data.IsDead;
             bool nightVisionEnabled = CustomOptionHolder.camsNightVision.getBool();
 
             if (isLightsOut && !nightVisionIsActive && nightVisionEnabled && !ignoreNightVision)
@@ -1110,7 +1110,7 @@ namespace TheOtherRoles.Patches
         {
             public static bool Prefix(PlanetSurveillanceMinigame __instance, [HarmonyArgument(0)] int direction)
             {
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && CustomOptionHolder.enabledSecurityCameraTimer.getBool())
+                if (!PlayerControl.LocalPlayer.Data.IsDead && CustomOptionHolder.enabledSecurityCameraTimer.getBool())
                 {
                     if (TORMapOptions.securityCameraTimer <= 0)
                         return false;
@@ -1127,9 +1127,9 @@ namespace TheOtherRoles.Patches
             {
 #if false
                 Func<PlayerTask, bool> p = (t) => { return t.TaskType == TaskTypes.FixComms; };
-                bool commsActive = CachedPlayer.LocalPlayer.PlayerControl.myTasks.Find(p) != null;
+                bool commsActive = PlayerControl.LocalPlayer.myTasks.Find(p) != null;
 #endif
-                bool commsActive = PlayerTask.PlayerHasTaskOfType<IHudOverrideTask>(CachedPlayer.LocalPlayer.PlayerControl);
+                bool commsActive = PlayerTask.PlayerHasTaskOfType<IHudOverrideTask>(PlayerControl.LocalPlayer);
                 if (commsActive)
                 {
                     __instance.SabText.gameObject.SetActive(true);
@@ -1137,7 +1137,7 @@ namespace TheOtherRoles.Patches
                 }
 
                 // Consume time to see security camera if the player is alive
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (!PlayerControl.LocalPlayer.Data.IsDead)
                 {
                     if (CustomOptionHolder.enabledSecurityCameraTimer.getBool())
                     {
@@ -1151,7 +1151,7 @@ namespace TheOtherRoles.Patches
                         // Consume the time via RPC
                         float delta = Time.unscaledDeltaTime;
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                            CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                            PlayerControl.LocalPlayer.NetId,
                             (byte)CustomRPC.ConsumeSecurityCameraTime,
                             Hazel.SendOption.Reliable,
                             -1);
@@ -1173,7 +1173,7 @@ namespace TheOtherRoles.Patches
         {
             if (TORMapOptions.allowParallelMedBayScans)
             {
-                __instance.medscan.CurrentUser = CachedPlayer.LocalPlayer.PlayerId;
+                __instance.medscan.CurrentUser = PlayerControl.LocalPlayer.PlayerId;
                 __instance.medscan.UsersList.Clear();
             }
         }
@@ -1201,9 +1201,9 @@ namespace TheOtherRoles.Patches
                     __instance.Close();
                     return false;
                 }
-                if (!CachedPlayer.LocalPlayer.PlayerControl.CanMove)
+                if (!PlayerControl.LocalPlayer.CanMove)
                     return false;
-                CachedPlayer.LocalPlayer.PlayerControl.SetPlayerMaterialColors(__instance.HerePoint);
+                PlayerControl.LocalPlayer.SetPlayerMaterialColors(__instance.HerePoint);
                 __instance.GenericShow();
                 __instance.taskOverlay.Show();
                 __instance.ColorControl.SetColor(new Color(0.05f, 0.2f, 1f, 1f));
@@ -1237,7 +1237,7 @@ namespace TheOtherRoles.Patches
         {
             static void Postfix(MapBehaviour __instance)
             {
-                if (Kataomoi.kataomoi == CachedPlayer.LocalPlayer.PlayerControl)
+                if (Kataomoi.kataomoi == PlayerControl.LocalPlayer)
                 {
                     if (kataomoiMark == null)
                     {
@@ -1257,7 +1257,7 @@ namespace TheOtherRoles.Patches
             static void Postfix(MapBehaviour __instance)
             {
 
-                if (Kataomoi.kataomoi == CachedPlayer.LocalPlayer.PlayerControl)
+                if (Kataomoi.kataomoi == PlayerControl.LocalPlayer)
                 {
                     bool isShowKataomoiMark = IsShowKataomoiMark();
                     kataomoiMark.enabled = isShowKataomoiMark;
@@ -1275,7 +1275,7 @@ namespace TheOtherRoles.Patches
 
         static bool IsShowKataomoiMark()
         {
-            return Kataomoi.kataomoi == CachedPlayer.LocalPlayer.PlayerControl && !CachedPlayer.LocalPlayer.PlayerControl.isDead() && Kataomoi.target != null && !Kataomoi.target.isDead() && Kataomoi.isSearch;
+            return Kataomoi.kataomoi == PlayerControl.LocalPlayer && !PlayerControl.LocalPlayer.isDead() && Kataomoi.target != null && !Kataomoi.target.isDead() && Kataomoi.isSearch;
         }
 
         static SpriteRenderer kataomoiMark;

@@ -44,7 +44,7 @@ namespace TheOtherRoles.Patches
             }
 
             __instance.HerePoint.transform.SetLocalZ(-2.1f);
-            if (Trapper.trapper != null && CachedPlayer.LocalPlayer.PlayerId == Trapper.trapper.PlayerId)
+            if (Trapper.trapper != null && PlayerControl.LocalPlayer.PlayerId == Trapper.trapper.PlayerId)
             {
                 foreach (PlayerControl player in Trapper.playersOnMap)
                 {

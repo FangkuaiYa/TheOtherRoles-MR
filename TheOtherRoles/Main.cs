@@ -268,7 +268,7 @@ namespace TheOtherRoles
                     GameData.Instance.AddPlayer(playerControl);
                     AmongUsClient.Instance.Spawn(playerControl, -2, InnerNet.SpawnFlags.None);
 
-                    playerControl.transform.position = CachedPlayer.LocalPlayer.transform.position;
+                    playerControl.transform.position = PlayerControl.LocalPlayer.transform.position;
 #if true
                     playerControl.GetComponent<DummyBehaviour>().enabled = true;
                     playerControl.NetTransform.enabled = false;
@@ -286,7 +286,7 @@ namespace TheOtherRoles
                 // Terminate round
                 if (Input.GetKeyDown(KeyCode.L))
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ForceEnd, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ForceEnd, Hazel.SendOption.Reliable, -1);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.forceEnd();
                 }
@@ -348,12 +348,12 @@ namespace TheOtherRoles
 
                 if (Input.GetKeyDown(KeyCode.Alpha2))
                 {
-                    MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
-                    killWriter.Write(CachedPlayer.LocalPlayer.PlayerId);
-                    killWriter.Write(CachedPlayer.LocalPlayer.PlayerId);
+                    MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
+                    killWriter.Write(PlayerControl.LocalPlayer.PlayerId);
+                    killWriter.Write(PlayerControl.LocalPlayer.PlayerId);
                     killWriter.Write(byte.MaxValue);
                     AmongUsClient.Instance.FinishRpcImmediately(killWriter);
-                    RPCProcedure.uncheckedMurderPlayer(CachedPlayer.LocalPlayer.PlayerId, CachedPlayer.LocalPlayer.PlayerId, Byte.MaxValue);
+                    RPCProcedure.uncheckedMurderPlayer(PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.PlayerId, Byte.MaxValue);
                 }
             }
  

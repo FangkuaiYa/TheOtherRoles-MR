@@ -112,7 +112,7 @@ namespace TheOtherRoles.Objects
             }
         }
 
-        private void OnDestroy()
+        private static void OnDestroy()
         {
             Instance = null;
         }

@@ -148,7 +148,7 @@ namespace TheOtherRoles.Patches
             }
             else
             {
-                foreach (var playerControl in CachedPlayer.AllPlayers)
+                foreach (var playerControl in PlayerControl.AllPlayerControls)
                 {
                     int allTasks = GameOptionsManager.Instance.currentNormalGameOptions.NumCommonTasks + GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks + GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks;
                     var roles = RoleInfo.getRoleInfoForPlayer(playerControl);
@@ -162,7 +162,7 @@ namespace TheOtherRoles.Patches
                     bool isTaskMaster = TaskMaster.isTaskMaster(playerControl.PlayerId);
                     bool isTaskMasterExTasks = isTaskMaster && TaskMaster.isTaskComplete;
                     string extraInfo = "";
-                    if (Kataomoi.kataomoi != null && Kataomoi.target == playerControl.PlayerControl)
+                    if (Kataomoi.kataomoi != null && Kataomoi.target == playerControl)
                         extraInfo = Helpers.cs(Kataomoi.color, "♥");
                     string roleString = RoleInfo.GetRolesString(playerControl, true, true, false);
                     AdditionalTempData.playerRoles.Add(new AdditionalTempData.PlayerRoleInfo()
@@ -725,11 +725,11 @@ namespace TheOtherRoles.Patches
 
                 if (RPCProcedure.uncheckedEndGameReason != (byte)CustomGameOverReason.Unused)
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
                         (byte)CustomRPC.UncheckedEndGame_Response, Hazel.SendOption.Reliable, -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
-                    RPCProcedure.uncheckedEndGameResponse(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    RPCProcedure.uncheckedEndGameResponse(PlayerControl.LocalPlayer.PlayerId);
                     if (!AmongUsClient.Instance.AmHost)
                         RPCProcedure.uncheckedEndGameReason = (byte)CustomGameOverReason.Unused;
                 }
@@ -771,7 +771,7 @@ namespace TheOtherRoles.Patches
 
             public static void UncheckedEndGame(GameOverReason reason, bool never_used)
             {
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
                     (byte)CustomRPC.UncheckedEndGame, Hazel.SendOption.Reliable, -1);
                 writer.Write((byte)reason);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -1034,7 +1034,7 @@ namespace TheOtherRoles.Patches
                 GetPlayerCounts();
             }
 
-            private bool isLover(GameData.PlayerInfo p)
+            private static bool isLover(GameData.PlayerInfo p)
             {
                 return (Lovers.lover1 != null && Lovers.lover1.PlayerId == p.PlayerId) || (Lovers.lover2 != null && Lovers.lover2.PlayerId == p.PlayerId);
             }

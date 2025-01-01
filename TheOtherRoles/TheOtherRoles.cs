@@ -372,12 +372,12 @@ namespace TheOtherRoles
             public static void setHandcuffedKnows(bool active = true, byte playerId = Byte.MaxValue)
             {
                 if (playerId == Byte.MaxValue)
-                    playerId = CachedPlayer.LocalPlayer.PlayerId;
+                    playerId = PlayerControl.LocalPlayer.PlayerId;
 
-                if (active && playerId == CachedPlayer.LocalPlayer.PlayerId)
+                if (active && playerId == PlayerControl.LocalPlayer.PlayerId)
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerId);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
                     writer.Write((byte)RPCProcedure.GhostInfoTypes.HandcuffNoticed);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                 }
@@ -387,7 +387,7 @@ namespace TheOtherRoles
                     handcuffedPlayers.RemoveAll(x => x == playerId);
                 }
 
-                if (playerId == CachedPlayer.LocalPlayer.PlayerId)
+                if (playerId == PlayerControl.LocalPlayer.PlayerId)
                 {
                     HudManagerStartPatch.setAllButtonsHandcuffedStatus(active);
                     SoundEffectsManager.play(AssetLoader.customAssets.deputyHandcuff);
@@ -533,10 +533,10 @@ namespace TheOtherRoles
             if (Medic.shielded != null && ((target == Medic.shielded && !isMorphedMorphling) || (isMorphedMorphling && Morphling.morphTarget == Medic.shielded)))
             {
                 hasVisibleShield = Medic.showShielded == 0 || Helpers.shouldShowGhostInfo() // Everyone or Ghost info
-                    || (Medic.showShielded == 1 && (CachedPlayer.LocalPlayer.PlayerControl == Medic.shielded || CachedPlayer.LocalPlayer.PlayerControl == Medic.medic)) // Shielded + Medic
-                    || (Medic.showShielded == 2 && CachedPlayer.LocalPlayer.PlayerControl == Medic.medic); // Medic only
+                    || (Medic.showShielded == 1 && (PlayerControl.LocalPlayer == Medic.shielded || PlayerControl.LocalPlayer == Medic.medic)) // Shielded + Medic
+                    || (Medic.showShielded == 2 && PlayerControl.LocalPlayer == Medic.medic); // Medic only
                 // Make shield invisible till after the next meeting if the option is set (the medic can already see the shield)
-                hasVisibleShield = hasVisibleShield && (Medic.meetingAfterShielding || !Medic.showShieldAfterMeeting || CachedPlayer.LocalPlayer.PlayerControl == Medic.medic || Helpers.shouldShowGhostInfo());
+                hasVisibleShield = hasVisibleShield && (Medic.meetingAfterShielding || !Medic.showShieldAfterMeeting || PlayerControl.LocalPlayer == Medic.medic || Helpers.shouldShowGhostInfo());
             }
             return hasVisibleShield;
         }
@@ -2161,7 +2161,7 @@ namespace TheOtherRoles
         {
             if (doorHacker == null || doorHacker.PlayerId != playerId || remainingUses == 0) return;
 
-            if (playerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId)
+            if (playerId == PlayerControl.LocalPlayer.PlayerId)
             {
                 doors = GameObject.FindObjectsOfType<PlainDoor>();
                 if (doors != null && doors.Count > 0)
@@ -2399,12 +2399,12 @@ namespace TheOtherRoles
                 {
                     float elapsedTime = stalkingDuration - stalkingTimer;
                     float alpha = Mathf.Min(elapsedTime, stalkingFadeTime) / stalkingFadeTime;
-                    alpha = Mathf.Clamp(1f - alpha, CachedPlayer.LocalPlayer.PlayerControl == kataomoi || CachedPlayer.LocalPlayer.PlayerControl.isDead() ? 0.1f : 0f, 1f);
+                    alpha = Mathf.Clamp(1f - alpha, PlayerControl.LocalPlayer == kataomoi || PlayerControl.LocalPlayer.isDead() ? 0.1f : 0f, 1f);
                     setAlpha(alpha);
                 }
                 else
                 {
-                    setAlpha(CachedPlayer.LocalPlayer.PlayerControl == kataomoi ? 0.1f : 0f);
+                    setAlpha(PlayerControl.LocalPlayer == kataomoi ? 0.1f : 0f);
                 }
 
                 if (stalkingTimer <= 0f)
@@ -2420,7 +2420,7 @@ namespace TheOtherRoles
                 {
                     float elapsedTime = stalkingFadeTime - stalkingEffectTimer;
                     float alpha = Mathf.Min(elapsedTime, stalkingFadeTime) / stalkingFadeTime;
-                    alpha = Mathf.Clamp(alpha, CachedPlayer.LocalPlayer.PlayerControl == kataomoi || CachedPlayer.LocalPlayer.PlayerControl.isDead() ? 0.1f : 0f, 1f);
+                    alpha = Mathf.Clamp(alpha, PlayerControl.LocalPlayer == kataomoi || PlayerControl.LocalPlayer.isDead() ? 0.1f : 0f, 1f);
                     setAlpha(alpha);
                 }
                 else
@@ -2513,7 +2513,7 @@ namespace TheOtherRoles
             public Info(PlayerControl player)
             {
                 this.player = player;
-                if (CachedPlayer.LocalPlayer.PlayerControl == player)
+                if (PlayerControl.LocalPlayer == player)
                     self = this;
             }
 
@@ -2640,7 +2640,7 @@ namespace TheOtherRoles
                 selfEndDateTime = DateTime.Now;
                 ulong completeTime = (ulong)(selfEndDateTime - selfStartDateTime).TotalMilliseconds;
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                    CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                    PlayerControl.LocalPlayer.NetId,
                     (byte)CustomRPC.TaskVsMode_AllTaskCompleted,
                     Hazel.SendOption.Reliable,
                     -1);
@@ -2886,7 +2886,7 @@ namespace TheOtherRoles
             if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost && isReadyAll())
             {
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                    CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                    PlayerControl.LocalPlayer.NetId,
                     (byte)CustomRPC.TaskVsMode_Start,
                     Hazel.SendOption.Reliable,
                     -1);
@@ -3267,9 +3267,9 @@ namespace TheOtherRoles
         public static void setPosition()
         {
             if (position == Vector3.zero) return;  // Check if this has been set, otherwise first spawn on submerged will fail
-            if (antiTeleport.FindAll(x => x.PlayerId == CachedPlayer.LocalPlayer.PlayerId).Count > 0)
+            if (antiTeleport.FindAll(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId).Count > 0)
             {
-                CachedPlayer.LocalPlayer.NetTransform.RpcSnapTo(position);
+                PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(position);
                 if (SubmergedCompatibility.IsSubmerged)
                 {
                     SubmergedCompatibility.ChangeFloor(position.y > -7);

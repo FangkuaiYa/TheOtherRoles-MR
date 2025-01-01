@@ -131,7 +131,7 @@ namespace TheOtherRoles
         {
             var option = options.FirstOrDefault(x => x.id == optionId);
             if (option == null) return;
-            var writer = AmongUsClient.Instance!.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
+            var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
             writer.Write((byte)1);
             writer.WritePacked((uint)option.id);
             writer.WritePacked(Convert.ToUInt32(option.selection));
@@ -140,12 +140,12 @@ namespace TheOtherRoles
 
         public static void ShareOptionSelections()
         {
-            if (CachedPlayer.AllPlayers.Count <= 1 || AmongUsClient.Instance!.AmHost == false && CachedPlayer.LocalPlayer.PlayerControl == null) return;
+            if (CachedPlayer.AllPlayers.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
             var optionsList = new List<CustomOption>(CustomOption.options);
             while (optionsList.Any())
             {
                 byte amount = (byte)Math.Min(optionsList.Count, 200); // takes less than 3 bytes per option on average
-                var writer = AmongUsClient.Instance!.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
+                var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
                 writer.Write(amount);
                 for (int i = 0; i < amount; i++)
                 {
@@ -237,7 +237,7 @@ namespace TheOtherRoles
                 stringOption.oldValue = stringOption.Value = selection;
                 stringOption.ValueText.text = selections[selection].ToString();
 
-                if (AmongUsClient.Instance?.AmHost == true && CachedPlayer.LocalPlayer.PlayerControl)
+                if (AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer)
                 {
                     if (id == 0 && selection != preset)
                     {
@@ -1379,7 +1379,7 @@ namespace TheOtherRoles
             Scroller.ContentYBounds = new FloatRange(MinY, maxY);
 
             // Prevent scrolling when the player is interacting with a menu
-            if (CachedPlayer.LocalPlayer?.PlayerControl.CanMove != true)
+            if (PlayerControl.LocalPlayer?.CanMove != true)
             {
                 __instance.GameSettings.transform.localPosition = LastPosition;
 

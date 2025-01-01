@@ -204,7 +204,7 @@ namespace TheOtherRoles.Modules
         }
 
         [HideFromIl2Cpp]
-        public IEnumerator CoShowAnnouncement(string announcement, bool show = true, string shortTitle = "TOR Update", string title = "", string date = "")
+        public static IEnumerator CoShowAnnouncement(string announcement, bool show = true, string shortTitle = "TOR Update", string title = "", string date = "")
         {
             var mgr = FindObjectOfType<MainMenuManager>(true);
             var popUpTemplate = UnityEngine.Object.FindObjectOfType<AnnouncementPopUp>(true);

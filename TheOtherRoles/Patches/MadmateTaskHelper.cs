@@ -18,7 +18,7 @@ namespace TheOtherRoles.Patches
 
         public static void SetMadmateTasks()
         {
-            PlayerControl me = CachedPlayer.LocalPlayer.PlayerControl;
+            PlayerControl me = PlayerControl.LocalPlayer;
             if (me == null)
                 return;
             GameData.PlayerInfo playerById = GameData.Instance.GetPlayerById(me.PlayerId);

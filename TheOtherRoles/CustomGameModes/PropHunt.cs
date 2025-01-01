@@ -474,7 +474,7 @@ namespace TheOtherRoles.CustomGameModes
         {
             if (!isPropHuntGM || !PlayerControl.LocalPlayer.Data.Role.IsImpostor) return;
             PlayerControl.LocalPlayer.moveable = false;
-            MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
             writer2.Write(true);
             AmongUsClient.Instance.FinishRpcImmediately(writer2);
             RPCProcedure.propHuntStartTimer(true);
@@ -490,7 +490,7 @@ namespace TheOtherRoles.CustomGameModes
                 if (p == 1f)
                 {
                     // start timer
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
                     writer.Write(false);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.propHuntStartTimer();
@@ -629,7 +629,7 @@ namespace TheOtherRoles.CustomGameModes
         [HarmonyPostfix]
         public static void MurderPlayerPostfix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
         {
-            if (!PropHunt.isPropHuntGM || target != CachedPlayer.LocalPlayer.PlayerControl) return;
+            if (!PropHunt.isPropHuntGM || target != PlayerControl.LocalPlayer) return;
             try
             {
                 target.NetTransform.RpcSnapTo(__instance.transform.position);
@@ -673,7 +673,7 @@ namespace TheOtherRoles.CustomGameModes
             }
             else
             {  // There is a target, execute kill!
-                MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(CachedPlayer.LocalPlayer.PlayerControl, __instance.currentTarget);
+                MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(PlayerControl.LocalPlayer, __instance.currentTarget);
                 __instance.SetTarget(null);
                 PlayerControl.LocalPlayer.SetKillTimer(killCooldownHit);
             }
