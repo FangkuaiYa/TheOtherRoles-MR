@@ -196,7 +196,7 @@ namespace TheOtherRoles.Patches
                     option.updateSelection(v);
                 }
                 CustomOption.ShareOptionSelections();
-                //PlayerControl.LocalPlayer.RpcSyncSettings(GameOptionsData.hostOptionsData);Hmm?Need not it?
+                //CachedPlayer.LocalPlayer.PlayerControl.RpcSyncSettings(GameOptionsData.hostOptionsData);Hmm?Need not it?
             }
 
             public void Rename(string newPresetName)

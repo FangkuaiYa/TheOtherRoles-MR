@@ -1,4 +1,5 @@
 ﻿using System;
+using AmongUs.GameOptions;
 using HarmonyLib;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Players;
@@ -16,20 +17,9 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
         public static class PingTrackerPatch
         {
-            public static GameObject modStamp;
             public static GameObject customPreset;
             static void Prefix(PingTracker __instance)
             {
-                if (modStamp == null)
-                {
-                    modStamp = new GameObject("ModStamp");
-                    var rend = modStamp.AddComponent<SpriteRenderer>();
-                    rend.sprite = TheOtherRolesPlugin.GetModStamp();
-                    rend.color = new Color(1, 1, 1, 0.5f);
-                    ModManager.Instance.ModStamp.enabled = false;
-                    modStamp.transform.parent = __instance.transform.parent;
-                    modStamp.transform.localScale *= SubmergedCompatibility.Loaded ? 0 : 0.6f;
-                }
                 if (customPreset == null)
                 {
                     var buttonBehaviour = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.GameMenu.CensorChatButton);
@@ -53,17 +43,9 @@ namespace TheOtherRoles.Patches
                     }));
                 }
                 float offset = (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started) ? 0.75f : 0f;
-                if (AmongUsClient.Instance.IsGameStarted)
-                {
-                    modStamp.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + Vector3.down * offset + Vector3.down * 0.75f;
-                }
-                else
-                {
-                    modStamp.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + Vector3.down * offset;
-                }
                 if (customPreset)
                 {
-                    customPreset.transform.position = modStamp.transform.position + Vector3.down * offset + Vector3.down * 0.75f;
+                    customPreset.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + 3 * Vector3.left + new Vector3(0, 0.8f, 0);
                     if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started && customPreset.gameObject.activeSelf)
                         customPreset.gameObject.SetActive(false);
                 }
@@ -71,8 +53,9 @@ namespace TheOtherRoles.Patches
 
             static void Postfix(PingTracker __instance)
             {
-                __instance.text.alignment = TextAlignmentOptions.TopRight;
+                __instance.text.alignment = AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started ? TextAlignmentOptions.Top : TextAlignmentOptions.TopLeft;
                 var position = __instance.GetComponent<AspectPosition>();
+                position.Alignment = AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started ? AspectPosition.EdgeAlignments.Top : AspectPosition.EdgeAlignments.LeftTop;
                 if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started)
                 {
                     string gameModeText = $"";
@@ -81,7 +64,7 @@ namespace TheOtherRoles.Patches
                     else if (PropHunt.isPropHuntGM) gameModeText = ModTranslation.GetString("Credentials", 4);
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
                     __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles MR</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n{gameModeText}" + __instance.text.text;
-                    position.DistanceFromEdge = new Vector3(2.25f, 0.11f, 0);
+                    position.DistanceFromEdge = new Vector3(1.5f, 0.11f, 0);
                 }
                 else
                 {
@@ -90,9 +73,16 @@ namespace TheOtherRoles.Patches
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = ModTranslation.GetString("Credentials", 2);
                     else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) gameModeText = ModTranslation.GetString("Credentials", 4);
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
-                    var host = $"Host: {GameData.Instance?.GetHost()?.PlayerName}";
-                    __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles MR</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n  {gameModeText + ModTranslation.GetString("Credentials", 5)}\n {host}\n {__instance.text.text}";
-                    position.DistanceFromEdge = new Vector3(3.5f, 0.1f, 0);
+                    __instance.text.text = $"<size=130%><color=#ff351f>TheOtherRoles MR</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}\n{gameModeText + ModTranslation.GetString("Credentials", 5)}\n {__instance.text.text}";
+                    position.DistanceFromEdge = new Vector3(0.5f, 0.11f);
+                    try
+                    {
+                        var GameModeText = GameObject.Find("GameModeText")?.GetComponent<TextMeshPro>();
+                        GameModeText.text = gameModeText == "" ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek ? "Van. HideNSeek" : "Classic") : gameModeText;
+                        var ModeLabel = GameObject.Find("ModeLabel")?.GetComponentInChildren<TextMeshPro>();
+                        ModeLabel.text = "Game Mode";
+                    }
+                    catch { }
                 }
                 position.AdjustPosition();
             }

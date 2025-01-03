@@ -38,13 +38,13 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.FixedUpdate))]
         static void Postfix(MapBehaviour __instance)
         {
-            if (__instance.infectedOverlay.gameObject.active && PlayerControl.LocalPlayer.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool())
+            if (__instance.infectedOverlay.gameObject.active && CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool())
             {
                 __instance.Close();
             }
 
             __instance.HerePoint.transform.SetLocalZ(-2.1f);
-            if (Trapper.trapper != null && PlayerControl.LocalPlayer.PlayerId == Trapper.trapper.PlayerId)
+            if (Trapper.trapper != null && CachedPlayer.LocalPlayer.PlayerControl.PlayerId == Trapper.trapper.PlayerId)
             {
                 foreach (PlayerControl player in Trapper.playersOnMap)
                 {
@@ -69,11 +69,11 @@ namespace TheOtherRoles.Patches
                 }
             }
             // Show location of all players on the map for ghosts!
-            if (PlayerControl.LocalPlayer.Data.IsDead && (!PlayerControl.LocalPlayer.Data.Role.IsImpostor || CustomOptionHolder.deadImpsBlockSabotage.getBool()))
+            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && (!CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor || CustomOptionHolder.deadImpsBlockSabotage.getBool()))
             {
                 foreach (PlayerControl player in CachedPlayer.AllPlayers)
                 {
-                    if (player == PlayerControl.LocalPlayer)
+                    if (player == CachedPlayer.LocalPlayer.PlayerControl)
                         continue;
                     var alpha = player.Data.IsDead ? 0.25f : 1f;
                     Vector3 v = player.transform.position;
@@ -97,7 +97,7 @@ namespace TheOtherRoles.Patches
             }
             foreach (var vent in MapUtilities.CachedShipStatus.AllVents)
             {
-                if ((vent.name.StartsWith("JackInThe") && !(PlayerControl.LocalPlayer == Trickster.trickster || PlayerControl.LocalPlayer.Data.IsDead))) continue; //for trickster vents
+                if ((vent.name.StartsWith("JackInThe") && !(CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead))) continue; //for trickster vents
 
                 if (!TheOtherRolesPlugin.ShowVentsOnMap.Value)
                 {
@@ -110,7 +110,7 @@ namespace TheOtherRoles.Patches
                 }
 
                 var Instance = DestroyableSingleton<MapTaskOverlay>.Instance;
-                var task = PlayerControl.LocalPlayer.myTasks.ToArray().FirstOrDefault(x => x.TaskType == TaskTypes.VentCleaning);
+                var task = CachedPlayer.LocalPlayer.PlayerControl.myTasks.ToArray().FirstOrDefault(x => x.TaskType == TaskTypes.VentCleaning);
 
                 var location = vent.transform.position / MapUtilities.CachedShipStatus.MapScale;
                 location.z = -2f; //show above sabotage buttons
