@@ -94,19 +94,19 @@ namespace TheOtherRoles.Objects
             if (Bomber.bomber != null)
             {
                 var position = b.bomb.transform.position;
-                var distance = Vector2.Distance(position, CachedPlayer.LocalPlayer.PlayerControl.transform.position);  // every player only checks that for their own client (desynct with positions sucks)
-                if (distance < Bomber.destructionRange && !CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                var distance = Vector2.Distance(position, CachedPlayer.LocalPlayer.transform.position);  // every player only checks that for their own client (desynct with positions sucks)
+                if (distance < Bomber.destructionRange && !CachedPlayer.LocalPlayer.Data.IsDead)
                 {
                     Helpers.checkMurderAttemptAndKill(Bomber.bomber, CachedPlayer.LocalPlayer.PlayerControl, false, false, true, true);
 
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                     writer.Write((byte)RPCProcedure.GhostInfoTypes.DeathReasonAndKiller);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                     writer.Write((byte)DeadPlayer.CustomDeathReason.Bomb);
                     writer.Write(Bomber.bomber.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
-                    GameHistory.overrideDeathReasonAndKiller(CachedPlayer.LocalPlayer.PlayerControl, DeadPlayer.CustomDeathReason.Bomb, killer: Bomber.bomber);
+                    GameHistory.overrideDeathReasonAndKiller(CachedPlayer.LocalPlayer, DeadPlayer.CustomDeathReason.Bomb, killer: Bomber.bomber);
                 }
                 playAtPosition(AssetLoader.customAssets.bombExplosion, position, range: Bomber.hearRange);
             }

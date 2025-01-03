@@ -36,7 +36,7 @@ namespace TheOtherRoles.Patches
         static void resetNameTagsAndColors()
         {
             var localPlayer = CachedPlayer.LocalPlayer.PlayerControl;
-            var myData = CachedPlayer.LocalPlayer.PlayerControl.Data;
+            var myData = CachedPlayer.LocalPlayer.Data;
             var amImpostor = myData.Role.IsImpostor;
             var morphTimerNotUp = Morphling.morphTimer > 0f;
             var morphTargetNotNull = Morphling.morphTarget != null;
@@ -239,7 +239,7 @@ namespace TheOtherRoles.Patches
         static void setNameTags()
         {
             // Mafia
-            if (CachedPlayer.LocalPlayer.PlayerControl != null && CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor)
+            if (CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor)
             {
                 foreach (PlayerControl player in CachedPlayer.AllPlayers)
                     if (Godfather.godfather != null && Godfather.godfather == player)
@@ -297,7 +297,7 @@ namespace TheOtherRoles.Patches
             }
 
             // Display lighter / darker color for all alive players
-            if (CachedPlayer.LocalPlayer.PlayerControl != null && MeetingHud.Instance != null && TORMapOptions.showLighterDarker)
+            if (CachedPlayer.LocalPlayer != null && MeetingHud.Instance != null && TORMapOptions.showLighterDarker)
             {
                 foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
                 {
@@ -365,7 +365,7 @@ namespace TheOtherRoles.Patches
 
         static void updateImpostorKillButton(HudManager __instance)
         {
-            if (!CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor) return;
+            if (!CachedPlayer.LocalPlayer.Data.Role.IsImpostor) return;
             if (MeetingHud.Instance)
             {
                 __instance.KillButton.Hide();
@@ -382,20 +382,20 @@ namespace TheOtherRoles.Patches
             if (enabled) __instance.KillButton.Show();
             else __instance.KillButton.Hide();
 
-            if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerControl.PlayerId] > 0) __instance.KillButton.Hide();
+            if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerId] > 0) __instance.KillButton.Hide();
         }
 
         static void updateReportButton(HudManager __instance)
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return;
-            if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerControl.PlayerId] > 0 || MeetingHud.Instance) __instance.ReportButton.Hide();
+            if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerId] > 0 || MeetingHud.Instance) __instance.ReportButton.Hide();
             else if (!__instance.ReportButton.isActiveAndEnabled) __instance.ReportButton.Show();
         }
 
         static void updateVentButton(HudManager __instance)
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return;
-            if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerControl.PlayerId] > 0 || MeetingHud.Instance) __instance.ImpostorVentButton.Hide();
+            if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerId] > 0 || MeetingHud.Instance) __instance.ImpostorVentButton.Hide();
             else if (CachedPlayer.LocalPlayer.PlayerControl.roleCanUseVents() && !__instance.ImpostorVentButton.isActiveAndEnabled) __instance.ImpostorVentButton.Show();
 
         }
@@ -408,12 +408,12 @@ namespace TheOtherRoles.Patches
         static void updateSabotageButton(HudManager __instance)
         {
             if (MeetingHud.Instance || TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt) __instance.SabotageButton.Hide();
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool()) __instance.SabotageButton.Hide();
+            if (PlayerControl.LocalPlayer.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool()) __instance.SabotageButton.Hide();
         }
 
         static void updateMapButton(HudManager __instance)
         {
-            if (Trapper.trapper == null || !(CachedPlayer.LocalPlayer.PlayerControl.PlayerId == Trapper.trapper.PlayerId) || __instance == null || __instance.MapButton.HeldButtonSprite == null) return;
+            if (Trapper.trapper == null || !(CachedPlayer.LocalPlayer.PlayerId == Trapper.trapper.PlayerId) || __instance == null || __instance.MapButton.HeldButtonSprite == null) return;
             __instance.MapButton.HeldButtonSprite.color = Trapper.playersOnMap.Any() ? Trapper.color : Color.white;
         }
 
@@ -430,7 +430,7 @@ namespace TheOtherRoles.Patches
             __instance.ImpostorVentButton.ToggleVisible(false);
         }
 
-        /*static void Postfix(HudManager __instance)
+        static void Postfix(HudManager __instance)
         {
             if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return;
 
@@ -463,14 +463,14 @@ namespace TheOtherRoles.Patches
             //if (!MeetingHud.Instance) __instance.AbilityButton?.Update();
 
             // Fix dead player's pets being visible by just always updating whether the pet should be visible at all.
-            foreach (PlayerControl target in PlayerControl.AllPlayerControls)
+            foreach (PlayerControl target in CachedPlayer.AllPlayers)
             {
                 var pet = target.GetPet();
                 if (pet != null)
                 {
-                    pet.Visible = (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && target.Data.IsDead || !target.Data.IsDead) && !target.inVent;
+                    pet.Visible = (PlayerControl.LocalPlayer.Data.IsDead && target.Data.IsDead || !target.Data.IsDead) && !target.inVent;
                 }
             }
-        }*/
+        }
     }
 }

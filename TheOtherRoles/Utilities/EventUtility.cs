@@ -36,7 +36,7 @@ public static class EventUtility {
     public static void meetingEndsUpdate() {
         if (!isEnabled) return;
         // TODO - Implement Horse hats
-        // CachedPlayer.LocalPlayer.PlayerControl.RpcSetHat(CustomHatLoader.horseHatProductIds[rnd.Next(CustomHatLoader.horseHatProductIds.Count)]);
+        // PlayerControl.LocalPlayer.RpcSetHat(CustomHatLoader.horseHatProductIds[rnd.Next(CustomHatLoader.horseHatProductIds.Count)]);
     }
 
 

@@ -372,12 +372,12 @@ namespace TheOtherRoles
             public static void setHandcuffedKnows(bool active = true, byte playerId = Byte.MaxValue)
             {
                 if (playerId == Byte.MaxValue)
-                    playerId = CachedPlayer.LocalPlayer.PlayerControl.PlayerId;
+                    playerId = CachedPlayer.LocalPlayer.PlayerId;
 
-                if (active && playerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId)
+                if (active && playerId == CachedPlayer.LocalPlayer.PlayerId)
                 {
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                     writer.Write((byte)RPCProcedure.GhostInfoTypes.HandcuffNoticed);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                 }
@@ -387,7 +387,7 @@ namespace TheOtherRoles
                     handcuffedPlayers.RemoveAll(x => x == playerId);
                 }
 
-                if (playerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId)
+                if (playerId == CachedPlayer.LocalPlayer.PlayerId)
                 {
                     HudManagerStartPatch.setAllButtonsHandcuffedStatus(active);
                     SoundEffectsManager.play(AssetLoader.customAssets.deputyHandcuff);
@@ -3037,15 +3037,15 @@ namespace TheOtherRoles
             {
                 var playerData = taskRacers[i].player.Data;
                 playerData.Object.clearAllTasks();
-                playerData.Tasks = new Il2CppSystem.Collections.Generic.List<NetworkedPlayerInfo.TaskInfo>(hostTaskTypeIds.Length);
+                playerData.Tasks = new Il2CppSystem.Collections.Generic.List<GameData.TaskInfo>(hostTaskTypeIds.Length);
                 for (int j = 0; j < hostTaskTypeIds.Length; j++)
                 {
-                    playerData.Tasks.Add(new NetworkedPlayerInfo.TaskInfo(hostTaskTypeIds[j], (uint)j));
+                    playerData.Tasks.Add(new GameData.TaskInfo(hostTaskTypeIds[j], (uint)j));
                     playerData.Tasks[j].Id = (uint)j;
                 }
                 for (int j = 0; j < playerData.Tasks.Count; j++)
                 {
-                    NetworkedPlayerInfo.TaskInfo taskInfo = playerData.Tasks[j];
+                    GameData.TaskInfo taskInfo = playerData.Tasks[j];
                     NormalPlayerTask normalPlayerTask = UnityEngine.Object.Instantiate(MapUtilities.CachedShipStatus.GetTaskById(taskInfo.TypeId), playerData.Object.transform);
                     normalPlayerTask.Id = taskInfo.Id;
                     normalPlayerTask.Owner = playerData.Object;
@@ -3180,7 +3180,7 @@ namespace TheOtherRoles
         public static bool markStaysOverMeeting = false;
         public static bool hasAdminTable = false;
         public static float adminCooldown = 0;
-        public static float SilhouetteVisibility => (silhouetteVisibility == 0 && (CachedPlayer.LocalPlayer.PlayerControl == yoyo || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)) ? 0.1f : silhouetteVisibility;
+        public static float SilhouetteVisibility => (silhouetteVisibility == 0 && (PlayerControl.LocalPlayer == yoyo || PlayerControl.LocalPlayer.Data.IsDead)) ? 0.1f : silhouetteVisibility;
         public static float silhouetteVisibility = 0;
         public static Vector3? markedLocation = null;
         private static Sprite markButtonSprite;
@@ -3267,9 +3267,9 @@ namespace TheOtherRoles
         public static void setPosition()
         {
             if (position == Vector3.zero) return;  // Check if this has been set, otherwise first spawn on submerged will fail
-            if (antiTeleport.FindAll(x => x.PlayerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId).Count > 0)
+            if (antiTeleport.FindAll(x => x.PlayerId == CachedPlayer.LocalPlayer.PlayerId).Count > 0)
             {
-                CachedPlayer.LocalPlayer.PlayerControl.NetTransform.RpcSnapTo(position);
+                CachedPlayer.LocalPlayer.NetTransform.RpcSnapTo(position);
                 if (SubmergedCompatibility.IsSubmerged)
                 {
                     SubmergedCompatibility.ChangeFloor(position.y > -7);
@@ -3390,7 +3390,7 @@ namespace TheOtherRoles
                     else visibility = (1 - (tStill - holdDuration) / fadeDuration) * (1 - minVisibility) + minVisibility;
                 }
             }
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && visibility < 0.1f)
+            if (PlayerControl.LocalPlayer.Data.IsDead && visibility < 0.1f)
             {  // Ghosts can always see!
                 visibility = 0.1f;
             }

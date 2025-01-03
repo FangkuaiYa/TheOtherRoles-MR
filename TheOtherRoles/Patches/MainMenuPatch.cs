@@ -19,11 +19,6 @@ namespace TheOtherRoles.Modules
 
         private static void Prefix(MainMenuManager __instance)
         {
-            SceneManager.add_sceneLoaded((Action<Scene, LoadSceneMode>)((scene, _) =>
-            {
-                ModManager.Instance.ShowModStamp();
-            }));
-
             var template = GameObject.Find("ExitGameButton");
             var template2 = GameObject.Find("CreditsButton");
             if (template == null || template2 == null) return;

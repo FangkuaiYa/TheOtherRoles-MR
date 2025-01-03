@@ -196,7 +196,7 @@ namespace TheOtherRoles
             if (showModifier)
             {
                 // after dead modifier
-                if (!CustomOptionHolder.modifiersAreHidden.getBool() || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended)
+                if (!CustomOptionHolder.modifiersAreHidden.getBool() || PlayerControl.LocalPlayer.Data.IsDead || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended)
                 {
                     if (Bait.bait.Any(x => x.PlayerId == p.PlayerId)) infos.Add(bait);
                     if (Bloody.bloody.Any(x => x.PlayerId == p.PlayerId)) infos.Add(bloody);

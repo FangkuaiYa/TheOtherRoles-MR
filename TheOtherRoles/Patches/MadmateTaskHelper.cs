@@ -21,7 +21,7 @@ namespace TheOtherRoles.Patches
             PlayerControl me = CachedPlayer.LocalPlayer.PlayerControl;
             if (me == null)
                 return;
-            NetworkedPlayerInfo playerById = GameData.Instance.GetPlayerById(me.PlayerId);
+            GameData.PlayerInfo playerById = GameData.Instance.GetPlayerById(me.PlayerId);
             if (playerById == null)
                 return;
             me.clearAllTasks();
@@ -40,15 +40,15 @@ namespace TheOtherRoles.Patches
                 Mathf.RoundToInt(CustomOptionHolder.madmateShortTasks.getFloat()));
 
             byte[] taskTypeIds = list.ToArray();
-            playerById.Tasks = new Il2CppSystem.Collections.Generic.List<NetworkedPlayerInfo.TaskInfo>(taskTypeIds.Length);
+            playerById.Tasks = new Il2CppSystem.Collections.Generic.List<GameData.TaskInfo>(taskTypeIds.Length);
             for (int i = 0; i < taskTypeIds.Length; i++)
             {
-                playerById.Tasks.Add(new NetworkedPlayerInfo.TaskInfo(taskTypeIds[i], (uint)i));
+                playerById.Tasks.Add(new GameData.TaskInfo(taskTypeIds[i], (uint)i));
                 playerById.Tasks[i].Id = (uint)i;
             }
             for (int i = 0; i < playerById.Tasks.Count; i++)
             {
-                NetworkedPlayerInfo.TaskInfo taskInfo = playerById.Tasks[i];
+                GameData.TaskInfo taskInfo = playerById.Tasks[i];
                 NormalPlayerTask normalPlayerTask = UnityEngine.Object.Instantiate<NormalPlayerTask>(MapUtilities.CachedShipStatus.GetTaskById(taskInfo.TypeId), me.transform);
                 normalPlayerTask.Id = taskInfo.Id;
                 normalPlayerTask.Owner = me;

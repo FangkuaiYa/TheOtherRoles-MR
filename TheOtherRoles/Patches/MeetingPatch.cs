@@ -23,7 +23,7 @@ namespace TheOtherRoles.Patches
     {
         static bool[] selections;
         static SpriteRenderer[] renderers;
-        private static NetworkedPlayerInfo target = null;
+        private static GameData.PlayerInfo target = null;
         private const float scale = 0.65f;
         private static TMPro.TextMeshPro meetingExtraButtonText;
         private static PassiveButton[] swapperButtonList;
@@ -116,10 +116,10 @@ namespace TheOtherRoles.Patches
                     Dictionary<byte, int> self = CalculateVotes(__instance);
                     bool tie;
                     KeyValuePair<byte, int> max = self.MaxPair(out tie);
-                    NetworkedPlayerInfo exiled = GameData.Instance.AllPlayers.ToArray().FirstOrDefault(v => !tie && v.PlayerId == max.Key && !v.IsDead);
+                    GameData.PlayerInfo exiled = GameData.Instance.AllPlayers.ToArray().FirstOrDefault(v => !tie && v.PlayerId == max.Key && !v.IsDead);
 
                     // TieBreaker 
-                    List<NetworkedPlayerInfo> potentialExiled = new List<NetworkedPlayerInfo>();
+                    List<GameData.PlayerInfo> potentialExiled = new List<GameData.PlayerInfo>();
                     bool skipIsTie = false;
                     if (self.Count > 0)
                     {
@@ -190,12 +190,12 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.BloopAVoteIcon))]
         class MeetingHudBloopAVoteIconPatch
         {
-            public static bool Prefix(MeetingHud __instance, NetworkedPlayerInfo voterPlayer, int index, Transform parent)
+            public static bool Prefix(MeetingHud __instance, GameData.PlayerInfo voterPlayer, int index, Transform parent)
             {
                 var spriteRenderer = UnityEngine.Object.Instantiate<SpriteRenderer>(__instance.PlayerVotePrefab);
                 var showVoteColors = !GameManager.Instance.LogicOptions.GetAnonymousVotes() ||
-                                      (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && TORMapOptions.ghostsSeeVotes) ||
-                                      (Mayor.mayor != null && Mayor.mayor == CachedPlayer.LocalPlayer.PlayerControl && Mayor.canSeeVoteColors && TasksHandler.taskInfo(CachedPlayer.LocalPlayer.PlayerControl.Data).Item1 >= Mayor.tasksNeededToSeeVoteColors);
+                                      (CachedPlayer.LocalPlayer.Data.IsDead && TORMapOptions.ghostsSeeVotes) ||
+                                      (Mayor.mayor != null && Mayor.mayor == CachedPlayer.LocalPlayer.PlayerControl && Mayor.canSeeVoteColors && TasksHandler.taskInfo(CachedPlayer.LocalPlayer.Data).Item1 >= Mayor.tasksNeededToSeeVoteColors);
                 if (showVoteColors)
                 {
                     PlayerMaterial.SetColors(voterPlayer.DefaultOutfit.ColorId, spriteRenderer);
@@ -256,7 +256,7 @@ namespace TheOtherRoles.Patches
                     for (int j = 0; j < states.Length; j++)
                     {
                         MeetingHud.VoterState voterState = states[j];
-                        NetworkedPlayerInfo playerById = GameData.Instance.GetPlayerById(voterState.VoterId);
+                        GameData.PlayerInfo playerById = GameData.Instance.GetPlayerById(voterState.VoterId);
                         if (playerById == null)
                         {
                             Debug.LogError(string.Format("Couldn't find player info for voter: {0}", voterState.VoterId));
@@ -287,7 +287,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.VotingComplete))]
         class MeetingHudVotingCompletedPatch
         {
-            static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] byte[] states, [HarmonyArgument(1)] NetworkedPlayerInfo exiled, [HarmonyArgument(2)] bool tie)
+            static void Postfix(MeetingHud __instance, [HarmonyArgument(0)] byte[] states, [HarmonyArgument(1)] GameData.PlayerInfo exiled, [HarmonyArgument(2)] bool tie)
             {
                 if (Yasuna.isYasuna(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Yasuna.specialVoteTargetPlayerId == byte.MaxValue)
                 {
@@ -512,7 +512,7 @@ namespace TheOtherRoles.Patches
                 __instance.playerStates.ToList().ForEach(x =>
                 {
                     x.gameObject.SetActive(true);
-                    if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject);
+                    if (CachedPlayer.LocalPlayer.Data.IsDead && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject);
                 });
                 UnityEngine.Object.Destroy(container.gameObject);
             }));
@@ -522,7 +522,7 @@ namespace TheOtherRoles.Patches
 
             foreach (RoleInfo roleInfo in RoleInfo.allRoleInfos)
             {
-                RoleId guesserRole = (Guesser.niceGuesser != null && CachedPlayer.LocalPlayer.PlayerControl.PlayerId == Guesser.niceGuesser.PlayerId) ? RoleId.NiceGuesser : RoleId.EvilGuesser;
+                RoleId guesserRole = (Guesser.niceGuesser != null && CachedPlayer.LocalPlayer.PlayerId == Guesser.niceGuesser.PlayerId) ? RoleId.NiceGuesser : RoleId.EvilGuesser;
                 if (roleInfo.isModifier || roleInfo.roleId == guesserRole || (!HandleGuesser.evilGuesserCanGuessSpy && guesserRole == RoleId.EvilGuesser && roleInfo.roleId == RoleId.Spy && !HandleGuesser.isGuesserGm)) continue; // Not guessable roles & modifier
                 if (HandleGuesser.isGuesserGm && (roleInfo.roleId == RoleId.NiceGuesser || roleInfo.roleId == RoleId.EvilGuesser)) continue; // remove Guesser for guesser game mode
                 if (HandleGuesser.isGuesserGm && CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor && !HandleGuesser.evilGuesserCanGuessSpy && roleInfo.roleId == RoleId.Spy) continue;
@@ -531,7 +531,7 @@ namespace TheOtherRoles.Patches
                 if (roleData.neutralSettings.ContainsKey((byte)roleInfo.roleId) && roleData.neutralSettings[(byte)roleInfo.roleId] == 0) continue;
                 else if (roleData.impSettings.ContainsKey((byte)roleInfo.roleId) && roleData.impSettings[(byte)roleInfo.roleId] == 0) continue;
                 else if (roleData.crewSettings.ContainsKey((byte)roleInfo.roleId) && roleData.crewSettings[(byte)roleInfo.roleId] == 0) continue;
-                else if (new List<RoleId>() { RoleId.Janitor, RoleId.Godfather, RoleId.Mafioso }.Contains(roleInfo.roleId) && (CustomOptionHolder.mafiaSpawnRate.getSelection() == 0 || GameOptionsManager.Instance.currentGameOptions.NumImpostors < 3)) continue;
+                else if (new List<RoleId>() { RoleId.Janitor, RoleId.Godfather, RoleId.Mafioso }.Contains(roleInfo.roleId) && CustomOptionHolder.mafiaSpawnRate.getSelection() == 0) continue;
                 else if (roleInfo.roleId == RoleId.Sidekick && (!CustomOptionHolder.jackalCanCreateSidekick.getBool() || CustomOptionHolder.jackalSpawnRate.getSelection() == 0)) continue;
                 if (roleInfo.roleId == RoleId.Deputy && (CustomOptionHolder.deputySpawnRate.getSelection() == 0 || CustomOptionHolder.sheriffSpawnRate.getSelection() == 0)) continue;
                 if (roleInfo.roleId == RoleId.Pursuer && CustomOptionHolder.lawyerSpawnRate.getSelection() == 0) continue;
@@ -562,7 +562,7 @@ namespace TheOtherRoles.Patches
                 int copiedIndex = i;
 
                 button.GetComponent<PassiveButton>().OnClick.RemoveAllListeners();
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && !Helpers.playerById((byte)__instance.playerStates[buttonTarget].TargetPlayerId).Data.IsDead) button.GetComponent<PassiveButton>().OnClick.AddListener((System.Action)(() =>
+                if (!CachedPlayer.LocalPlayer.Data.IsDead && !Helpers.playerById((byte)__instance.playerStates[buttonTarget].TargetPlayerId).Data.IsDead) button.GetComponent<PassiveButton>().OnClick.AddListener((System.Action)(() =>
                 {
                     if (selectedButton != button)
                     {
@@ -572,7 +572,7 @@ namespace TheOtherRoles.Patches
                     else
                     {
                         PlayerControl focusedTarget = Helpers.playerById((byte)__instance.playerStates[buttonTarget].TargetPlayerId);
-                        if (!(__instance.state == MeetingHud.VoteStates.Voted || __instance.state == MeetingHud.VoteStates.NotVoted) || focusedTarget == null || HandleGuesser.remainingShots(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) <= 0) return;
+                        if (!(__instance.state == MeetingHud.VoteStates.Voted || __instance.state == MeetingHud.VoteStates.NotVoted) || focusedTarget == null || HandleGuesser.remainingShots(CachedPlayer.LocalPlayer.PlayerId) <= 0) return;
 
                         if (!HandleGuesser.killsThroughShield && focusedTarget == Medic.shielded)
                         { // Depending on the options, shooting the shielded player will not allow the guess, notifiy everyone about the kill attempt and close the window
@@ -594,19 +594,19 @@ namespace TheOtherRoles.Patches
                         // Reset the GUI
                         __instance.playerStates.ToList().ForEach(x => x.gameObject.SetActive(true));
                         UnityEngine.Object.Destroy(container.gameObject);
-                        if (HandleGuesser.hasMultipleShotsPerMeeting && HandleGuesser.remainingShots(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) > 1 && dyingTarget != CachedPlayer.LocalPlayer.PlayerControl)
+                        if (HandleGuesser.hasMultipleShotsPerMeeting && HandleGuesser.remainingShots(CachedPlayer.LocalPlayer.PlayerId) > 1 && dyingTarget != CachedPlayer.LocalPlayer.PlayerControl)
                             __instance.playerStates.ToList().ForEach(x => { if (x.TargetPlayerId == dyingTarget.PlayerId && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
                         else
                             __instance.playerStates.ToList().ForEach(x => { if (x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
 
                         // Shoot player and send chat info if activated
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.GuesserShoot, Hazel.SendOption.Reliable, -1);
-                        writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                        writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                         writer.Write(dyingTarget.PlayerId);
                         writer.Write(focusedTarget.PlayerId);
                         writer.Write((byte)roleInfo.roleId);
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
-                        RPCProcedure.guesserShoot(CachedPlayer.LocalPlayer.PlayerControl.PlayerId, dyingTarget.PlayerId, focusedTarget.PlayerId, (byte)roleInfo.roleId);
+                        RPCProcedure.guesserShoot(CachedPlayer.LocalPlayer.PlayerId, dyingTarget.PlayerId, focusedTarget.PlayerId, (byte)roleInfo.roleId);
                     }
                 }));
 
@@ -699,9 +699,9 @@ namespace TheOtherRoles.Patches
             {
                 if (CachedPlayer.LocalPlayer.PlayerControl != null)
                 {
-                    if (HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && guesserUI != null)
+                    if (HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerId) && guesserUI != null)
                         return false;
-                    if (Yasuna.isYasuna(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Yasuna.specialVoteTargetPlayerId != byte.MaxValue)
+                    if (Yasuna.isYasuna(CachedPlayer.LocalPlayer.PlayerId) && Yasuna.specialVoteTargetPlayerId != byte.MaxValue)
                         return false;
                 }
 
@@ -730,7 +730,7 @@ namespace TheOtherRoles.Patches
                     checkbox.transform.SetParent(playerVoteArea.transform);
                     checkbox.transform.position = template.transform.position;
                     checkbox.transform.localPosition = new Vector3(-0.95f, 0.03f, -1.3f);
-                    if (HandleGuesser.isGuesserGm && HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerControl.PlayerId)) checkbox.transform.localPosition = new Vector3(-0.5f, 0.03f, -1.3f);
+                    if (HandleGuesser.isGuesserGm && HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerId)) checkbox.transform.localPosition = new Vector3(-0.5f, 0.03f, -1.3f);
                     SpriteRenderer renderer = checkbox.GetComponent<SpriteRenderer>();
                     renderer.sprite = Swapper.getCheckSprite();
                     renderer.color = Color.red;
@@ -786,7 +786,7 @@ namespace TheOtherRoles.Patches
                 }
                 PassiveButton passiveButton = meetingExtraButton.GetComponent<PassiveButton>();
                 passiveButton.OnClick.RemoveAllListeners();
-                if (!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (!CachedPlayer.LocalPlayer.Data.IsDead)
                 {
                     if (addSwapperButtons)
                         passiveButton.OnClick.AddListener((Action)(() => swapperConfirm(__instance)));
@@ -803,7 +803,7 @@ namespace TheOtherRoles.Patches
                 })));
             }
 
-            bool isGuesser = HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+            bool isGuesser = HandleGuesser.isGuesser(CachedPlayer.LocalPlayer.PlayerId);
 
             // Add overlay for spelled players
             if (Witch.witch != null && Witch.futureSpelled != null)
@@ -823,15 +823,15 @@ namespace TheOtherRoles.Patches
             }
 
             // Add Guesser Buttons
-            int remainingShots = HandleGuesser.remainingShots(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+            int remainingShots = HandleGuesser.remainingShots(CachedPlayer.LocalPlayer.PlayerId);
 
-            if (isGuesser && !CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && remainingShots > 0)
+            if (isGuesser && !CachedPlayer.LocalPlayer.Data.IsDead && remainingShots > 0)
             {
                 for (int i = 0; i < __instance.playerStates.Length; i++)
                 {
                     PlayerVoteArea playerVoteArea = __instance.playerStates[i];
-                    if (playerVoteArea.AmDead || playerVoteArea.TargetPlayerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId) continue;
-                    if (CachedPlayer.LocalPlayer.PlayerControl != null && CachedPlayer.LocalPlayer.PlayerControl == Eraser.eraser && Eraser.alreadyErased.Contains(playerVoteArea.TargetPlayerId)) continue;
+                    if (playerVoteArea.AmDead || playerVoteArea.TargetPlayerId == CachedPlayer.LocalPlayer.PlayerId) continue;
+                    if (CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.PlayerControl == Eraser.eraser && Eraser.alreadyErased.Contains(playerVoteArea.TargetPlayerId)) continue;
 
                     GameObject template = playerVoteArea.Buttons.transform.Find("CancelButton").gameObject;
                     GameObject targetBox = UnityEngine.Object.Instantiate(template, playerVoteArea.transform);
@@ -928,7 +928,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.StartMeeting))]
         class StartMeetingPatch
         {
-            public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] NetworkedPlayerInfo meetingTarget)
+            public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] GameData.PlayerInfo meetingTarget)
             {
                 {
                     RoomTracker roomTracker = FastDestroyableSingleton<HudManager>.Instance?.roomTracker;
@@ -940,7 +940,7 @@ namespace TheOtherRoles.Patches
                     if (Snitch.snitch != null && roomTracker != null)
                     {
                         MessageWriter roomWriter = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareRoom, Hazel.SendOption.Reliable, -1);
-                        roomWriter.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                        roomWriter.Write(CachedPlayer.LocalPlayer.PlayerId);
                         roomWriter.Write(roomId);
                         AmongUsClient.Instance.FinishRpcImmediately(roomWriter);
                     }
@@ -949,10 +949,10 @@ namespace TheOtherRoles.Patches
                     // Save AntiTeleport position, if the player is able to move (i.e. not on a ladder or a gap thingy)
                     if (CachedPlayer.LocalPlayer.PlayerPhysics.enabled && (CachedPlayer.LocalPlayer.PlayerControl.moveable || CachedPlayer.LocalPlayer.PlayerControl.inVent
                         || HudManagerStartPatch.hackerVitalsButton.isEffectActive || HudManagerStartPatch.hackerAdminTableButton.isEffectActive || HudManagerStartPatch.securityGuardCamButton.isEffectActive
-                    || Portal.isTeleporting && Portal.teleportedPlayers.Last().playerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId))
+                    || Portal.isTeleporting && Portal.teleportedPlayers.Last().playerId == CachedPlayer.LocalPlayer.PlayerId))
                     {
                         if (!CachedPlayer.LocalPlayer.PlayerControl.inMovingPlat)
-                            AntiTeleport.position = CachedPlayer.LocalPlayer.PlayerControl.transform.position;
+                            AntiTeleport.position = CachedPlayer.LocalPlayer.transform.position;
                     }
 
                     // Medium meeting start time
@@ -1043,12 +1043,12 @@ namespace TheOtherRoles.Patches
                 return false;
             }
 
-            static void StartMeeting(PlayerControl reporter, NetworkedPlayerInfo target)
+            static void StartMeeting(PlayerControl reporter, GameData.PlayerInfo target)
             {
                 MapUtilities.CachedShipStatus.StartCoroutine(CoStartMeeting(reporter, target).WrapToIl2Cpp());
             }
 
-            static IEnumerator CoStartMeeting(PlayerControl reporter, NetworkedPlayerInfo target)
+            static IEnumerator CoStartMeeting(PlayerControl reporter, GameData.PlayerInfo target)
             {
                 {
                     while (!MeetingHud.Instance)
@@ -1077,7 +1077,7 @@ namespace TheOtherRoles.Patches
                 yield break;
             }
 
-            static IEnumerator CoStartMeeting2(PlayerControl reporter, NetworkedPlayerInfo target)
+            static IEnumerator CoStartMeeting2(PlayerControl reporter, GameData.PlayerInfo target)
             {
                 SpriteRenderer blackscreen = null;
                 {
@@ -1138,8 +1138,8 @@ namespace TheOtherRoles.Patches
 
                 {
                     DeadBody[] array = UnityEngine.Object.FindObjectsOfType<DeadBody>();
-                    NetworkedPlayerInfo[] deadBodies = (from b in array
-                                                        select GameData.Instance.GetPlayerById(b.ParentId)).ToArray<NetworkedPlayerInfo>();
+                    GameData.PlayerInfo[] deadBodies = (from b in array
+                                                        select GameData.Instance.GetPlayerById(b.ParentId)).ToArray<GameData.PlayerInfo>();
                     for (int j = 0; j < array.Length; j++)
                     {
                         if (array[j] != null && array[j].gameObject != null)
@@ -1216,7 +1216,7 @@ namespace TheOtherRoles.Patches
                 {
                     continue;
                 }
-                NetworkedPlayerInfo playerInfo = GameData.Instance.AllPlayers[i];
+                GameData.PlayerInfo playerInfo = GameData.Instance.AllPlayers[i];
                 PlayerVoteArea playerVoteArea = __instance.playerStates[playerStatesCounter] = __instance.CreateButton(playerInfo);
                 playerVoteArea.Parent = __instance;
                 playerVoteArea.SetTargetPlayerId(playerInfo.PlayerId);

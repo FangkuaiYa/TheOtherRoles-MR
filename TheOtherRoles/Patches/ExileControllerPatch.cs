@@ -15,8 +15,8 @@ namespace TheOtherRoles.Patches
     [HarmonyPriority(Priority.First)]
     class ExileControllerBeginPatch
     {
-        public static NetworkedPlayerInfo lastExiled;
-        public static void Prefix(ExileController __instance, [HarmonyArgument(0)] ref NetworkedPlayerInfo exiled, [HarmonyArgument(1)] bool tie)
+        public static GameData.PlayerInfo lastExiled;
+        public static void Prefix(ExileController __instance, [HarmonyArgument(0)] ref GameData.PlayerInfo exiled, [HarmonyArgument(1)] bool tie)
         {
             lastExiled = exiled;
 
@@ -130,7 +130,7 @@ namespace TheOtherRoles.Patches
                         RPCProcedure.uncheckedExilePlayer(target.PlayerId);
 
                         MessageWriter writer3 = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
-                        writer3.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                        writer3.Write(CachedPlayer.LocalPlayer.PlayerId);
                         writer3.Write((byte)RPCProcedure.GhostInfoTypes.DeathReasonAndKiller);
                         writer3.Write(target.PlayerId);
                         writer3.Write((byte)DeadPlayer.CustomDeathReason.WitchExile);
@@ -243,7 +243,7 @@ namespace TheOtherRoles.Patches
             }
         }
 
-        static void WrapUpPostfix(NetworkedPlayerInfo exiled)
+        static void WrapUpPostfix(GameData.PlayerInfo exiled)
         {
             // Prosecutor win condition
             if (exiled != null && Lawyer.lawyer != null && Lawyer.target != null && Lawyer.isProsecutor && Lawyer.target.PlayerId == exiled.PlayerId && !Lawyer.lawyer.Data.IsDead)

@@ -97,7 +97,7 @@ namespace TheOtherRoles.Objects
                 this.OnClick();
 
                 // Deputy skip onClickEvent if handcuffed
-                if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerControl.PlayerId] > 0f) return;
+                if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerId] > 0f) return;
 
                 if (this.HasEffect && !this.isEffectActive)
                 {
@@ -176,8 +176,8 @@ namespace TheOtherRoles.Objects
 
         public void Update()
         {
-            var localPlayer = CachedPlayer.LocalPlayer.PlayerControl;
-            var moveable = localPlayer.moveable;
+            var localPlayer = CachedPlayer.LocalPlayer;
+            var moveable = localPlayer.PlayerControl.moveable;
 
             if (localPlayer.Data == null || MeetingHud.Instance || ExileController.Instance || !HasButton())
             {
@@ -190,7 +190,7 @@ namespace TheOtherRoles.Objects
             { // This had to be reordered, so that the handcuffs do not stop the underlying timers from running
                 if (HasEffect && isEffectActive)
                     DeputyTimer -= Time.deltaTime;
-                else if (!localPlayer.inVent && moveable)
+                else if (!localPlayer.PlayerControl.inVent && moveable)
                     DeputyTimer -= Time.deltaTime;
             }
 
@@ -240,7 +240,7 @@ namespace TheOtherRoles.Objects
             {
                 bool always = CustomOptionHolder.alwaysConsumeKillCooldown.getBool();
                 // オプションがONの場合はベント内はクールダウン減少を止める
-                bool exceptInVent = CustomOptionHolder.stopConsumeKillCooldownInVent.getBool() && CachedPlayer.LocalPlayer.PlayerControl.inVent;
+                bool exceptInVent = CustomOptionHolder.stopConsumeKillCooldownInVent.getBool() && PlayerControl.LocalPlayer.inVent;
                 // オプションがONの場合は配電盤タスク中はクールダウン減少を止める
                 bool exceptOnTask = CustomOptionHolder.stopConsumeKillCooldownOnSwitchingTask.getBool() && Patches.ElectricPatch.onTask;
                 if (HasEffect && isEffectActive)
@@ -252,7 +252,7 @@ namespace TheOtherRoles.Objects
                         Timer -= Time.deltaTime;
                     }
                 }
-                else if (!localPlayer.inVent && moveable)
+                else if (!localPlayer.PlayerControl.inVent && moveable)
                     Timer -= Time.deltaTime;
             }
 

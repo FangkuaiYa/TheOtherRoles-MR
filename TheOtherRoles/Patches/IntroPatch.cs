@@ -21,7 +21,7 @@ namespace TheOtherRoles.Patches
             // Generate and initialize player icons
             int playerCounter = 0;
             int hideNSeekCounter = 0;
-            if (CachedPlayer.LocalPlayer.PlayerControl != null && FastDestroyableSingleton<HudManager>.Instance != null)
+            if (CachedPlayer.LocalPlayer != null && FastDestroyableSingleton<HudManager>.Instance != null)
             {
                 float aspect = Camera.main.aspect;
                 float safeOrthographicSize = CameraSafeArea.GetSafeOrthographicSize(Camera.main);
@@ -30,7 +30,7 @@ namespace TheOtherRoles.Patches
                 bottomLeft = new Vector3(xpos / 2, ypos / 2, -61f);
                 foreach (PlayerControl p in CachedPlayer.AllPlayers)
                 {
-                    NetworkedPlayerInfo data = p.Data;
+                    GameData.PlayerInfo data = p.Data;
                     PoolablePlayer player = UnityEngine.Object.Instantiate<PoolablePlayer>(__instance.PlayerPrefab, FastDestroyableSingleton<HudManager>.Instance.transform);
                     playerPrefab = __instance.PlayerPrefab;
                     p.SetPlayerMaterialColors(player.cosmetics.currentBodySprite.BodySprite);
@@ -331,7 +331,7 @@ namespace TheOtherRoles.Patches
             }
 
             // Add the Spy to the Impostor team (for the Impostors)
-            if (Spy.spy != null && CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor)
+            if (Spy.spy != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor)
             {
                 List<PlayerControl> players = PlayerControl.AllPlayerControls.ToArray().ToList().OrderBy(x => Guid.NewGuid()).ToList();
                 var fakeImpostorTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>(); // The local player always has to be the first one in the list (to be displayed in the center)
@@ -380,6 +380,7 @@ namespace TheOtherRoles.Patches
             static int seed = 0;
             public static void Postfix(IntroCutscene __instance)
             {
+                if (!CustomOptionHolder.activateRoles.getBool()) return; // Don't override the intro of the vanilla roles
                 seed = rnd.Next(5000);
                 if (IntroCutsceneShowRoleUpdatePatch.introCutscene != null)
                     IntroCutsceneShowRoleUpdatePatch.introCutscene = null;
@@ -538,8 +539,8 @@ namespace TheOtherRoles.Patches
                     if (taskTypeIdList == null && CustomOptionHolder.taskVsMode_EnabledMakeItTheSameTaskAsTheHost.getBool())
                     {
                         taskTypeIdList = new List<byte>();
-                        for (int i = 0; i < CachedPlayer.LocalPlayer.PlayerControl.Data.Tasks.Count; ++i)
-                            taskTypeIdList.Add(CachedPlayer.LocalPlayer.PlayerControl.Data.Tasks[i].TypeId);
+                        for (int i = 0; i < PlayerControl.LocalPlayer.Data.Tasks.Count; ++i)
+                            taskTypeIdList.Add(PlayerControl.LocalPlayer.Data.Tasks[i].TypeId);
                     }
 
                     if (taskTypeIdList == null) return;
@@ -547,15 +548,15 @@ namespace TheOtherRoles.Patches
                     var taskIdDataTable = new Dictionary<uint, byte[]>();
                     var playerData = CachedPlayer.LocalPlayer.PlayerControl.Data;
                     playerData.Object.clearAllTasks();
-                    playerData.Tasks = new Il2CppSystem.Collections.Generic.List<NetworkedPlayerInfo.TaskInfo>(taskTypeIdList.Count);
+                    playerData.Tasks = new Il2CppSystem.Collections.Generic.List<GameData.TaskInfo>(taskTypeIdList.Count);
                     for (int j = 0; j < taskTypeIdList.Count; j++)
                     {
-                        playerData.Tasks.Add(new NetworkedPlayerInfo.TaskInfo(taskTypeIdList[j], (uint)j));
+                        playerData.Tasks.Add(new GameData.TaskInfo(taskTypeIdList[j], (uint)j));
                         playerData.Tasks[j].Id = (uint)j;
                     }
                     for (int j = 0; j < playerData.Tasks.Count; j++)
                     {
-                        NetworkedPlayerInfo.TaskInfo taskInfo = playerData.Tasks[j];
+                        GameData.TaskInfo taskInfo = playerData.Tasks[j];
                         NormalPlayerTask normalPlayerTask = UnityEngine.Object.Instantiate(MapUtilities.CachedShipStatus.GetTaskById(taskInfo.TypeId), playerData.Object.transform);
                         normalPlayerTask.Id = taskInfo.Id;
                         normalPlayerTask.Owner = playerData.Object;

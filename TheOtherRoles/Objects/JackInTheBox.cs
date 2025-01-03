@@ -86,7 +86,7 @@ namespace TheOtherRoles.Objects
             vent.name = "JackInTheBoxVent_" + vent.Id;
 
             // Only render the box for the Trickster and for Ghosts
-            var showBoxToLocalPlayer = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead;
+            var showBoxToLocalPlayer = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || PlayerControl.LocalPlayer.Data.IsDead;
             gameObject.SetActive(showBoxToLocalPlayer);
 
             AllJackInTheBoxes.Add(this);
@@ -97,7 +97,7 @@ namespace TheOtherRoles.Objects
             if (boxesConvertedToVents == true) return;
             foreach (var box in AllJackInTheBoxes)
             {
-                var showBoxToLocalPlayer = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead;
+                var showBoxToLocalPlayer = CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || PlayerControl.LocalPlayer.Data.IsDead;
                 box.gameObject.SetActive(showBoxToLocalPlayer);
             }
         }

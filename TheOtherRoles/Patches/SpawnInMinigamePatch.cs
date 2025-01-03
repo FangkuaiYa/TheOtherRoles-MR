@@ -273,13 +273,13 @@ namespace TheOtherRoles.Patches
             if (TaskRacer.isValid())
             {
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                    CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                    Players.CachedPlayer.LocalPlayer.PlayerControl.NetId,
                     (byte)CustomRPC.TaskVsMode_Ready,
                     Hazel.SendOption.Reliable,
                     -1);
-                writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                writer.Write(Players.CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
-                RPCProcedure.taskVsModeReady(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                RPCProcedure.taskVsModeReady(Players.CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
             }
         }
 

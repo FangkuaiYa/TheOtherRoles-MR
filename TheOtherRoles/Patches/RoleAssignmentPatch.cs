@@ -11,12 +11,12 @@ using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Patches
 {
-    [HarmonyPatch(typeof(RoleOptionsCollectionV08), nameof(RoleOptionsCollectionV08.GetNumPerGame))]
+    [HarmonyPatch(typeof(RoleOptionsCollectionV07), nameof(RoleOptionsCollectionV07.GetNumPerGame))]
     class RoleOptionsDataGetNumPerGamePatch
     {
         public static void Postfix(ref int __result)
         {
-            if (GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal) __result = 0; // Deactivate Vanilla Roles if the mod roles are active
+            if (CustomOptionHolder.activateRoles.getBool() && GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal) __result = 0; // Deactivate Vanilla Roles if the mod roles are active
         }
     }
 
@@ -80,7 +80,8 @@ namespace TheOtherRoles.Patches
             }
 
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return; // Don't assign Roles in Hide N Seek
-            assignRoles();
+            if (CustomOptionHolder.activateRoles.getBool()) // Don't assign Roles in Tutorial or if deactivated
+                assignRoles();
         }
 
         private static void assignRoles()
@@ -103,7 +104,7 @@ namespace TheOtherRoles.Patches
                 if (isGuesserGamemode) assignGuesserGamemode();
                 assignModifiers(); // Assign modifier
             }
-            //setRolesAgain();
+            setRolesAgain();
         }
 
         public static RoleAssignmentData getRoleAssignmentData()

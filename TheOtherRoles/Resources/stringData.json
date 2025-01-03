@@ -704,9 +704,9 @@
         "13": "\u76ee\u6807\u51fa\u751f\u65e5"
     },
     "Opt-General,56": {
-        "0": "VIP, Bait & Bloody Are Hidden",
+        "0": "Hide After Death Modifiers",
         "11": "\u751f\u5b58\u6642\u306b\u81ea\u8eab\u304c\u30e2\u30c7\u30a3\u30d5\u30a1\u30a4\u30a2\u304b\u3069\u3046\u304b\u5206\u304b\u3089\u306a\u3044",
-        "13": "\u9690\u85cfVIP, \u8bf1\u9975 & \u6e85\u8840\u8005\u6548\u679c"
+        "13": "\u73a9\u5bb6\u6b7b\u540e\u9690\u85cf\u9644\u52a0\u804c\u4e1a"
     },
     "Opt-General,57": {
         "0": "Number Of Meetings (excluding Mayor meeting)",
@@ -783,19 +783,19 @@
         "13": "<color=#FFFF00FF>\u5f00\u542f</color>"
     },
     "Opt-General,71": {
-        "0": "TORMR Settings",
+        "0": "The Other Roles Settings",
         "11": "The Other Roles\u8a2d\u5b9a",
-        "13": "TORMR\u8bbe\u7f6e"
+        "13": "\u8d85\u591a\u804c\u4e1a\u6a21\u7ec4\u8bbe\u7f6e"
     },
     "Opt-General,72": {
-        "0": "Hide 'N' Seek Roles",
+        "0": "Impostor Roles Settings",
         "11": "\u30a4\u30f3\u30dd\u30b9\u30bf\u30fc\u5f79\u8077\u8a2d\u5b9a",
-        "13": "\u6349\u8ff7\u85cf\u804c\u4e1a"
+        "13": "\u5185\u9b3c\u9635\u8425\u8bbe\u7f6e"
     },
     "Opt-General,73": {
-        "0": "Spawn Chance",
+        "0": "Neutral Roles Settings",
         "11": "\u7b2c\u4e09\u9663\u55b6\u5f79\u8077\u8a2d\u5b9a",
-        "13": "\u5206\u914d\u6982\u7387"
+        "13": "\u4e2d\u7acb\u804c\u4e1a\u8bbe\u7f6e"
     },
     "Opt-General,74": {
         "0": "Crewmate Roles Settings",
@@ -808,18 +808,18 @@
         "13": "\u9644\u52a0\u804c\u4e1a\u8bbe\u7f6e"
     },
     "Opt-General,76": {
-        "0": "Guesser Settings",
+        "0": "Guesser Mode Settings",
         "11": "\u30b2\u30c3\u30b5\u30fc\u30e2\u30fc\u30c9\u8a2d\u5b9a",
-        "13": "\u8d4c\u602a\u8bbe\u7f6e"
+        "13": "\u8d4c\u602a\u6a21\u5f0f\u8bbe\u7f6e"
     },
     "Opt-General,77": {
-        "0": "Hide 'N' Seek",
+        "0": "Hide 'N Seek Settings",
         "11": "\u304b\u304f\u308c\u3093\u307c\u8a2d\u5b9a",
         "13": "\u6349\u8ff7\u85cf\u6a21\u5f0f\u8bbe\u7f6e"
     },
     "Opt-General,103": {
-        "0": "Prop Hunt",
-        "13": "\u53d8\u5f62\u72e9\u730e"
+        "0": "Prop Hunt Settings",
+        "13": "\u53d8\u5f62\u72e9\u730e\u6a21\u5f0f\u8bbe\u7f6e"
     },
     "Opt-General,78": {
         "0": "1 Evil:",
@@ -944,10 +944,6 @@
     "Opt-General,109": {
         "0": "Block Dead Impostor From Sabotaging",
         "13": "\u7981\u6b62\u5df2\u6b7b\u4ea1\u7684\u5185\u9b3c\u7834\u574f"
-    },
-    "Opt-General,110": {
-        "0": "Role Overview",
-        "13": "\u804c\u4e1a\u603b\u89c8"
     },
     "Color,1": {
         "0": "Salmon",
@@ -3927,16 +3923,12 @@
         "13": "{0} \u963b\u6b62\u4e86\u6e38\u620f\u5f00\u59cb!"
     },
     "GameStart,9": {
-        "0": "Host Info: Pasting vanilla settings failed, TOR Options applied!",
-        "13": "\u623f\u4e3b\u6d88\u606f\uff1a\u7c98\u8d34\u539f\u7248\u8bbe\u7f6e\u5931\u8d25\uff0cTOR\u8bbe\u7f6e\u5df2\u7ecf\u5e94\u7528"
+        "0": "STOP",
+        "13": "\u505c\u6b62"
     },
     "GameStart,10": {
         "0": "Nice try, but you have to be the host to use this feature",
         "13": "\u8fd9\u662f\u623f\u4e3b\u81f3\u9ad8\u65e0\u4e0a\u7684\u6743\u529b\n- \u5c0a\u8d35\u7684\u6c49\u5316\u8005"
-    },
-    "GameStart,11": {
-        "0": "Host Info: You tried to paste invalid settings: \"{0}...\"",
-        "13": "\u623f\u4e3b\u4fe1\u606f: \u60a8\u8bd5\u56fe\u7c98\u8d34\u65e0\u6548\u7684\u8bbe\u7f6e: \"{0}...\""
     },
     "Exile,1": {
         "0": "{0} was The {1}",

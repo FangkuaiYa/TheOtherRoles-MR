@@ -87,7 +87,7 @@ namespace TheOtherRoles.Modules
                     if (text.ToLower().Equals("/murder"))
                     {
                         CachedPlayer.LocalPlayer.PlayerControl.Exiled();
-                        FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(CachedPlayer.LocalPlayer.PlayerControl.Data, CachedPlayer.LocalPlayer.PlayerControl.Data);
+                        FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(CachedPlayer.LocalPlayer.Data, CachedPlayer.LocalPlayer.Data);
                         handled = true;
                     }
                     else if (text.ToLower().StartsWith("/color "))
@@ -104,13 +104,13 @@ namespace TheOtherRoles.Modules
                     }
                 }
 
-                if (text.ToLower().StartsWith("/tp ") && CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (text.ToLower().StartsWith("/tp ") && CachedPlayer.LocalPlayer.Data.IsDead)
                 {
                     string playerName = text.Substring(4).ToLower();
                     PlayerControl target = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data.PlayerName.ToLower().Equals(playerName));
                     if (target != null)
                     {
-                        CachedPlayer.LocalPlayer.PlayerControl.transform.position = target.transform.position;
+                        CachedPlayer.LocalPlayer.transform.position = target.transform.position;
                         handled = true;
                     }
                 }
@@ -139,7 +139,7 @@ namespace TheOtherRoles.Modules
             public static void Postfix(ChatBubble __instance, [HarmonyArgument(0)] string playerName)
             {
                 PlayerControl sourcePlayer = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data != null && x.Data.PlayerName.Equals(playerName));
-                if (sourcePlayer != null && CachedPlayer.LocalPlayer.PlayerControl != null && CachedPlayer.LocalPlayer.PlayerControl.Data?.Role?.IsImpostor == true && (Spy.spy != null && sourcePlayer.PlayerId == Spy.spy.PlayerId || Sidekick.sidekick != null && Sidekick.wasTeamRed && sourcePlayer.PlayerId == Sidekick.sidekick.PlayerId || Jackal.jackal != null && Jackal.wasTeamRed && sourcePlayer.PlayerId == Jackal.jackal.PlayerId) && __instance != null) __instance.NameText.color = Palette.ImpostorRed;
+                if (CachedPlayer.LocalPlayer != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor && (Spy.spy != null && sourcePlayer.PlayerId == Spy.spy.PlayerId || Sidekick.sidekick != null && Sidekick.wasTeamRed && sourcePlayer.PlayerId == Sidekick.sidekick.PlayerId || Jackal.jackal != null && Jackal.wasTeamRed && sourcePlayer.PlayerId == Jackal.jackal.PlayerId) && __instance != null) __instance.NameText.color = Palette.ImpostorRed;
             }
         }
 
@@ -151,7 +151,7 @@ namespace TheOtherRoles.Modules
                 if (__instance != FastDestroyableSingleton<HudManager>.Instance.Chat)
                     return true;
                 PlayerControl localPlayer = CachedPlayer.LocalPlayer.PlayerControl;
-                return localPlayer == null || (MeetingHud.Instance != null || LobbyBehaviour.Instance != null || (localPlayer.Data.IsDead || localPlayer.isLover() && Lovers.enableChat) || (int)sourcePlayer.PlayerId == (int)CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                return localPlayer == null || (MeetingHud.Instance != null || LobbyBehaviour.Instance != null || (localPlayer.Data.IsDead || localPlayer.isLover() && Lovers.enableChat) || (int)sourcePlayer.PlayerId == (int)CachedPlayer.LocalPlayer.PlayerId);
 
             }
         }

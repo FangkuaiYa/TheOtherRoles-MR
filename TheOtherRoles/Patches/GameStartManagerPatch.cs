@@ -24,11 +24,10 @@ namespace TheOtherRoles.Patches
         {
             public static void Postfix(AmongUsClient __instance)
             {
-                if (CachedPlayer.LocalPlayer.PlayerControl != null)
+                if (CachedPlayer.LocalPlayer != null)
                 {
                     Helpers.shareGameVersion();
                 }
-                GameStartManagerUpdatePatch.sendGamemode = true;
             }
         }
 
@@ -50,7 +49,7 @@ namespace TheOtherRoles.Patches
                 //Start room MinPlaters
                 __instance.MinPlayers = 1;
                 // Task Vs Mode
-                //TaskRacer.clearAndReload();
+                TaskRacer.clearAndReload();
             }
         }
 
@@ -61,7 +60,6 @@ namespace TheOtherRoles.Patches
             private static bool update = false;
             private static string currentText = "";
             private static GameObject copiedStartButton;
-            public static bool sendGamemode = true;
             public static void Prefix(GameStartManager __instance)
             {
                 if (!GameData.Instance) return; // No instance
@@ -71,7 +69,7 @@ namespace TheOtherRoles.Patches
             public static void Postfix(GameStartManager __instance)
             {
                 // Send version as soon as CachedPlayer.LocalPlayer.PlayerControl exists
-                if (CachedPlayer.LocalPlayer.PlayerControl != null && !versionSent)
+                if (PlayerControl.LocalPlayer != null && !versionSent)
                 {
                     versionSent = true;
                     Helpers.shareGameVersion();
@@ -84,6 +82,9 @@ namespace TheOtherRoles.Patches
                 foreach (InnerNet.ClientData client in AmongUsClient.Instance.allClients.ToArray())
                 {
                     if (client.Character == null) continue;
+                    var dummyComponent = client.Character.GetComponent<DummyBehaviour>();
+                    if (dummyComponent != null && dummyComponent.enabled)
+                        continue;
                     else if (!playerVersions.ContainsKey(client.Id))
                     {
                         versionMismatch = true;
@@ -116,20 +117,14 @@ namespace TheOtherRoles.Patches
                 {
                     if (versionMismatch)
                     {
+                        __instance.StartButton.color = __instance.startLabelText.color = Palette.DisabledClear;
                         __instance.GameStartText.text = message;
-                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 5;
-                        __instance.GameStartText.transform.localScale = new Vector3(2f, 2f, 1f);
-                        __instance.GameStartTextParent.SetActive(true);
+                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 2;
                     }
                     else
                     {
-                        __instance.GameStartText.transform.localPosition = Vector3.zero;
-                        __instance.GameStartText.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
-                        if (!__instance.GameStartText.text.Contains(FastDestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameStarting).Replace("{0}", "")))
-                        {
-                            __instance.GameStartText.text = String.Empty;
-                            __instance.GameStartTextParent.SetActive(false);
-                        }
+                        __instance.StartButton.color = __instance.startLabelText.color = ((__instance.LastPlayerCount >= __instance.MinPlayers) ? Palette.EnabledColor : Palette.DisabledClear);
+                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition;
                     }
 
                     if (__instance.startState != GameStartManager.StartingStates.Countdown)
@@ -144,9 +139,10 @@ namespace TheOtherRoles.Patches
                         // Activate Stop-Button
                         copiedStartButton = GameObject.Instantiate(__instance.StartButton.gameObject, __instance.StartButton.gameObject.transform.parent);
                         copiedStartButton.transform.localPosition = __instance.StartButton.transform.localPosition;
+                        copiedStartButton.GetComponent<SpriteRenderer>().sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.StopClean.png", 180f);
                         copiedStartButton.SetActive(true);
                         var startButtonText = copiedStartButton.GetComponentInChildren<TMPro.TextMeshPro>();
-                        startButtonText.text = "";
+                        startButtonText.text = ModTranslation.GetString("GameStart", 9);
                         startButtonText.fontSize *= 0.8f;
                         startButtonText.fontSizeMax = startButtonText.fontSize;
                         startButtonText.gameObject.transform.localPosition = Vector3.zero;
@@ -158,8 +154,9 @@ namespace TheOtherRoles.Patches
                             startingTimer = 0;
                         }
                         startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
-                        __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
-                            startButtonText.text = "";
+                        __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) =>
+                        {
+                            startButtonText.text = ModTranslation.GetString("GameStart", 9);
                         })));
                     }
                 }
@@ -177,26 +174,18 @@ namespace TheOtherRoles.Patches
                             SceneChanger.ChangeScene("MainMenu");
                         }
                         __instance.GameStartText.text = string.Format(ModTranslation.GetString("GameStart", 5), Math.Round(10 - kickingTimer));
-                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 5;
-                        __instance.GameStartText.transform.localScale = new Vector3(2f, 2f, 1f);
-                        __instance.GameStartTextParent.SetActive(true);
+                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 2;
                     }
                     else if (versionMismatch)
                     {
                         __instance.GameStartText.text = ModTranslation.GetString("GameStart", 6) + message;
-                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 5;
-                        __instance.GameStartText.transform.localScale = new Vector3(2f, 2f, 1f);
-                        __instance.GameStartTextParent.SetActive(true);
+                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 2;
                     }
                     else
                     {
-                        __instance.GameStartText.transform.localPosition = Vector3.zero;
-                        __instance.GameStartText.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+                        __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition;
                         if (!__instance.GameStartText.text.Contains(FastDestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameStarting).Replace("{0}", "")))
-                        {
                             __instance.GameStartText.text = String.Empty;
-                            __instance.GameStartTextParent.SetActive(false);
-                        }
                     }
                     if (!__instance.GameStartText.text.Contains(FastDestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameStarting).Replace("{0}", "")) || !CustomOptionHolder.anyPlayerCanStopStart.getBool())
                         copiedStartButton?.Destroy();
@@ -205,9 +194,10 @@ namespace TheOtherRoles.Patches
                         // Activate Stop-Button
                         copiedStartButton = GameObject.Instantiate(__instance.StartButton.gameObject, __instance.StartButton.gameObject.transform.parent);
                         copiedStartButton.transform.localPosition = __instance.StartButton.transform.localPosition;
+                        copiedStartButton.GetComponent<SpriteRenderer>().sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.StopClean.png", 180f);
                         copiedStartButton.SetActive(true);
                         var startButtonText = copiedStartButton.GetComponentInChildren<TMPro.TextMeshPro>();
-                        startButtonText.text = "";
+                        startButtonText.text = ModTranslation.GetString("GameStart", 9);
                         startButtonText.fontSize *= 0.8f;
                         startButtonText.fontSizeMax = startButtonText.fontSize;
                         startButtonText.gameObject.transform.localPosition = Vector3.zero;
@@ -215,23 +205,26 @@ namespace TheOtherRoles.Patches
                         void StopStartFunc()
                         {
                             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.StopStart, Hazel.SendOption.Reliable, AmongUsClient.Instance.HostId);
-                            writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                            writer.Write(PlayerControl.LocalPlayer.PlayerId);
                             AmongUsClient.Instance.FinishRpcImmediately(writer);
                             copiedStartButton.Destroy();
                             __instance.GameStartText.text = String.Empty;
                             startingTimer = 0;
                             startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
-                            __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
-                                startButtonText.text = "";
+                            __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) =>
+                            {
+                                startButtonText.text = ModTranslation.GetString("GameStart", 9);
                             })));
                         }
+                        if (__instance.GameStartText.text.Contains(FastDestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameStarting).Replace("{0}", "")) && CustomOptionHolder.anyPlayerCanStopStart.getBool())
+                            __instance.GameStartText.transform.localPosition = __instance.StartButton.transform.localPosition + Vector3.up * 0.6f;
                     }
 
                     // Task Vs Mode
                     if (CustomOptionHolder.enabledTaskVsMode.getBool())
                     {
-                        __instance.StartButton.enabled = true;
-                        __instance.GameStartText.color = Palette.EnabledColor;
+                        __instance.StartButton.color = Palette.EnabledColor;
+                        __instance.startLabelText.color = Palette.EnabledColor;
                         if (__instance.StartButtonGlyph != null)
                             __instance.StartButtonGlyph.SetColor(Palette.EnabledColor);
                     }
@@ -243,7 +236,7 @@ namespace TheOtherRoles.Patches
                     }
 
                     // Lobby timer
-                    if (!GameData.Instance || !__instance.PlayerCounter) return; // No instance
+                    if (!GameData.Instance) return; // No instance
 
                     if (update) currentText = __instance.PlayerCounter.text;
 
@@ -252,15 +245,15 @@ namespace TheOtherRoles.Patches
                     int seconds = (int)timer % 60;
                     string suffix = $" ({minutes:00}:{seconds:00})";
 
-                    if (!AmongUsClient.Instance) return;
+                    __instance.PlayerCounter.text = currentText + suffix;
+                    __instance.PlayerCounter.autoSizeTextContainer = true;
 
-                    if (AmongUsClient.Instance.AmHost && sendGamemode && CachedPlayer.LocalPlayer.PlayerControl != null)
+                    if (AmongUsClient.Instance.AmHost)
                     {
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGamemode, Hazel.SendOption.Reliable, -1);
                         writer.Write((byte)TORMapOptions.gameMode);
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
                         RPCProcedure.shareGamemode((byte)TORMapOptions.gameMode);
-                        sendGamemode = false;
                     }
                 }
             }
@@ -317,15 +310,13 @@ namespace TheOtherRoles.Patches
                         // 4 = Airship
                         // 5 = Submerged
                         byte chosenMapId = 0;
-                        List<float> probabilities =
-                        [
-                            CustomOptionHolder.dynamicMapEnableSkeld.getSelection() / 10f,
-                            CustomOptionHolder.dynamicMapEnableMira.getSelection() / 10f,
-                            CustomOptionHolder.dynamicMapEnablePolus.getSelection() / 10f,
-                            CustomOptionHolder.dynamicMapEnableAirShip.getSelection() / 10f,
-                            CustomOptionHolder.dynamicMapEnableFungle.getSelection() / 10f,
-                            CustomOptionHolder.dynamicMapEnableSubmerged.getSelection() / 10f,
-                        ];
+                        List<float> probabilities = new List<float>();
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnableSkeld.getSelection() / 10f);
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnableMira.getSelection() / 10f);
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnablePolus.getSelection() / 10f);
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnableAirShip.getSelection() / 10f);
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnableFungle.getSelection() / 10f);
+                        probabilities.Add(CustomOptionHolder.dynamicMapEnableSubmerged.getSelection() / 10f);
 
                         // if any map is at 100%, remove all maps that are not!
                         if (probabilities.Contains(1.0f))

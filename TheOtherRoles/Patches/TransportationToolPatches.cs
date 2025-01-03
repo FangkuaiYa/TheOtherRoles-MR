@@ -4,7 +4,6 @@ using System;
 using UnityEngine.Windows.Speech;
 using TheOtherRoles;
 using static UnityEngine.GraphicsBuffer;
-using TheOtherRoles.Players;
 namespace TheOtherRoles.Patches
 {
     [HarmonyPatch]
@@ -26,7 +25,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(ZiplineBehaviour), nameof(ZiplineBehaviour.Use), new Type[] { typeof(PlayerControl), typeof(bool) })]
         public static void prefix3(ZiplineBehaviour __instance, PlayerControl player, bool fromTop)
         {
-            AntiTeleport.position = PlayerControl.LocalPlayer.transform.position;
+            AntiTeleport.position = Players.CachedPlayer.LocalPlayer.transform.position;
         }
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ZiplineBehaviour), nameof(ZiplineBehaviour.Use), new Type[] { typeof(PlayerControl), typeof(bool) })]
@@ -63,7 +62,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.ClimbLadder))]
         public static void prefix()
         {
-            AntiTeleport.position = PlayerControl.LocalPlayer.transform.position;
+            AntiTeleport.position = Players.CachedPlayer.LocalPlayer.transform.position;
         }
         [HarmonyPostfix]
         [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.ClimbLadder))]
@@ -82,7 +81,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MovingPlatformBehaviour), nameof(MovingPlatformBehaviour.UsePlatform))]
         public static void prefix2()
         {
-            AntiTeleport.position = PlayerControl.LocalPlayer.transform.position;
+            AntiTeleport.position = Players.CachedPlayer.LocalPlayer.transform.position;
         }
     }
 }

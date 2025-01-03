@@ -31,7 +31,7 @@ namespace TheOtherRoles.Objects
             public Transform Transform;
             public SpriteRenderer Renderer;
             public PlayerControl Owner;
-            public NetworkedPlayerInfo Data;
+            public GameData.PlayerInfo Data;
             public float Lifetime;
 
             public Footprint()
@@ -112,7 +112,7 @@ namespace TheOtherRoles.Objects
             }
         }
 
-        private static void OnDestroy()
+        private void OnDestroy()
         {
             Instance = null;
         }

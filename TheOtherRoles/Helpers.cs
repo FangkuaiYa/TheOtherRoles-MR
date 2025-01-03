@@ -11,7 +11,6 @@ using TheOtherRoles.Modules;
 using TheOtherRoles.Patches;
 using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
-using Unity.Services.Core.Telemetry.Internal;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 using UnityObject = UnityEngine.Object;
@@ -72,7 +71,7 @@ namespace TheOtherRoles
                 sprite.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
                 return CachedSprites[path + pixelsPerUnit] = sprite;
             }
-            catch
+            catch (Exception e)
             {
                 System.Console.WriteLine("Error loading sprite from path: " + path);
             }
@@ -197,7 +196,7 @@ namespace TheOtherRoles
 
         public static PlayerControl firstImpostorById()
         {
-            foreach (PlayerControl player in PlayerControl.AllPlayerControls)
+            foreach (PlayerControl player in CachedPlayer.AllPlayers)
             {
                 if (player.Data.Role.IsImpostor)
                     return player;
@@ -448,7 +447,7 @@ namespace TheOtherRoles
 
         public static bool hidePlayerName(PlayerControl target)
         {
-            return hidePlayerName(CachedPlayer.LocalPlayer.PlayerControl, target);
+            return hidePlayerName(PlayerControl.LocalPlayer, target);
         }
 
         public static bool hidePlayerName(PlayerControl source, PlayerControl target)
@@ -490,7 +489,7 @@ namespace TheOtherRoles
             {
                 var instance = ShipStatus.Instance.CastFast<FungleShipStatus>().specialSabotage;
                 MushroomMixupSabotageSystem.CondensedOutfit condensedOutfit = instance.currentMixups[target.PlayerId];
-                NetworkedPlayerInfo.PlayerOutfit playerOutfit = instance.ConvertToPlayerOutfit(condensedOutfit);
+                GameData.PlayerOutfit playerOutfit = instance.ConvertToPlayerOutfit(condensedOutfit);
                 target.MixUpOutfit(playerOutfit);
             }
             else
@@ -601,7 +600,7 @@ namespace TheOtherRoles
             return roleCouldUse;
         }
 
-        public static MurderAttemptResult checkMuderAttempt(PlayerControl killer, PlayerControl target, bool blockRewind = false, bool ignoreBlank = false, bool ignoreIfKillerIsDead = false, bool ignoreMedic = false)
+        public static MurderAttemptResult checkMuderAttempt(PlayerControl killer, PlayerControl target, bool blockRewind = false, bool ignoreBlank = false, bool ignoreIfKillerIsDead = false)
         {
             var targetRole = RoleInfo.getRoleInfoForPlayer(target, false).FirstOrDefault();
 
@@ -627,7 +626,7 @@ namespace TheOtherRoles
             }
 
             // Block impostor shielded kill
-            if (!ignoreMedic && Medic.shielded != null && Medic.shielded == target)
+            if (Medic.shielded != null && Medic.shielded == target)
             {
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)CustomRPC.ShieldedMurderAttempt, Hazel.SendOption.Reliable, -1);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -780,15 +779,9 @@ namespace TheOtherRoles
                 if (cam != null && cam.gameObject.name == "UI Camera") cam.orthographicSize = orthographicSize;  // The UI is scaled too, else we cant click the buttons. Downside: map is super small.
             }
 
-            var tzGO = GameObject.Find("TOGGLEZOOMBUTTON");
-            if (tzGO != null)
-            {
-                var rend = tzGO.transform.Find("Inactive").GetComponent<SpriteRenderer>();
-                var rendActive = tzGO.transform.Find("Active").GetComponent<SpriteRenderer>();
-                rend.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Plus_Button.png", 100f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Minus_Button.png", 100f);
-                rendActive.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Plus_ButtonActive.png", 100f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Minus_ButtonActive.png", 100f);
-                tzGO.transform.localScale = new Vector3(1.2f, 1.2f, 1f) * (zoomOutStatus ? 4 : 1);
-            }
+            HudManagerStartPatch.zoomOutButton.Sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.PlusButton.png", 75f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.MinusButton.png", 150f);
+            HudManagerStartPatch.zoomOutButton.PositionOffset = zoomOutStatus ? new Vector3(0f, 3f, 0) : new Vector3(0.4f, 2.8f, 0);
+            ResolutionManager.ResolutionChanged.Invoke((float)Screen.width / Screen.height, Screen.width, Screen.height, Screen.fullScreen); // This will move button positions to the correct position.
         }
 #if false
         private static long GetBuiltInTicks()
@@ -832,7 +825,7 @@ namespace TheOtherRoles
             }
         }
         #endif
-        public static bool hasImpVision(NetworkedPlayerInfo player)
+        public static bool hasImpVision(GameData.PlayerInfo player)
         {
             return player.Role.IsImpostor
                 || (Madmate.madmate != null && Madmate.madmate.PlayerId == player.PlayerId && Madmate.hasImpostorVision)

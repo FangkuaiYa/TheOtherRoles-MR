@@ -7,18 +7,17 @@ using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using TheOtherRoles.Players;
 
 namespace TheOtherRoles.Modules.CustomHats.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(HatsTab))]
 internal static class HatsTabPatches
 {
     private static TextMeshPro textTemplate;
-
-    [HarmonyPatch(typeof(HatsTab), nameof(HatsTab.OnEnable))]
-    [HarmonyPrefix]
-    private static bool OnEnablePrefix(HatsTab __instance)
+    
+    [HarmonyPatch(nameof(HatsTab.OnEnable))]
+    [HarmonyPostfix]
+    private static void OnEnablePostfix(HatsTab __instance)
     {
         for (var i = 0; i < __instance.scroller.Inner.childCount; i++)
         {
@@ -67,7 +66,6 @@ internal static class HatsTabPatches
         }
         
         __instance.scroller.ContentYBounds.max = -(yOffset + 4.1f);
-        return false;
     }
 
     private static float CreateHatPackage(List<Tuple<HatData, HatExtension>> hats, string packageName, float yStart,
@@ -108,7 +106,7 @@ internal static class HatsTabPatches
                 colorChip.Button.OnClick.AddListener((Action)(() => hatsTab.SelectHat(hat)));
             }
             colorChip.Button.ClickMask = hatsTab.scroller.Hitbox;
-            colorChip.Inner.SetMaskType(PlayerMaterial.MaskType.SimpleUI);
+            colorChip.Inner.SetMaskType(PlayerMaterial.MaskType.ScrollingUI);
             hatsTab.UpdateMaterials(colorChip.Inner.FrontLayer, hat);
             var background = colorChip.transform.FindChild("Background");
             var foreground = colorChip.transform.FindChild("ForeGround");
@@ -133,7 +131,7 @@ internal static class HatsTabPatches
             }
             
             colorChip.transform.localPosition = new Vector3(xPos, yPos, -1f);
-            colorChip.Inner.SetHat(hat, hatsTab.HasLocalPlayer() ? CachedPlayer.LocalPlayer.PlayerControl.Data.DefaultOutfit.ColorId : DataManager.Player.Customization.Color);
+            colorChip.Inner.SetHat(hat, hatsTab.HasLocalPlayer() ? PlayerControl.LocalPlayer.Data.DefaultOutfit.ColorId : DataManager.Player.Customization.Color);
             colorChip.Inner.transform.localPosition = hat.ChipOffset;
             colorChip.Tag = hat;
             colorChip.SelectionHighlight.gameObject.SetActive(false);

@@ -19,7 +19,7 @@ namespace TheOtherRoles.Patches
     [HarmonyPatch(typeof(Vent), nameof(Vent.CanUse))]
     public static class VentCanUsePatch
     {
-        public static bool Prefix(Vent __instance, ref float __result, [HarmonyArgument(0)] NetworkedPlayerInfo pc, [HarmonyArgument(1)] ref bool canUse, [HarmonyArgument(2)] ref bool couldUse)
+        public static bool Prefix(Vent __instance, ref float __result, [HarmonyArgument(0)] GameData.PlayerInfo pc, [HarmonyArgument(1)] ref bool canUse, [HarmonyArgument(2)] ref bool couldUse)
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return true;
             float num = float.MaxValue;
@@ -112,7 +112,7 @@ namespace TheOtherRoles.Patches
         static bool Prefix(VentButton __instance)
         {
             // Manually modifying the VentButton to use Vent.Use again in order to trigger the Vent.Use prefix patch
-            if (__instance.currentTarget != null && !Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId)) __instance.currentTarget.Use();
+            if (__instance.currentTarget != null && !Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId)) __instance.currentTarget.Use();
             return false;
         }
     }
@@ -124,7 +124,7 @@ namespace TheOtherRoles.Patches
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return true;
             // Deputy handcuff disables the vents
-            if (Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerControl.PlayerId))
+            if (Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerId))
             {
                 Deputy.setHandcuffedKnows();
                 return false;
@@ -133,7 +133,7 @@ namespace TheOtherRoles.Patches
 
             bool canUse;
             bool couldUse;
-            __instance.CanUse(CachedPlayer.LocalPlayer.PlayerControl.Data, out canUse, out couldUse);
+            __instance.CanUse(CachedPlayer.LocalPlayer.Data, out canUse, out couldUse);
             if (!canUse) return false; // No need to execute the native method as using is disallowed anyways
 
             bool isEnter = !CachedPlayer.LocalPlayer.PlayerControl.inVent;
@@ -154,10 +154,10 @@ namespace TheOtherRoles.Patches
                 __instance.SetButtons(isEnter && canMoveInVents);
                 MessageWriter writer = AmongUsClient.Instance.StartRpc(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UseUncheckedVent, Hazel.SendOption.Reliable);
                 writer.WritePacked(__instance.Id);
-                writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                 writer.Write(isEnter ? byte.MaxValue : (byte)0);
                 writer.EndMessage();
-                RPCProcedure.useUncheckedVent(__instance.Id, CachedPlayer.LocalPlayer.PlayerControl.PlayerId, isEnter ? byte.MaxValue : (byte)0);
+                RPCProcedure.useUncheckedVent(__instance.Id, CachedPlayer.LocalPlayer.PlayerId, isEnter ? byte.MaxValue : (byte)0);
                 SoundEffectsManager.play(AssetLoader.customAssets.tricksterUseBoxVent);
                 return false;
             }
@@ -200,9 +200,9 @@ namespace TheOtherRoles.Patches
             bool b = !Trapper.playersOnMap.Contains(CachedPlayer.LocalPlayer.PlayerControl);
             if (b && CachedPlayer.LocalPlayer.PlayerControl.cosmetics.Visible)
             {
-                RPCProcedure.ventMoveInvisible(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                RPCProcedure.ventMoveInvisible(CachedPlayer.LocalPlayer.PlayerId);
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.VentMoveInvisible, Hazel.SendOption.Reliable, -1);
-                writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                writer.Write(CachedPlayer.LocalPlayer.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
             return b;
@@ -258,10 +258,10 @@ namespace TheOtherRoles.Patches
                 KillAnimationCoPerformKillPatch.hideNextAnimation = true;  // dont jump out of bounds!
                 return false;
             }
-            if (__instance.isActiveAndEnabled && __instance.currentTarget && !__instance.isCoolingDown && !CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && CachedPlayer.LocalPlayer.PlayerControl.CanMove)
+            if (__instance.isActiveAndEnabled && __instance.currentTarget && !__instance.isCoolingDown && !CachedPlayer.LocalPlayer.Data.IsDead && CachedPlayer.LocalPlayer.PlayerControl.CanMove)
             {
                 // Deputy handcuff update.
-                if (Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerControl.PlayerId))
+                if (Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerId))
                 {
                     Deputy.setHandcuffedKnows();
                     return false;
@@ -310,8 +310,8 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(ReportButton __instance)
         {
-            if (__instance.isActiveAndEnabled && Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && __instance.graphic.color == Palette.EnabledColor) Deputy.setHandcuffedKnows();
-            return !Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+            if (__instance.isActiveAndEnabled && Deputy.handcuffedPlayers.Contains(CachedPlayer.LocalPlayer.PlayerId) && __instance.graphic.color == Palette.EnabledColor) Deputy.setHandcuffedKnows();
+            return !Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId);
         }
     }
 
@@ -372,7 +372,7 @@ namespace TheOtherRoles.Patches
     [HarmonyPatch(typeof(Console), nameof(Console.CanUse))]
     public static class ConsoleCanUsePatch
     {
-        public static bool Prefix(ref float __result, Console __instance, [HarmonyArgument(0)] NetworkedPlayerInfo pc, [HarmonyArgument(1)] out bool canUse, [HarmonyArgument(2)] out bool couldUse)
+        public static bool Prefix(ref float __result, Console __instance, [HarmonyArgument(0)] GameData.PlayerInfo pc, [HarmonyArgument(1)] out bool canUse, [HarmonyArgument(2)] out bool couldUse)
         {
             canUse = couldUse = false;
 
@@ -520,7 +520,7 @@ namespace TheOtherRoles.Patches
                     for (int k = 0; k < __instance.vitals.Length; k++)
                     {
                         VitalsPanel vitalsPanel = __instance.vitals[k];
-                        NetworkedPlayerInfo player = vitalsPanel.PlayerInfo;
+                        GameData.PlayerInfo player = vitalsPanel.PlayerInfo;
 
                         // Hacker update
                         if (vitalsPanel.IsDead)
@@ -550,7 +550,7 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(SystemConsole __instance,
             ref float __result,
-            [HarmonyArgument(0)] NetworkedPlayerInfo pc,
+            [HarmonyArgument(0)] GameData.PlayerInfo pc,
             [HarmonyArgument(1)] out bool canUse,
             [HarmonyArgument(2)] out bool couldUse)
         {
@@ -585,7 +585,7 @@ namespace TheOtherRoles.Patches
         {
             public static bool Prefix(MapConsole __instance,
                 ref float __result,
-                [HarmonyArgument(0)] NetworkedPlayerInfo pc,
+                [HarmonyArgument(0)] GameData.PlayerInfo pc,
                 [HarmonyArgument(1)] out bool canUse,
                 [HarmonyArgument(2)] out bool couldUse)
             {
@@ -691,7 +691,7 @@ namespace TheOtherRoles.Patches
                                     DeadBody bodyComponent = collider2D.GetComponent<DeadBody>();
                                     if (bodyComponent)
                                     {
-                                        NetworkedPlayerInfo playerInfo = GameData.Instance.GetPlayerById(bodyComponent.ParentId);
+                                        GameData.PlayerInfo playerInfo = GameData.Instance.GetPlayerById(bodyComponent.ParentId);
                                         if (playerInfo != null)
                                         {
                                             var color = Palette.PlayerColors[playerInfo.DefaultOutfit.ColorId];
@@ -1003,7 +1003,7 @@ namespace TheOtherRoles.Patches
 
 
             isLightsOut = CachedPlayer.LocalPlayer.PlayerControl.myTasks.ToArray().Any(x => x.name.Contains("FixLightsTask")) || Trickster.lightsOutTimer > 0;
-            bool ignoreNightVision = CustomOptionHolder.camsNoNightVisionIfImpVision.getBool() && Helpers.hasImpVision(GameData.Instance.GetPlayerById(CachedPlayer.LocalPlayer.PlayerControl.PlayerId)) || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead;
+            bool ignoreNightVision = CustomOptionHolder.camsNoNightVisionIfImpVision.getBool() && Helpers.hasImpVision(GameData.Instance.GetPlayerById(CachedPlayer.LocalPlayer.PlayerId)) || CachedPlayer.LocalPlayer.Data.IsDead;
             bool nightVisionEnabled = CustomOptionHolder.camsNightVision.getBool();
 
             if (isLightsOut && !nightVisionIsActive && nightVisionEnabled && !ignoreNightVision)
@@ -1173,7 +1173,7 @@ namespace TheOtherRoles.Patches
         {
             if (TORMapOptions.allowParallelMedBayScans)
             {
-                __instance.medscan.CurrentUser = CachedPlayer.LocalPlayer.PlayerControl.PlayerId;
+                __instance.medscan.CurrentUser = CachedPlayer.LocalPlayer.PlayerId;
                 __instance.medscan.UsersList.Clear();
             }
         }
@@ -1187,7 +1187,7 @@ namespace TheOtherRoles.Patches
             if (HideNSeek.isHideNSeekGM)
                 return HideNSeek.canSabotage;
             if (PropHunt.isPropHuntGM) return false;
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool())
+            if (PlayerControl.LocalPlayer.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool())
             {
                 __instance.ShowNormalMap();
                 return false;

@@ -19,7 +19,7 @@ public class CachedPlayer
     public PlayerControl PlayerControl;
     public PlayerPhysics PlayerPhysics;
     public CustomNetworkTransform NetTransform;
-    public NetworkedPlayerInfo Data => PlayerControl.Data;
+    public GameData.PlayerInfo Data => PlayerControl.Data;
     public byte PlayerId;
 
     public static implicit operator bool(CachedPlayer player) => player != null && player.PlayerControl;
@@ -48,14 +48,14 @@ public static class CachedPlayerPatches
             var localPlayer = PlayerControl.LocalPlayer;
             if (!localPlayer)
             {
-                PlayerControl.LocalPlayer = null;
+                CachedPlayer.LocalPlayer = null;
                 return;
             }
 
             var cached = CachedPlayer.AllPlayers.FirstOrDefault(p => p.PlayerControl.Pointer == localPlayer.Pointer);
             if (cached != null)
             {
-                PlayerControl.LocalPlayer = cached;
+                CachedPlayer.LocalPlayer = cached;
                 return;
             }
         }
@@ -75,6 +75,16 @@ public static class CachedPlayerPatches
         };
         CachedPlayer.AllPlayers.Add(player);
         CachedPlayer.PlayerPtrs[__instance.Pointer] = player;
+
+#if DEBUG
+        foreach (var cachedPlayer in CachedPlayer.AllPlayers)
+        {
+            if (!cachedPlayer.PlayerControl || !cachedPlayer.PlayerPhysics || !cachedPlayer.NetTransform || !cachedPlayer.transform)
+            {
+                TheOtherRolesPlugin.Logger.LogError($"CachedPlayer {cachedPlayer.PlayerControl.name} has null fields");
+            }
+        }
+#endif
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.OnDestroy))]
@@ -86,7 +96,7 @@ public static class CachedPlayerPatches
         CachedPlayer.PlayerPtrs.Remove(__instance.Pointer);
     }
 
-    [HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.Deserialize))]
+    [HarmonyPatch(typeof(GameData), nameof(GameData.Deserialize))]
     [HarmonyPostfix]
     public static void AddCachedDataOnDeserialize()
     {

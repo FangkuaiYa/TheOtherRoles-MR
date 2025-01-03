@@ -11,7 +11,7 @@ namespace TheOtherRoles
     public static class TasksHandler
     {
 
-        public static Tuple<int, int> taskInfo(NetworkedPlayerInfo playerInfo, bool madmateCount = false, bool isResult = false)
+        public static Tuple<int, int> taskInfo(GameData.PlayerInfo playerInfo, bool madmateCount = false, bool isResult = false)
         {
             int TotalTasks = 0;
             int CompletedTasks = 0;
