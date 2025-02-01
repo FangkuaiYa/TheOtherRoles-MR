@@ -10,6 +10,10 @@ using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.CustomOption;
 using static TheOtherRoles.TheOtherRoles;
+using BepInEx.Unity.IL2CPP;
+using BepInEx;
+using static ShipStatus;
+using AmongUs.GameOptions;
 
 namespace TheOtherRoles
 {
@@ -24,7 +28,8 @@ namespace TheOtherRoles
             Modifier,
             Guesser,
             HideNSeekMain,
-            HideNSeekRoles
+            HideNSeekRoles,
+            PropHunt,
         }
 
         public static List<CustomOption> options = new List<CustomOption>();
@@ -41,10 +46,11 @@ namespace TheOtherRoles
         public CustomOption parent;
         public bool isHeader;
         public CustomOptionType type;
+        public Action onChange = null;
         TranslationInfo translationInfo = null;
         // Option creation
 
-        public CustomOption(int id, CustomOptionType type, TranslationInfo translationInfo, System.Object[] selections, System.Object defaultValue, CustomOption parent, bool isHeader)
+        public CustomOption(int id, CustomOptionType type, TranslationInfo translationInfo, System.Object[] selections, System.Object defaultValue, CustomOption parent, bool isHeader, Action onChange = null)
         {
             this.id = id;
             this.translationInfo = translationInfo;
@@ -56,6 +62,7 @@ namespace TheOtherRoles
             this.parent = parent;
             this.isHeader = isHeader;
             this.type = type;
+            this.onChange = onChange;
             selection = 0;
             if (id != 0)
             {
@@ -65,22 +72,22 @@ namespace TheOtherRoles
             options.Add(this);
         }
 
-        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, TranslationInfo[] selections, CustomOption parent = null, bool isHeader = false)
+        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, TranslationInfo[] selections, CustomOption parent = null, bool isHeader = false, Action onChange = null)
         {
-            return new CustomOption(id, type, translationInfo, selections, "", parent, isHeader);
+            return new CustomOption(id, type, translationInfo, selections, "", parent, isHeader, onChange);
         }
 
-        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, float defaultValue, float min, float max, float step, CustomOption parent = null, bool isHeader = false)
+        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, float defaultValue, float min, float max, float step, CustomOption parent = null, bool isHeader = false, Action onChange = null)
         {
             List<object> selections = new();
             for (float s = min; s <= max; s += step)
                 selections.Add(s);
-            return new CustomOption(id, type, translationInfo, selections.ToArray(), defaultValue, parent, isHeader);
+            return new CustomOption(id, type, translationInfo, selections.ToArray(), defaultValue, parent, isHeader, onChange);
         }
 
-        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, bool defaultValue, CustomOption parent = null, bool isHeader = false)
+        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, bool defaultValue, CustomOption parent = null, bool isHeader = false, Action onChange = null)
         {
-            return new CustomOption(id, type, translationInfo, new[] { new TranslationInfo("Opt-General", 69), new TranslationInfo("Opt-General", 70) }, defaultValue ? new TranslationInfo("Opt-General", 70) : new TranslationInfo("Opt-General", 69), parent, isHeader);
+            return new CustomOption(id, type, translationInfo, new[] { new TranslationInfo("Opt-General", 69), new TranslationInfo("Opt-General", 70) }, defaultValue ? new TranslationInfo("Opt-General", 70) : new TranslationInfo("Opt-General", 69), parent, isHeader, onChange);
         }
 
         // Static behaviour
@@ -107,7 +114,7 @@ namespace TheOtherRoles
 
         public static void saveVanillaOptions()
         {
-            vanillaSettings.Value = Convert.ToBase64String(GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameManager.Instance.LogicOptions.currentGameOptions));
+            vanillaSettings.Value = Convert.ToBase64String(GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameManager.Instance.LogicOptions.currentGameOptions, false));
         }
 
         public static void loadVanillaOptions()
@@ -124,7 +131,7 @@ namespace TheOtherRoles
         {
             var option = options.FirstOrDefault(x => x.id == optionId);
             if (option == null) return;
-            var writer = AmongUsClient.Instance!.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
+            var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
             writer.Write((byte)1);
             writer.WritePacked((uint)option.id);
             writer.WritePacked(Convert.ToUInt32(option.selection));
@@ -133,12 +140,12 @@ namespace TheOtherRoles
 
         public static void ShareOptionSelections()
         {
-            if (CachedPlayer.AllPlayers.Count <= 1 || AmongUsClient.Instance!.AmHost == false && CachedPlayer.LocalPlayer.PlayerControl == null) return;
+            if (CachedPlayer.AllPlayers.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
             var optionsList = new List<CustomOption>(CustomOption.options);
             while (optionsList.Any())
             {
                 byte amount = (byte)Math.Min(optionsList.Count, 200); // takes less than 3 bytes per option on average
-                var writer = AmongUsClient.Instance!.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
+                var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareOptions, SendOption.Reliable, -1);
                 writer.Write(amount);
                 for (int i = 0; i < amount; i++)
                 {
@@ -220,12 +227,17 @@ namespace TheOtherRoles
         public void updateSelection(int newSelection)
         {
             selection = Mathf.Clamp((newSelection + selections.Length) % selections.Length, 0, selections.Length - 1);
+            try
+            {
+                if (onChange != null) onChange();
+            }
+            catch { }
             if (optionBehaviour != null && optionBehaviour is StringOption stringOption)
             {
                 stringOption.oldValue = stringOption.Value = selection;
                 stringOption.ValueText.text = selections[selection].ToString();
 
-                if (AmongUsClient.Instance?.AmHost == true && CachedPlayer.LocalPlayer.PlayerControl)
+                if (AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer)
                 {
                     if (id == 0 && selection != preset)
                     {
@@ -263,6 +275,9 @@ namespace TheOtherRoles
                     break;
                 case CustomGamemodes.HideNSeek:
                     createHideNSeekTabs(__instance);
+                    break;
+                case CustomGamemodes.PropHunt:
+                    createPropHuntTabs(__instance);
                     break;
             }
         }
@@ -638,6 +653,78 @@ namespace TheOtherRoles
             gameSettingMenu.GameSettingsHightlight.enabled = false;
         }
 
+        private static void createPropHuntTabs(GameOptionsMenu __instance)
+        {
+            bool isReturn = setNames(
+                new Dictionary<string, TranslationInfo>()
+                {
+                    ["TORSettings"] = new TranslationInfo("Opt-General", 103)
+                });
+            if (isReturn) return;
+            // Setup TOR tab
+            var template = UnityEngine.Object.FindObjectsOfType<StringOption>().FirstOrDefault();
+            if (template == null) return;
+            var gameSettings = GameObject.Find("Game Settings");
+            var gameSettingMenu = UnityEngine.Object.FindObjectsOfType<GameSettingMenu>().FirstOrDefault();
+            var torSettings = UnityEngine.Object.Instantiate(gameSettings, gameSettings.transform.parent);
+            var torMenu = getMenu(torSettings, "TORSettings");
+            var roleTab = GameObject.Find("RoleTab");
+            var gameTab = GameObject.Find("GameTab");
+            var torTab = UnityEngine.Object.Instantiate(roleTab, gameTab.transform.parent);
+            var torTabHighlight = getTabHighlight(torTab, "TheOtherRolesTab", "TheOtherRoles.Resources.TabIconPropHuntSettings.png");
+            roleTab.active = false;
+            gameTab.active = false;
+            // Position of Tab Icons
+            torTab.transform.position += Vector3.left * 3f;
+
+            var tabs = new GameObject[] { torTab };
+            var settingsHighlightMap = new Dictionary<GameObject, SpriteRenderer>
+            {
+                [torSettings.gameObject] = torTabHighlight
+            };
+            for (int i = 0; i < tabs.Length; i++)
+            {
+                var button = tabs[i].GetComponentInChildren<PassiveButton>();
+                if (button == null) continue;
+                int copiedIndex = i;
+                button.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                button.OnClick.AddListener((System.Action)(() => {
+                    setListener(settingsHighlightMap, copiedIndex);
+                }));
+            }
+            destroyOptions(new List<List<OptionBehaviour>>{
+                torMenu.GetComponentsInChildren<OptionBehaviour>().ToList(),
+            });
+            List<OptionBehaviour> torOptions = new List<OptionBehaviour>();
+            List<Transform> menus = new List<Transform>() { torMenu.transform };
+            List<List<OptionBehaviour>> optionBehaviours = new List<List<OptionBehaviour>>() { torOptions };
+            for (int i = 0; i < CustomOption.options.Count; i++)
+            {
+                CustomOption option = CustomOption.options[i];
+                if (option.type != CustomOptionType.PropHunt) continue;
+                if (option.optionBehaviour == null)
+                {
+                    int index = 0;
+                    StringOption stringOption = UnityEngine.Object.Instantiate(template, menus[index]);
+                    optionBehaviours[index].Add(stringOption);
+                    stringOption.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+                    stringOption.TitleText.text = option.getTitle();
+                    stringOption.Value = stringOption.oldValue = option.selection;
+                    stringOption.ValueText.text = option.selections[option.selection].ToString();
+                    option.optionBehaviour = stringOption;
+                }
+                option.optionBehaviour.gameObject.SetActive(true);
+            }
+            setOptions(
+                new List<GameOptionsMenu> { torMenu },
+                new List<List<OptionBehaviour>> { torOptions },
+                new List<GameObject> { torSettings }
+            );
+            torSettings.gameObject.SetActive(true);
+            torTabHighlight.enabled = true;
+            gameSettingMenu.RegularGameSettings.SetActive(false);
+            gameSettingMenu.GameSettingsHightlight.enabled = false;
+        }
 
         private static void setListener(Dictionary<GameObject, SpriteRenderer> settingsHighlightMap, int index)
         {
@@ -743,6 +830,13 @@ namespace TheOtherRoles
             CustomOption option = CustomOption.options.FirstOrDefault(option => option.optionBehaviour == __instance);
             if (option == null) return true;
             option.updateSelection(option.selection + 1);
+            if (CustomOptionHolder.isMapSelectionOption(option))
+            {
+                IGameOptions currentGameOptions = GameOptionsManager.Instance.CurrentGameOptions;
+                currentGameOptions.SetByte(ByteOptionNames.MapId, (byte)option.selection);
+                GameOptionsManager.Instance.GameHostOptions = GameOptionsManager.Instance.CurrentGameOptions;
+                GameManager.Instance.LogicOptions.SyncOptions();
+            }
             return false;
         }
     }
@@ -755,9 +849,37 @@ namespace TheOtherRoles
             CustomOption option = CustomOption.options.FirstOrDefault(option => option.optionBehaviour == __instance);
             if (option == null) return true;
             option.updateSelection(option.selection - 1);
+            if (CustomOptionHolder.isMapSelectionOption(option))
+            {
+                IGameOptions currentGameOptions = GameOptionsManager.Instance.CurrentGameOptions;
+                currentGameOptions.SetByte(ByteOptionNames.MapId, (byte)option.selection);
+                GameOptionsManager.Instance.GameHostOptions = GameOptionsManager.Instance.CurrentGameOptions;
+                GameManager.Instance.LogicOptions.SyncOptions();
+            }
             return false;
         }
     }
+    [HarmonyPatch(typeof(StringOption), nameof(StringOption.FixedUpdate))]
+    public class StringOptionFixedUpdate
+    {
+        public static void Postfix(StringOption __instance)
+        {
+            if (!IL2CPPChainloader.Instance.Plugins.TryGetValue("com.DigiWorm.LevelImposter", out PluginInfo _)) return;
+            CustomOption option = CustomOption.options.FirstOrDefault(option => option.optionBehaviour == __instance);
+            if (option == null || !CustomOptionHolder.isMapSelectionOption(option)) return;
+            if (GameOptionsManager.Instance.CurrentGameOptions.MapId == 6)
+                if (option.optionBehaviour != null && option.optionBehaviour is StringOption stringOption)
+                {
+                    stringOption.ValueText.text = option.selections[option.selection].ToString();
+                }
+                else if (option.optionBehaviour != null && option.optionBehaviour is StringOption stringOptionToo)
+                {
+                    stringOptionToo.oldValue = stringOptionToo.Value = option.selection;
+                    stringOptionToo.ValueText.text = option.selections[option.selection].ToString();
+                }
+        }
+    }
+
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.RpcSyncSettings))]
     public class RpcSyncSettingsPatch
@@ -774,8 +896,9 @@ namespace TheOtherRoles
     {
         public static void Postfix()
         {
-            if (PlayerControl.LocalPlayer != null)
+            if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost)
             {
+                GameManager.Instance.LogicOptions.SyncOptions();
                 CustomOption.ShareOptionSelections();
             }
         }
@@ -800,7 +923,7 @@ namespace TheOtherRoles
             float offset = 2.75f;
             foreach (CustomOption option in CustomOption.options)
             {
-                if (GameObject.Find("TORSettings") && option.type != CustomOption.CustomOptionType.General && option.type != CustomOptionType.HideNSeekMain)
+                if (GameObject.Find("TORSettings") && option.type != CustomOption.CustomOptionType.General && option.type != CustomOptionType.HideNSeekMain && option.type != CustomOptionType.PropHunt)
                     continue;
                 if (GameObject.Find("ImpostorSettings") && option.type != CustomOption.CustomOptionType.Impostor)
                     continue;
@@ -838,10 +961,6 @@ namespace TheOtherRoles
     [HarmonyPatch]
     class GameOptionsDataPatch
     {
-        /*private static IEnumerable<MethodBase> TargetMethods() {
-            return typeof(IGameOptionsExtensions.).GetMethods().Where(x => x.ReturnType == typeof(string) && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(int));
-        }*/
-
         private static string buildRoleOptions()
         {
             var impRoles = buildOptionsOfType(CustomOption.CustomOptionType.Impostor, true) + "\n";
@@ -880,6 +999,8 @@ namespace TheOtherRoles
                 options = options.Where(x => !(x.type == CustomOption.CustomOptionType.Guesser || x == CustomOptionHolder.crewmateRolesFill));
             else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
                 options = options.Where(x => (x.type == CustomOption.CustomOptionType.HideNSeekMain || x.type == CustomOption.CustomOptionType.HideNSeekRoles));
+            else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
+                options = options.Where(x => (x.type == CustomOption.CustomOptionType.PropHunt));
 
             foreach (var option in options)
             {
@@ -905,6 +1026,7 @@ namespace TheOtherRoles
             foreach (CustomOption option in options)
             {
                 if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek && option.type != CustomOptionType.HideNSeekMain && option.type != CustomOptionType.HideNSeekRoles) continue;
+                if (TORMapOptions.gameMode == CustomGamemodes.PropHunt && option.type != CustomOptionType.PropHunt) continue;
                 if (option.parent != null)
                 {
                     bool isIrrelevant = option.parent.getSelection() == 0 || (option.parent.parent != null && option.parent.parent.getSelection() == 0);
@@ -988,13 +1110,13 @@ namespace TheOtherRoles
             return sb.ToString();
         }
 
+        public static int maxPage = 7;
         public static string buildAllOptions(string vanillaSettings = "", bool hideExtras = false)
         {
             if (vanillaSettings == "")
                 vanillaSettings = GameOptionsManager.Instance.CurrentGameOptions.ToHudString(PlayerControl.AllPlayerControls.Count);
             int counter = TheOtherRolesPlugin.optionsPage;
             string hudString = counter != 0 && !hideExtras ? Helpers.cs(DateTime.Now.Second % 2 == 0 ? Color.white : Color.red, $"{ModTranslation.GetString("Opt-General", 83)}\n\n") : "";
-            int maxPage = 7;
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
             {
                 if (TheOtherRolesPlugin.optionsPage > 1) TheOtherRolesPlugin.optionsPage = 0;
@@ -1009,8 +1131,19 @@ namespace TheOtherRoles
                         break;
                 }
             }
+            else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
+            {
+                maxPage = 1;
+                switch (counter)
+                {
+                    case 0:
+                        hudString += "Page 1: Prop Hunt Settings \n\n" + buildOptionsOfType(CustomOption.CustomOptionType.PropHunt, false);
+                        break;
+                }
+            }
             else
             {
+                maxPage = 7;
                 switch (counter)
                 {
                     case 0:
@@ -1047,6 +1180,95 @@ namespace TheOtherRoles
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return; // Allow Vanilla Hide N Seek
             __result = buildAllOptions(vanillaSettings: __result);
+        }
+    }
+
+    [HarmonyPatch]
+    public class AddToKillDistanceSetting
+    {
+        [HarmonyPatch(typeof(GameOptionsData), nameof(GameOptionsData.AreInvalid))]
+        [HarmonyPrefix]
+
+        public static bool Prefix(GameOptionsData __instance, ref int maxExpectedPlayers)
+        {
+            //making the killdistances bound check higher since extra short is added
+            return __instance.MaxPlayers > maxExpectedPlayers || __instance.NumImpostors < 1
+                    || __instance.NumImpostors > 3 || __instance.KillDistance < 0
+                    || __instance.KillDistance >= GameOptionsData.KillDistances.Count
+                    || __instance.PlayerSpeedMod <= 0f || __instance.PlayerSpeedMod > 3f;
+        }
+        [HarmonyPatch(typeof(NormalGameOptionsV07), nameof(NormalGameOptionsV07.AreInvalid))]
+        [HarmonyPrefix]
+
+        public static bool Prefix(NormalGameOptionsV07 __instance, ref int maxExpectedPlayers)
+        {
+            return __instance.MaxPlayers > maxExpectedPlayers || __instance.NumImpostors < 1
+                    || __instance.NumImpostors > 3 || __instance.KillDistance < 0
+                    || __instance.KillDistance >= GameOptionsData.KillDistances.Count
+                    || __instance.PlayerSpeedMod <= 0f || __instance.PlayerSpeedMod > 3f;
+        }
+        [HarmonyPatch(typeof(StringOption), nameof(StringOption.OnEnable))]
+        [HarmonyPrefix]
+
+        public static void Prefix(StringOption __instance)
+        {
+            //prevents indexoutofrange exception breaking the setting if long happens to be selected
+            //when host opens the laptop
+            if (__instance.Title == StringNames.GameKillDistance && __instance.Value == 3)
+            {
+                __instance.Value = 1;
+                GameOptionsManager.Instance.currentNormalGameOptions.KillDistance = 1;
+                GameManager.Instance.LogicOptions.SyncOptions();
+            }
+        }
+        [HarmonyPatch(typeof(StringOption), nameof(StringOption.OnEnable))]
+        [HarmonyPostfix]
+
+        public static void Postfix(StringOption __instance)
+        {
+            if (__instance.Title == StringNames.GameKillDistance && __instance.Values.Count == 3)
+            {
+                __instance.Values = new(
+                        new StringNames[] { (StringNames)49999, StringNames.SettingShort, StringNames.SettingMedium, StringNames.SettingLong });
+            }
+        }
+        [HarmonyPatch(typeof(IGameOptionsExtensions), nameof(IGameOptionsExtensions.AppendItem),
+            new Type[] { typeof(Il2CppSystem.Text.StringBuilder), typeof(StringNames), typeof(string) })]
+        [HarmonyPrefix]
+
+        public static void Prefix(ref StringNames stringName, ref string value)
+        {
+            if (stringName == StringNames.GameKillDistance)
+            {
+                int index;
+                if (GameOptionsManager.Instance.currentGameMode == GameModes.Normal)
+                {
+                    index = GameOptionsManager.Instance.currentNormalGameOptions.KillDistance;
+                }
+                else
+                {
+                    index = GameOptionsManager.Instance.currentHideNSeekGameOptions.KillDistance;
+                }
+                value = GameOptionsData.KillDistanceStrings[index];
+            }
+        }
+        [HarmonyPatch(typeof(TranslationController), nameof(TranslationController.GetString),
+            new[] { typeof(StringNames), typeof(Il2CppReferenceArray<Il2CppSystem.Object>) })]
+        [HarmonyPriority(Priority.Last)]
+
+        public static bool Prefix(ref string __result, ref StringNames id)
+        {
+            if ((int)id == 49999)
+            {
+                __result = ModTranslation.GetString("Opt-General", 105);
+                return false;
+            }
+            return true;
+        }
+        public static void addKillDistance()
+        {
+            GameOptionsData.KillDistances = new(new float[] { 0.5f, 1f, 1.8f, 2.5f });
+            GameOptionsData.KillDistanceStrings = new(new string[] { ModTranslation.GetString("Opt-General", 105), ModTranslation.GetString("Opt-General", 106), ModTranslation.GetString("Opt-General", 107), ModTranslation.GetString("Opt-General", 108) });
         }
     }
 
@@ -1090,6 +1312,7 @@ namespace TheOtherRoles
             }
             if (Input.GetKeyDown(KeyCode.F1))
                 HudManagerUpdate.ToggleSettings(HudManager.Instance);
+            if (TheOtherRolesPlugin.optionsPage >= GameOptionsDataPatch.maxPage) TheOtherRolesPlugin.optionsPage = 0;
 
             if (page != TheOtherRolesPlugin.optionsPage)
             {
@@ -1156,7 +1379,7 @@ namespace TheOtherRoles
             Scroller.ContentYBounds = new FloatRange(MinY, maxY);
 
             // Prevent scrolling when the player is interacting with a menu
-            if (CachedPlayer.LocalPlayer?.PlayerControl.CanMove != true)
+            if (PlayerControl.LocalPlayer?.CanMove != true)
             {
                 __instance.GameSettings.transform.localPosition = LastPosition;
 
@@ -1227,7 +1450,6 @@ namespace TheOtherRoles
             }
             for (int i = 0; i < blockCount; i++)
             {
-                TheOtherRolesPlugin.Logger.LogMessage(blockCount);
                 settingsTMPs[i].transform.localPosition = new Vector3(-blockCount * 1.2f + 2.7f * i, 2.2f, -500f);
             }
         }

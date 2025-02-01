@@ -48,14 +48,14 @@ public static class CachedPlayerPatches
             var localPlayer = PlayerControl.LocalPlayer;
             if (!localPlayer)
             {
-                CachedPlayer.LocalPlayer = null;
+                PlayerControl.LocalPlayer = null;
                 return;
             }
 
             var cached = CachedPlayer.AllPlayers.FirstOrDefault(p => p.PlayerControl.Pointer == localPlayer.Pointer);
             if (cached != null)
             {
-                CachedPlayer.LocalPlayer = cached;
+                PlayerControl.LocalPlayer = cached;
                 return;
             }
         }
@@ -75,16 +75,6 @@ public static class CachedPlayerPatches
         };
         CachedPlayer.AllPlayers.Add(player);
         CachedPlayer.PlayerPtrs[__instance.Pointer] = player;
-
-#if DEBUG
-        foreach (var cachedPlayer in CachedPlayer.AllPlayers)
-        {
-            if (!cachedPlayer.PlayerControl || !cachedPlayer.PlayerPhysics || !cachedPlayer.NetTransform || !cachedPlayer.transform)
-            {
-                TheOtherRolesPlugin.Logger.LogError($"CachedPlayer {cachedPlayer.PlayerControl.name} has null fields");
-            }
-        }
-#endif
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.OnDestroy))]

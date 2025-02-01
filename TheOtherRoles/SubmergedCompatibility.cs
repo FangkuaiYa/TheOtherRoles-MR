@@ -20,7 +20,7 @@ namespace TheOtherRoles
         }
 
         public const string SUBMERGED_GUID = "Submerged";
-        public const ShipStatus.MapType SUBMERGED_MAP_TYPE = (ShipStatus.MapType)5;
+        public const ShipStatus.MapType SUBMERGED_MAP_TYPE = (ShipStatus.MapType) 6;
 
         public static SemanticVersioning.Version Version { get; private set; }
         public static bool Loaded { get; private set; }
@@ -171,7 +171,7 @@ namespace TheOtherRoles
         public static void ChangeFloor(bool toUpper)
         {
             if (!Loaded) return;
-            MonoBehaviour _floorHandler = ((Component)GetFloorHandlerMethod.Invoke(null, new object[] { CachedPlayer.LocalPlayer.PlayerControl })).TryCast(FloorHandlerType) as MonoBehaviour;
+            MonoBehaviour _floorHandler = ((Component)GetFloorHandlerMethod.Invoke(null, new object[] { PlayerControl.LocalPlayer })).TryCast(FloorHandlerType) as MonoBehaviour;
             RpcRequestChangeFloorMethod.Invoke(_floorHandler, new object[] { toUpper });
         }
 
@@ -187,7 +187,7 @@ namespace TheOtherRoles
             try
             {
                 ShipStatus.Instance.RpcRepairSystem((SystemTypes)130, 64);
-                RepairDamageMethod.Invoke(SubmarineOxygenSystemInstanceField.Invoke(null, Array.Empty<object>()), new object[] { CachedPlayer.LocalPlayer.PlayerControl, 64 });
+                RepairDamageMethod.Invoke(SubmarineOxygenSystemInstanceField.Invoke(null, Array.Empty<object>()), new object[] { PlayerControl.LocalPlayer, 64 });
             }
             catch (System.NullReferenceException)
             {

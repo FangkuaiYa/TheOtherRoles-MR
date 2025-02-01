@@ -25,9 +25,9 @@ namespace TheOtherRoles.Patches
     {
         public static void Postfix(ref int __result)
         {
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
+            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt)
             {
-                int impCount = Mathf.RoundToInt(CustomOptionHolder.hideNSeekHunterCount.getFloat());
+                int impCount = TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? Mathf.RoundToInt(CustomOptionHolder.hideNSeekHunterCount.getFloat()) : CustomOptionHolder.propHuntNumberOfHunters.getQuantity();
                 __result = impCount; ; // Set Imp Num
             }
             else if (GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal)
@@ -43,6 +43,8 @@ namespace TheOtherRoles.Patches
         public static void Postfix(GameOptionsData __instance)
         {
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || GameOptionsManager.Instance.CurrentGameOptions.GameMode != GameModes.Normal) return;
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
+                __instance.NumImpostors = CustomOptionHolder.propHuntNumberOfHunters.getQuantity();
             __instance.NumImpostors = GameOptionsManager.Instance.CurrentGameOptions.NumImpostors;
         }
     }
@@ -57,7 +59,7 @@ namespace TheOtherRoles.Patches
         public static bool isGuesserGamemode { get { return TORMapOptions.gameMode == CustomGamemodes.Guesser; } }
         public static void Postfix()
         {
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ResetVaribles, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ResetVaribles, Hazel.SendOption.Reliable, -1);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
             RPCProcedure.resetVariables();
 
@@ -77,7 +79,7 @@ namespace TheOtherRoles.Patches
                 }
             }
 
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return; // Don't assign Roles in Hide N Seek
+            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return; // Don't assign Roles in Hide N Seek
             if (CustomOptionHolder.activateRoles.getBool()) // Don't assign Roles in Tutorial or if deactivated
                 assignRoles();
         }
@@ -162,6 +164,7 @@ namespace TheOtherRoles.Patches
             //impSettings.Add((byte)RoleId.DoorHacker, CustomOptionHolder.doorHackerSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.KillerCreator, CustomOptionHolder.killerCreatorSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.Bomber, CustomOptionHolder.bomberSpawnRate.getSelection());
+            impSettings.Add((byte)RoleId.Yoyo, CustomOptionHolder.yoyoSpawnRate.getSelection());
 
             neutralSettings.Add((byte)RoleId.Jester, CustomOptionHolder.jesterSpawnRate.getSelection());
             neutralSettings.Add((byte)RoleId.Arsonist, CustomOptionHolder.arsonistSpawnRate.getSelection());
@@ -497,14 +500,14 @@ namespace TheOtherRoles.Patches
 
                 if (possibleTargets.Count == 0)
                 {
-                    MessageWriter w = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.LawyerPromotesToPursuer, Hazel.SendOption.Reliable, -1);
+                    MessageWriter w = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.LawyerPromotesToPursuer, Hazel.SendOption.Reliable, -1);
                     AmongUsClient.Instance.FinishRpcImmediately(w);
                     RPCProcedure.lawyerPromotesToPursuer();
                 }
                 else
                 {
                     var target = possibleTargets[TheOtherRoles.rnd.Next(0, possibleTargets.Count)];
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.LawyerSetTarget, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.LawyerSetTarget, Hazel.SendOption.Reliable, -1);
                     writer.Write(target.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.lawyerSetTarget(target.PlayerId);
@@ -523,7 +526,7 @@ namespace TheOtherRoles.Patches
                 if (possibleTargets.Count > 0)
                 {
                     var target = possibleTargets[TheOtherRoles.rnd.Next(0, possibleTargets.Count)];
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.KataomoiSetTarget, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.KataomoiSetTarget, Hazel.SendOption.Reliable, -1);
                     writer.Write(target.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.kataomoiSetTarget(target.PlayerId);
@@ -640,7 +643,7 @@ namespace TheOtherRoles.Patches
                 byte playerId = playerList[index].PlayerId;
                 playerList.RemoveAt(index);
 
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetGuesserGm, Hazel.SendOption.Reliable, -1);
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetGuesserGm, Hazel.SendOption.Reliable, -1);
                 writer.Write(playerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
                 RPCProcedure.setGuesserGm(playerId);
@@ -662,7 +665,7 @@ namespace TheOtherRoles.Patches
         {
             playerRoleMap.Add(new Tuple<byte, byte>(playerId, roleId));
 
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetRole, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetRole, Hazel.SendOption.Reliable, -1);
             writer.Write(roleId);
             writer.Write(playerId);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -676,7 +679,7 @@ namespace TheOtherRoles.Patches
             byte playerId = playerList[index].PlayerId;
             playerList.RemoveAt(index);
 
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetModifier, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetModifier, Hazel.SendOption.Reliable, -1);
             writer.Write(modifierId);
             writer.Write(playerId);
             writer.Write(flag);
@@ -781,7 +784,7 @@ namespace TheOtherRoles.Patches
             while (playerRoleMap.Any())
             {
                 byte amount = (byte)Math.Min(playerRoleMap.Count, 20);
-                var writer = AmongUsClient.Instance!.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.WorkaroundSetRoles, SendOption.Reliable, -1);
+                var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.WorkaroundSetRoles, SendOption.Reliable, -1);
                 writer.Write(amount);
                 for (int i = 0; i < amount; i++)
                 {

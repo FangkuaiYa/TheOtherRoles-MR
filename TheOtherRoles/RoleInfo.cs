@@ -81,9 +81,12 @@ namespace TheOtherRoles
         public static RoleInfo ninja = new RoleInfo(Ninja.color, RoleId.Ninja);
         public static RoleInfo thief = new RoleInfo(Thief.color, RoleId.Thief, true);
         public static RoleInfo bomber = new RoleInfo(Bomber.color, RoleId.Bomber);
+        public static RoleInfo yoyo = new RoleInfo(Yoyo.color, RoleId.Yoyo);
 
         public static RoleInfo hunter = new RoleInfo(Palette.ImpostorRed, RoleId.Impostor, false, false, ModTranslation.GetRoleName(RoleId.Hunter, Palette.ImpostorRed), ModTranslation.GetRoleIntroDesc(RoleId.Hunter, Palette.ImpostorRed), ModTranslation.GetRoleShortDesc(RoleId.Hunter, Palette.ImpostorRed));
         public static RoleInfo hunted = new RoleInfo(Color.white, RoleId.Crewmate, false, false, ModTranslation.GetRoleName(RoleId.Hunted, Color.white), ModTranslation.GetRoleIntroDesc(RoleId.Hunted, Color.white), ModTranslation.GetRoleShortDesc(RoleId.Hunted, Color.white));
+        
+        public static RoleInfo prop = new RoleInfo(Color.white, RoleId.Crewmate);
 
         public static RoleInfo yasuna = new RoleInfo(Yasuna.color, RoleId.Yasuna);
         public static RoleInfo yasunaJr = new RoleInfo(YasunaJr.color, RoleId.YasunaJr);
@@ -144,6 +147,7 @@ namespace TheOtherRoles
             mayor,
             portalmaker,
             engineer,
+            yoyo,
             sheriff,
             deputy,
             lighter,
@@ -232,6 +236,7 @@ namespace TheOtherRoles
             if (p == Witch.witch) infos.Add(witch);
             if (p == Ninja.ninja) infos.Add(ninja);
             if (p == Bomber.bomber) infos.Add(bomber);
+            if (p == Yoyo.yoyo) infos.Add(yoyo);
             if (p == Detective.detective) infos.Add(detective);
             if (p == TimeMaster.timeMaster) infos.Add(timeMaster);
             if (p == Medic.medic) infos.Add(medic);
@@ -268,13 +273,13 @@ namespace TheOtherRoles
             if (TaskRacer.isTaskRacer(p))
                 infos.Add(taskRacer);
 
-            // Default roles (just impostor, just crewmate, or hunter / hunted for hide n seek
+            // Default roles (just impostor, just crewmate, or hunter / hunted for hide n seek, prop hunt prop ...
             if (infos.Count == count)
             {
                 if (p.Data.Role.IsImpostor)
-                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? RoleInfo.hunter : RoleInfo.impostor);
+                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt ? RoleInfo.hunter : RoleInfo.impostor);
                 else
-                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? RoleInfo.hunted : RoleInfo.crewmate);
+                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? RoleInfo.hunted : TORMapOptions.gameMode == CustomGamemodes.PropHunt ? RoleInfo.prop : RoleInfo.crewmate);
             }
 
             return infos;
@@ -297,13 +302,13 @@ namespace TheOtherRoles
                     roleList[0] = RoleInfo.crewmate;
 
                 roleName = String.Join(" ", roleList.Select(x => useColors ? Helpers.cs(x.color, x.name) : x.name).ToArray());
-                if (Lawyer.target != null && p.PlayerId == Lawyer.target.PlayerId && CachedPlayer.LocalPlayer.PlayerControl != Lawyer.target) roleName += (useColors ? Helpers.cs(Pursuer.color, " §") : " §");
+                if (Lawyer.target != null && p.PlayerId == Lawyer.target.PlayerId && PlayerControl.LocalPlayer != Lawyer.target) roleName += (useColors ? Helpers.cs(Pursuer.color, " §") : " §");
                 if (HandleGuesser.isGuesserGm && HandleGuesser.isGuesser(p.PlayerId)) roleName += ModTranslation.GetString("Game-Guesser", 1);
                 if (!suppressGhostInfo && p != null)
                 {
-                    if (p == Shifter.shifter && (CachedPlayer.LocalPlayer.PlayerControl == Shifter.shifter || Helpers.shouldShowGhostInfo()) && Shifter.futureShift != null)
+                    if (p == Shifter.shifter && (PlayerControl.LocalPlayer == Shifter.shifter || Helpers.shouldShowGhostInfo()) && Shifter.futureShift != null)
                         roleName += Helpers.cs(Color.yellow, " ← " + Shifter.futureShift.Data.PlayerName);
-                    if (p == Vulture.vulture && (CachedPlayer.LocalPlayer.PlayerControl == Vulture.vulture || Helpers.shouldShowGhostInfo()))
+                    if (p == Vulture.vulture && (PlayerControl.LocalPlayer == Vulture.vulture || Helpers.shouldShowGhostInfo()))
                         roleName = roleName + Helpers.cs(Vulture.color, string.Format(ModTranslation.GetString("Opt-GhostInfo", 1), Vulture.vultureNumberToWin - Vulture.eatenBodies));
                     if (Helpers.shouldShowGhostInfo())
                     {

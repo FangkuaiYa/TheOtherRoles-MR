@@ -24,7 +24,7 @@ namespace TheOtherRoles.Objects
         {
             trace = new GameObject("NinjaTrace");
             trace.AddSubmergedComponent(SubmergedCompatibility.Classes.ElevatorMover);
-            //Vector3 position = new Vector3(p.x, p.y, CachedPlayer.LocalPlayer.transform.localPosition.z + 0.001f); // just behind player
+            //Vector3 position = new Vector3(p.x, p.y, PlayerControl.LocalPlayer.transform.localPosition.z + 0.001f); // just behind player
             Vector3 position = new Vector3(p.x, p.y, p.y / 1000f + 0.01f);
             trace.transform.position = position;
             trace.transform.localPosition = position;
@@ -39,14 +39,13 @@ namespace TheOtherRoles.Objects
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(colorDuration, new Action<float>((p) =>
             {
                 Color c = Palette.PlayerColors[(int)Ninja.ninja.Data.DefaultOutfit.ColorId];
-                if (Helpers.isLighterColor(Ninja.ninja.Data.DefaultOutfit.ColorId)) c = Color.white;
+                if (Helpers.isLighterColor(Ninja.ninja)) c = Color.white;
                 else c = Palette.PlayerColors[6];
                 //if (Camouflager.camouflageTimer > 0) {
                 //    c = Palette.PlayerColors[6];
                 //}
 
-                Color g = Color.green; // Usual display color. could also be Palette.PlayerColors[6] for default grey like camo
-                // if this stays black (0,0,0), it can ofc be removed.
+                Color g = Color.green; // Usual display color.
 
                 Color combinedColor = Mathf.Clamp01(p) * g + Mathf.Clamp01(1 - p) * c;
 

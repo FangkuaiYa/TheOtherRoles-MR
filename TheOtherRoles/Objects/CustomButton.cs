@@ -97,7 +97,7 @@ namespace TheOtherRoles.Objects
                 this.OnClick();
 
                 // Deputy skip onClickEvent if handcuffed
-                if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerId] > 0f) return;
+                if (Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[PlayerControl.LocalPlayer.PlayerId] > 0f) return;
 
                 if (this.HasEffect && !this.isEffectActive)
                 {
@@ -176,8 +176,8 @@ namespace TheOtherRoles.Objects
 
         public void Update()
         {
-            var localPlayer = CachedPlayer.LocalPlayer;
-            var moveable = localPlayer.PlayerControl.moveable;
+            var localPlayer = PlayerControl.LocalPlayer;
+            var moveable = localPlayer.moveable;
 
             if (localPlayer.Data == null || MeetingHud.Instance || ExileController.Instance || !HasButton())
             {
@@ -190,7 +190,7 @@ namespace TheOtherRoles.Objects
             { // This had to be reordered, so that the handcuffs do not stop the underlying timers from running
                 if (HasEffect && isEffectActive)
                     DeputyTimer -= Time.deltaTime;
-                else if (!localPlayer.PlayerControl.inVent && moveable)
+                else if (!localPlayer.inVent && moveable)
                     DeputyTimer -= Time.deltaTime;
             }
 
@@ -252,7 +252,7 @@ namespace TheOtherRoles.Objects
                         Timer -= Time.deltaTime;
                     }
                 }
-                else if (!localPlayer.PlayerControl.inVent && moveable)
+                else if (!localPlayer.inVent && moveable)
                     Timer -= Time.deltaTime;
             }
 

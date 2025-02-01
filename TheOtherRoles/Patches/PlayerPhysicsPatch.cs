@@ -15,33 +15,13 @@ namespace TheOtherRoles.Patches
             __instance.body.interpolation = RigidbodyInterpolation2D.Interpolate;
         }
     }
-
-    [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.FixedUpdate))]
-    public static class PlayerPhysicsFixedUpdatePatch
-    {
-        public static void Postfix(PlayerPhysics __instance)
-        {
-            bool shouldInvert = (Invert.invert.FindAll(x => x.PlayerId == CachedPlayer.LocalPlayer.PlayerId).Count > 0 && Invert.meetings > 0) ^ EventUtility.eventInvert;  // xor. if already invert, eventInvert will turn it off for 10s
-            if (__instance.AmOwner &&
-                AmongUsClient.Instance &&
-                AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started &&
-                !CachedPlayer.LocalPlayer.Data.IsDead &&
-                shouldInvert &&
-                GameData.Instance &&
-                __instance.myPlayer.CanMove)
-                __instance.body.velocity *= -1;
-
-            Kataomoi.fixedUpdate(__instance);
-        }
-    }
-
     [HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.WalkPlayerTo))]
     class PlayerPhysicsWalkPlayerToPatch
     {
         private static Vector2 offset = Vector2.zero;
         public static void Prefix(PlayerPhysics __instance)
         {
-            bool correctOffset = Camouflager.camouflageTimer <= 0f && (__instance.myPlayer == Mini.mini || (Morphling.morphling != null && __instance.myPlayer == Morphling.morphling && Morphling.morphTarget == Mini.mini && Morphling.morphTimer > 0f));
+            bool correctOffset = Camouflager.camouflageTimer <= 0f && !Helpers.MushroomSabotageActive() && (__instance.myPlayer == Mini.mini || (Morphling.morphling != null && __instance.myPlayer == Morphling.morphling && Morphling.morphTarget == Mini.mini && Morphling.morphTimer > 0f));
             correctOffset = correctOffset && !(Mini.mini == Morphling.morphling && Morphling.morphTimer > 0f);
             if (correctOffset)
             {

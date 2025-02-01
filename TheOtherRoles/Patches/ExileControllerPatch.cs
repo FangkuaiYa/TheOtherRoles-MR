@@ -23,7 +23,7 @@ namespace TheOtherRoles.Patches
             // Medic shield
             if (Medic.medic != null && AmongUsClient.Instance.AmHost && Medic.futureShielded != null && !Medic.medic.Data.IsDead)
             { // We need to send the RPC from the host here, to make sure that the order of shifting and setting the shield is correct(for that reason the futureShifted and futureShielded are being synced)
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.MedicSetShielded, Hazel.SendOption.Reliable, -1);
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.MedicSetShielded, Hazel.SendOption.Reliable, -1);
                 writer.Write(Medic.futureShielded.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
                 RPCProcedure.medicSetShielded(Medic.futureShielded.PlayerId);
@@ -42,7 +42,7 @@ namespace TheOtherRoles.Patches
                 if (target != null)
                 {
                     // exile the picked crewmate
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
                         (byte)CustomRPC.UncheckedExilePlayer,
                         Hazel.SendOption.Reliable,
                         -1);
@@ -57,7 +57,7 @@ namespace TheOtherRoles.Patches
             { // We need to send the RPC from the host here, to make sure that the order of shifting and erasing is correct (for that reason the futureShifted and futureErased are being synced)
                 PlayerControl oldShifter = Shifter.shifter;
                 byte oldTaskMasterPlayerId = TaskMaster.isTaskMaster(Shifter.futureShift.PlayerId) && TaskMaster.isTaskComplete ? Shifter.futureShift.PlayerId : byte.MaxValue;
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShifterShift, Hazel.SendOption.Reliable, -1);
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShifterShift, Hazel.SendOption.Reliable, -1);
                 writer.Write(Shifter.futureShift.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
                 RPCProcedure.shifterShift(Shifter.futureShift.PlayerId);
@@ -71,7 +71,7 @@ namespace TheOtherRoles.Patches
                     }
                     bool allTasksCompleted = clearTasks == oldShifter.Data.Tasks.Count;
                     byte[] taskTypeIds = allTasksCompleted ? TaskMasterTaskHelper.GetTaskMasterTasks(oldShifter) : null;
-                    MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.TaskMasterSetExTasks, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TaskMasterSetExTasks, Hazel.SendOption.Reliable, -1);
                     writer2.Write(oldShifter.PlayerId);
                     writer2.Write(oldTaskMasterPlayerId);
                     if (taskTypeIds != null)
@@ -87,7 +87,7 @@ namespace TheOtherRoles.Patches
             {  // We need to send the RPC from the host here, to make sure that the order of shifting and erasing is correct (for that reason the futureShifted and futureErased are being synced)
                 foreach (PlayerControl target in Eraser.futureErased)
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ErasePlayerRoles, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ErasePlayerRoles, Hazel.SendOption.Reliable, -1);
                     writer.Write(target.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.erasePlayerRoles(target.PlayerId);
@@ -120,17 +120,17 @@ namespace TheOtherRoles.Patches
                             continue;
                         if (target == Lawyer.target && Lawyer.lawyer != null)
                         {
-                            MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.LawyerPromotesToPursuer, Hazel.SendOption.Reliable, -1);
+                            MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.LawyerPromotesToPursuer, Hazel.SendOption.Reliable, -1);
                             AmongUsClient.Instance.FinishRpcImmediately(writer2);
                             RPCProcedure.lawyerPromotesToPursuer();
                         }
-                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedExilePlayer, Hazel.SendOption.Reliable, -1);
+                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UncheckedExilePlayer, Hazel.SendOption.Reliable, -1);
                         writer.Write(target.PlayerId);
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
                         RPCProcedure.uncheckedExilePlayer(target.PlayerId);
 
-                        MessageWriter writer3 = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
-                        writer3.Write(CachedPlayer.LocalPlayer.PlayerId);
+                        MessageWriter writer3 = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
+                        writer3.Write(PlayerControl.LocalPlayer.PlayerId);
                         writer3.Write((byte)RPCProcedure.GhostInfoTypes.DeathReasonAndKiller);
                         writer3.Write(target.PlayerId);
                         writer3.Write((byte)DeadPlayer.CustomDeathReason.WitchExile);
@@ -157,12 +157,20 @@ namespace TheOtherRoles.Patches
             foreach (Vent vent in TORMapOptions.ventsToSeal)
             {
                 PowerTools.SpriteAnim animator = vent.GetComponent<PowerTools.SpriteAnim>();
-                animator?.Stop();
                 vent.EnterVentAnim = vent.ExitVentAnim = null;
-                vent.myRend.sprite = animator == null ? SecurityGuard.getStaticVentSealedSprite() : SecurityGuard.getAnimatedVentSealedSprite();
+                Sprite newSprite = animator == null ? SecurityGuard.getStaticVentSealedSprite() : SecurityGuard.getAnimatedVentSealedSprite();
+                SpriteRenderer rend = vent.myRend;
+                if (Helpers.isFungle())
+                {
+                    newSprite = SecurityGuard.getFungleVentSealedSprite();
+                    rend = vent.transform.GetChild(3).GetComponent<SpriteRenderer>();
+                    animator = vent.transform.GetChild(3).GetComponent<PowerTools.SpriteAnim>();
+                }
+                animator?.Stop();
+                rend.sprite = newSprite;
                 if (SubmergedCompatibility.IsSubmerged && vent.Id == 0) vent.myRend.sprite = SecurityGuard.getSubmergedCentralUpperSealedSprite();
                 if (SubmergedCompatibility.IsSubmerged && vent.Id == 14) vent.myRend.sprite = SecurityGuard.getSubmergedCentralLowerSealedSprite();
-                vent.myRend.color = Color.white;
+                rend.color = Color.white;
                 vent.name = "SealedVent_" + vent.name;
             }
             TORMapOptions.ventsToSeal = new List<Vent>();
@@ -216,6 +224,13 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(UnityEngine.Object), nameof(UnityEngine.Object.Destroy), new Type[] { typeof(GameObject) })]
         public static void Prefix(GameObject obj)
         {
+            // Nightvision:
+            if (obj != null && obj.name != null && obj.name.Contains("FungleSecurity"))
+            {
+                SurveillanceMinigamePatch.resetNightVision();
+                return;
+            }
+            // submerged
             if (!SubmergedCompatibility.IsSubmerged) return;
             if (obj.name.Contains("ExileCutscene"))
             {
@@ -260,14 +275,14 @@ namespace TheOtherRoles.Patches
             }
 
             // Mini set adapted cooldown
-            if (Mini.mini != null && CachedPlayer.LocalPlayer.PlayerControl == Mini.mini && Mini.mini.Data.Role.IsImpostor)
+            if (Mini.mini != null && PlayerControl.LocalPlayer == Mini.mini && Mini.mini.Data.Role.IsImpostor)
             {
                 var multiplier = Mini.isGrownUp() ? 0.66f : 2f;
                 Mini.mini.SetKillTimer(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown * multiplier);
             }
 
             // Seer spawn souls
-            if (Seer.deadBodyPositions != null && Seer.seer != null && CachedPlayer.LocalPlayer.PlayerControl == Seer.seer && (Seer.mode == 0 || Seer.mode == 2))
+            if (Seer.deadBodyPositions != null && Seer.seer != null && PlayerControl.LocalPlayer == Seer.seer && (Seer.mode == 0 || Seer.mode == 2))
             {
                 foreach (Vector3 pos in Seer.deadBodyPositions)
                 {
@@ -300,7 +315,7 @@ namespace TheOtherRoles.Patches
             Tracker.deadBodyPositions = new List<Vector3>();
 
             // Arsonist deactivate dead poolable players
-            if (Arsonist.arsonist != null && Arsonist.arsonist == CachedPlayer.LocalPlayer.PlayerControl)
+            if (Arsonist.arsonist != null && Arsonist.arsonist == PlayerControl.LocalPlayer)
             {
                 int visibleCounter = 0;
                 Vector3 newBottomLeft = IntroCutsceneOnDestroyPatch.bottomLeft;
@@ -327,11 +342,11 @@ namespace TheOtherRoles.Patches
             }
 
             // Force Bounty Hunter Bounty Update
-            if (BountyHunter.bountyHunter != null && BountyHunter.bountyHunter == CachedPlayer.LocalPlayer.PlayerControl)
+            if (BountyHunter.bountyHunter != null && BountyHunter.bountyHunter == PlayerControl.LocalPlayer)
                 BountyHunter.bountyUpdateTimer = 0f;
 
             // Medium spawn souls
-            if (Medium.medium != null && CachedPlayer.LocalPlayer.PlayerControl == Medium.medium)
+            if (Medium.medium != null && PlayerControl.LocalPlayer == Medium.medium)
             {
                 if (Medium.souls != null)
                 {
@@ -370,6 +385,9 @@ namespace TheOtherRoles.Patches
             {
                 if (p == 1f) foreach (Trap trap in Trap.traps) trap.triggerable = true;
             })));
+
+            if (!Yoyo.markStaysOverMeeting)
+                Silhouette.clearSilhouettes();
         }
     }
 

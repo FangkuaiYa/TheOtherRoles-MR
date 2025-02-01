@@ -19,7 +19,6 @@ namespace TheOtherRoles.Modules
 
         private static void Prefix(MainMenuManager __instance)
         {
-            CustomHatLoader.LaunchHatFetcher();
             var template = GameObject.Find("ExitGameButton");
             var template2 = GameObject.Find("CreditsButton");
             if (template == null || template2 == null) return;
@@ -71,21 +70,27 @@ namespace TheOtherRoles.Modules
                 popUp.gameObject.SetActive(true);
 
                 popUp.gameObject.SetActive(true);
-                string creditsString = @$"<align=""center""><b>Github Contributors:</b>
+                string creditsString = @$"<align=""center""><b>Team:</b>
+Mallöris    K3ndo    Bavari    Gendelo
+<b>Former Team Members:</b>
+Eisbison (GOAT)    Thunderstorm584    EndOfFile
+<b>Additional Devs:</b>
+EnoPM    twix    NesTT
+<b>Github Contributors:</b>
 Alex2911    amsyarasyiq    MaximeGillot
 Psynomit    probablyadnf    JustASysAdmin
 
-[https://discord.gg/77RkMJHWsM]Discord[] Moderators:
-Streamblox    Draco Cordraconis
+<b>[https://discord.gg/77RkMJHWsM]Discord[] Moderators:</b>
+Draco Cordraconis    Streamblox (formerly)
 Thanks to all our discord helpers!
 
-Thanks to miniduikboot & GD for hosting modded servers
+Thanks to miniduikboot & GD for hosting modded servers (and so much more)
 
 Translation:
 Japanese: miru-y  Chinese: FangKuai
 
 ";
-                creditsString += $@"<size=60%> Other Credits & Resources:
+                creditsString += $@"<size=60%> <b>Other Credits & Resources:</b>
 OxygenFilter - For the versions v2.3.0 to v2.6.1, we were using the OxygenFilter for automatic deobfuscation
 Reactor - The framework used for all versions before v2.0.0, and again since 4.2.0
 BepInEx - Used to hook game functions
@@ -103,7 +108,8 @@ TownOfUs - Idea for the Swapper, Shifter, Arsonist and a similar Mayor role came
 Ottomated - Idea for the Morphling, Snitch and Camouflager role came from Ottomated
 Crowded-Mod - Our implementation for 10+ player lobbies was inspired by the one from the Crowded Mod Team
 Goose-Goose-Duck - Idea for the Vulture role came from Slushiegoose
-TheEpicRoles - Idea for the first kill shield (partly) and the tabbed option menu (fully + some code), by LaicosVK DasMonschta Nova</size>";
+TheEpicRoles - Idea for the first kill shield (partly) and the tabbed option menu (fully + some code), by LaicosVK DasMonschta Nova
+ugackMiner53 - Idea and core code for the Prop Hunt game mode</size>";
                 creditsString += "</align>";
                 Assets.InnerNet.Announcement creditsAnnouncement = new()
                 {
@@ -126,7 +132,7 @@ TheEpicRoles - Idea for the first kill shield (partly) and the tabbed option men
                         DataManager.Player.Announcements.SetAnnouncements(new Announcement[] { creditsAnnouncement });
                         popUp.CreateAnnouncementList();
                         popUp.UpdateAnnouncementText(creditsAnnouncement.Number);
-                        popUp.visibleAnnouncements[0].PassiveButton.OnClick.RemoveAllListeners();
+                        popUp.visibleAnnouncements._items[0].PassiveButton.OnClick.RemoveAllListeners();
                         DataManager.Player.Announcements.allAnnouncements = backup;
                     }
                 })));
@@ -170,10 +176,21 @@ TheEpicRoles - Idea for the first kill shield (partly) and the tabbed option men
                     template.OnClick();
                 }));
 
+                var PropHuntButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                PropHuntButton.transform.localPosition += new Vector3(3.4f, -0.5f);
+                var PropHuntButtonText = PropHuntButton.GetComponentInChildren<TMPro.TextMeshPro>();
+                var PropHuntButtonPassiveButton = PropHuntButton.GetComponentInChildren<PassiveButton>();
+                PropHuntButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
+                PropHuntButtonPassiveButton.OnClick.AddListener((System.Action)(() => {
+                    TORMapOptions.gameMode = CustomGamemodes.PropHunt;
+                    template.OnClick();
+                }));
+
                 template.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) =>
                 {
-                    guesserButtonText.SetText("TOR Guesser");
-                    HideNSeekButtonText.SetText("TOR Hide N Seek");
+                    guesserButtonText.SetText(ModTranslation.GetString("GameModeText", 1));
+                    HideNSeekButtonText.SetText(ModTranslation.GetString("GameModeText", 2));
+                    PropHuntButtonText.SetText(ModTranslation.GetString("GameModeText", 3));
                 })));
             }));
         }

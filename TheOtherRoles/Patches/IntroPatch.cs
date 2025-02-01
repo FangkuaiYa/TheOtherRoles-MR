@@ -21,7 +21,7 @@ namespace TheOtherRoles.Patches
             // Generate and initialize player icons
             int playerCounter = 0;
             int hideNSeekCounter = 0;
-            if (CachedPlayer.LocalPlayer != null && FastDestroyableSingleton<HudManager>.Instance != null)
+            if (PlayerControl.LocalPlayer != null && FastDestroyableSingleton<HudManager>.Instance != null)
             {
                 float aspect = Camera.main.aspect;
                 float safeOrthographicSize = CameraSafeArea.GetSafeOrthographicSize(Camera.main);
@@ -42,7 +42,7 @@ namespace TheOtherRoles.Patches
                     TORMapOptions.playerIcons[p.PlayerId] = player;
                     player.gameObject.SetActive(false);
 
-                    if (CachedPlayer.LocalPlayer.PlayerControl == Arsonist.arsonist && p != Arsonist.arsonist)
+                    if (PlayerControl.LocalPlayer == Arsonist.arsonist && p != Arsonist.arsonist)
                     {
                         player.transform.localPosition = bottomLeft + new Vector3(-0.25f, -0.25f, 0) + Vector3.right * playerCounter++ * 0.35f;
                         player.transform.localScale = Vector3.one * 0.2f;
@@ -67,13 +67,13 @@ namespace TheOtherRoles.Patches
                         }
 
                     }
-                    else if (CachedPlayer.LocalPlayer.PlayerControl == Kataomoi.kataomoi && p == Kataomoi.target)
+                    else if (PlayerControl.LocalPlayer == Kataomoi.kataomoi && p == Kataomoi.target)
                     {
                         player.transform.localPosition = bottomLeft + new Vector3(-0.25f, 0f, 0);
                         player.transform.localScale = Vector3.one * 0.4f;
                         player.gameObject.SetActive(true);
                     }
-                    else if (TaskRacer.isTaskRacer(CachedPlayer.LocalPlayer.PlayerControl))
+                    else if (TaskRacer.isTaskRacer(PlayerControl.LocalPlayer))
                     { // Task Vs Mode
                         var position = bottomLeft + new Vector3(-0.55f, -0.45f, 0) + Vector3.right * playerCounter++ * 0.35f;
                         TaskRacer.rankUIPositions.Add(position);
@@ -105,6 +105,15 @@ namespace TheOtherRoles.Patches
                             TaskRacer.rankMarkObjects[index].transform.localScale = Vector3.one * 0.8f;
                         }
                     }
+                    else if (PropHunt.isPropHuntGM)
+                    {
+                        player.transform.localPosition = bottomLeft + new Vector3(-1.25f, -0.1f, 0) + Vector3.right * hideNSeekCounter++ * 0.4f;
+                        player.transform.localScale = Vector3.one * 0.24f;
+                        player.setSemiTransparent(false);
+                        player.cosmetics.nameText.transform.localPosition += Vector3.up * 0.2f * (hideNSeekCounter % 2 == 0 ? 1 : -1);
+                        player.SetFlipX(false);
+                        player.gameObject.SetActive(true);
+                    }
                     else
                     {   //  This can be done for all players not just for the bounty hunter as it was before. Allows the thief to have the correct position and scaling
                         player.transform.localPosition = bottomLeft;
@@ -115,7 +124,7 @@ namespace TheOtherRoles.Patches
             }
 
             // Force Bounty Hunter to load a new Bounty when the Intro is over
-            if (BountyHunter.bounty != null && CachedPlayer.LocalPlayer.PlayerControl == BountyHunter.bountyHunter)
+            if (BountyHunter.bounty != null && PlayerControl.LocalPlayer == BountyHunter.bountyHunter)
             {
                 BountyHunter.bountyUpdateTimer = 0f;
                 if (FastDestroyableSingleton<HudManager>.Instance != null)
@@ -128,16 +137,13 @@ namespace TheOtherRoles.Patches
                 }
             }
 
-            // Force Reload of SoundEffectHolder
-            SoundEffectsManager.Load();
-
             // First kill
-            if (AmongUsClient.Instance.AmHost && TORMapOptions.shieldFirstKill && TORMapOptions.firstKillName != "" && !HideNSeek.isHideNSeekGM)
+            if (AmongUsClient.Instance.AmHost && TORMapOptions.shieldFirstKill && TORMapOptions.firstKillName != "" && !HideNSeek.isHideNSeekGM && !PropHunt.isPropHuntGM)
             {
                 PlayerControl target = PlayerControl.AllPlayerControls.ToArray().ToList().FirstOrDefault(x => x.Data.PlayerName.Equals(TORMapOptions.firstKillName));
                 if (target != null)
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetFirstKill, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetFirstKill, Hazel.SendOption.Reliable, -1);
                     writer.Write(target.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.setFirstKill(target.PlayerId);
@@ -198,7 +204,7 @@ namespace TheOtherRoles.Patches
                 GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown = CustomOptionHolder.hideNSeekKillCooldown.getFloat();
             }
 
-            if (Kataomoi.kataomoi != null && CachedPlayer.LocalPlayer.PlayerControl == Kataomoi.kataomoi)
+            if (Kataomoi.kataomoi != null && PlayerControl.LocalPlayer == Kataomoi.kataomoi)
             {
                 if (FastDestroyableSingleton<HudManager>.Instance != null)
                 {
@@ -266,13 +272,13 @@ namespace TheOtherRoles.Patches
                 if (GameOptionsManager.Instance.currentNormalGameOptions.MapId != (byte)MapId.Airship)
                 {
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                        CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                        PlayerControl.LocalPlayer.NetId,
                         (byte)CustomRPC.TaskVsMode_Ready,
                         Hazel.SendOption.Reliable,
                         -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
-                    RPCProcedure.taskVsModeReady(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    RPCProcedure.taskVsModeReady(PlayerControl.LocalPlayer.PlayerId);
                 }
 
                 // Task Vs Mode
@@ -317,22 +323,22 @@ namespace TheOtherRoles.Patches
              * This code is redundant, but this part should be decoupled from the original code
              * to merge future changes
              */
-            if (CachedPlayer.LocalPlayer.PlayerControl == Madmate.madmate || Helpers.isNeutral(CachedPlayer.LocalPlayer.PlayerControl))
+            if (PlayerControl.LocalPlayer == Madmate.madmate || Helpers.isNeutral(PlayerControl.LocalPlayer))
             {
                 var soloTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
-                soloTeam.Add(CachedPlayer.LocalPlayer.PlayerControl);
+                soloTeam.Add(PlayerControl.LocalPlayer);
                 yourTeam = soloTeam;
             }
 
             // Add the Spy to the Impostor team (for the Impostors)
-            if (Spy.spy != null && CachedPlayer.LocalPlayer.Data.Role.IsImpostor)
+            if (Spy.spy != null && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
             {
                 List<PlayerControl> players = PlayerControl.AllPlayerControls.ToArray().ToList().OrderBy(x => Guid.NewGuid()).ToList();
                 var fakeImpostorTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>(); // The local player always has to be the first one in the list (to be displayed in the center)
-                fakeImpostorTeam.Add(CachedPlayer.LocalPlayer.PlayerControl);
+                fakeImpostorTeam.Add(PlayerControl.LocalPlayer);
                 foreach (PlayerControl p in players)
                 {
-                    if (CachedPlayer.LocalPlayer.PlayerControl != p && (p == Spy.spy || p.Data.Role.IsImpostor))
+                    if (PlayerControl.LocalPlayer != p && (p == Spy.spy || p.Data.Role.IsImpostor))
                         fakeImpostorTeam.Add(p);
                 }
                 yourTeam = fakeImpostorTeam;
@@ -341,7 +347,7 @@ namespace TheOtherRoles.Patches
 
         public static void setupIntroTeam(IntroCutscene __instance, ref Il2CppSystem.Collections.Generic.List<PlayerControl> yourTeam)
         {
-            List<RoleInfo> infos = RoleInfo.getRoleInfoForPlayer(CachedPlayer.LocalPlayer.PlayerControl);
+            List<RoleInfo> infos = RoleInfo.getRoleInfoForPlayer(PlayerControl.LocalPlayer);
             RoleInfo roleInfo = infos.Where(info => !info.isModifier).FirstOrDefault();
             if (roleInfo == null) return;
             if (roleInfo.roleId == RoleId.TaskRacer)
@@ -406,7 +412,7 @@ namespace TheOtherRoles.Patches
             {
                 if (introCutscene == null) return;
 
-                List<RoleInfo> infos = RoleInfo.getRoleInfoForPlayer(CachedPlayer.LocalPlayer.PlayerControl);
+                List<RoleInfo> infos = RoleInfo.getRoleInfoForPlayer(PlayerControl.LocalPlayer);
                 RoleInfo roleInfo = infos.Where(info => !info.isModifier).FirstOrDefault();
                 RoleInfo modifierInfo = infos.Where(info => info.isModifier).FirstOrDefault();
                 if (EventUtility.isEnabled)
@@ -440,7 +446,7 @@ namespace TheOtherRoles.Patches
                     {
 
 
-                        PlayerControl otherLover = CachedPlayer.LocalPlayer.PlayerControl == Lovers.lover1 ? Lovers.lover2 : Lovers.lover1;
+                        PlayerControl otherLover = PlayerControl.LocalPlayer == Lovers.lover1 ? Lovers.lover2 : Lovers.lover1;
                         introCutscene.RoleBlurbText.text += Helpers.cs(Lovers.color, string.Format(ModTranslation.GetString("Intro", 4), otherLover?.Data?.PlayerName ?? ""));
                     }
                 }
@@ -482,7 +488,7 @@ namespace TheOtherRoles.Patches
                  * This should be done before a game starting and after tasks assinged
                  * If you have an idea, please send me a pull request!
                  */
-                if (Madmate.madmate != null && CachedPlayer.LocalPlayer.PlayerControl == Madmate.madmate
+                if (Madmate.madmate != null && PlayerControl.LocalPlayer == Madmate.madmate
                     && Madmate.noticeImpostors)
                 {
                     MadmateTaskHelper.SetMadmateTasks();
@@ -540,7 +546,7 @@ namespace TheOtherRoles.Patches
                     if (taskTypeIdList == null) return;
 
                     var taskIdDataTable = new Dictionary<uint, byte[]>();
-                    var playerData = CachedPlayer.LocalPlayer.PlayerControl.Data;
+                    var playerData = PlayerControl.LocalPlayer.Data;
                     playerData.Object.clearAllTasks();
                     playerData.Tasks = new Il2CppSystem.Collections.Generic.List<GameData.TaskInfo>(taskTypeIdList.Count);
                     for (int j = 0; j < taskTypeIdList.Count; j++)
@@ -562,7 +568,7 @@ namespace TheOtherRoles.Patches
                     foreach (var pair in taskIdDataTable)
                     {
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                            CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                            PlayerControl.LocalPlayer.NetId,
                             (byte)CustomRPC.TaskVsMode_MakeItTheSameTaskAsTheHostDetail,
                             Hazel.SendOption.Reliable,
                             -1);
@@ -573,7 +579,7 @@ namespace TheOtherRoles.Patches
                     }
 
                     MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(
-                        CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                        PlayerControl.LocalPlayer.NetId,
                         (byte)CustomRPC.TaskVsMode_MakeItTheSameTaskAsTheHost,
                         Hazel.SendOption.Reliable,
                         -1);
@@ -586,14 +592,12 @@ namespace TheOtherRoles.Patches
             }
         }
     }
-    [HarmonyPatch(typeof(Constants), nameof(Constants.ShouldHorseAround))]
-    public static class ShouldAlwaysHorseAround
+    [HarmonyPatch(typeof(AprilFoolsMode), nameof(AprilFoolsMode.ShouldShowAprilFoolsToggle))]
+    public static class ShouldShowAprilFoolsToggle
     {
-        public static bool Prefix(ref bool __result)
+        public static void Postfix(ref bool __result)
         {
-            __result = EventUtility.isEnabled && !EventUtility.disableHorses;
-            return false;
+            __result = __result || EventUtility.isEventDate || EventUtility.canBeEnabled;  // Extend it to a 7 day window instead of just 1st day of the Month
         }
     }
 }
-
