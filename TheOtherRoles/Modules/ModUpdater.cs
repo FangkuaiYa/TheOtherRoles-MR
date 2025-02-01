@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using AmongUs.Data;
+using Assets.InnerNet;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Unity.IL2CPP;
@@ -21,7 +22,7 @@ using Action = System.Action;
 using IntPtr = System.IntPtr;
 using Version = SemanticVersioning.Version;
 
-namespace TheOtherRoles.Modules 
+namespace TheOtherRoles.Modules
 {
     public class ModUpdateBehaviour : MonoBehaviour
     {
@@ -35,14 +36,15 @@ namespace TheOtherRoles.Modules
         public ModUpdateBehaviour(IntPtr ptr) : base(ptr) { }
         public class UpdateData
         {
+            public string Tag;
             public JObject Request;
             public string Version { get { return ver != null ? "v" + ver : Tag; } }
             public string Content { get { return DataManager.Settings.Language.CurrentLanguage == SupportedLangs.Japanese ? ContentJp : ContentDefault; } }
 
             string ContentDefault;
             string ContentJp;
-            string Tag;
             Version ver;
+            public string TimeString;
 
             public UpdateData(JObject data)
             {
@@ -59,18 +61,29 @@ namespace TheOtherRoles.Modules
                 int jpTagEndIndex = jpTagStartIndex != -1 ? jpTagStartIndex + "### JP".Length + 2 : -1;
                 int tagStartIndex = content.IndexOf("### EN");
                 int tagEndIndex = tagStartIndex != -1 ? tagStartIndex + "### EN".Length + 2 : -1;
+                TimeString = DateTime.FromBinary(((Il2CppSystem.DateTime)data["published_at"]).ToBinaryRaw()).ToString();
 
-                if (jpTagStartIndex == -1 && tagStartIndex == -1) {
+                if (jpTagStartIndex == -1 && tagStartIndex == -1)
+                {
                     ContentDefault = ContentJp = content;
-                } else if (jpTagStartIndex != -1 && tagStartIndex == -1) {
+                }
+                else if (jpTagStartIndex != -1 && tagStartIndex == -1)
+                {
                     ContentDefault = ContentJp = content.Substring(tagEndIndex);
-                } else if (jpTagStartIndex == -1 && tagStartIndex != -1) {
+                }
+                else if (jpTagStartIndex == -1 && tagStartIndex != -1)
+                {
                     ContentDefault = ContentJp = content.Substring(jpTagEndIndex);
-                } else {
-                    if (jpTagStartIndex < tagEndIndex) {
+                }
+                else
+                {
+                    if (jpTagStartIndex < tagEndIndex)
+                    {
                         ContentJp = content.Substring(jpTagEndIndex, tagStartIndex - jpTagEndIndex);
                         ContentDefault = content.Substring(tagEndIndex);
-                    } else {
+                    }
+                    else
+                    {
                         ContentDefault = content.Substring(tagEndIndex, jpTagStartIndex - tagEndIndex);
                         ContentJp = content.Substring(jpTagEndIndex);
                     }
@@ -89,15 +102,15 @@ namespace TheOtherRoles.Modules
 
         [HideFromIl2Cpp]
         public UpdateData RequiredUpdateData => TORUpdate ?? SubmergedUpdate;
-        
+
         public void Awake()
         {
             if (Instance) Destroy(this);
             Instance = this;
-            
-            SceneManager.add_sceneLoaded((System.Action<Scene, LoadSceneMode>) (OnSceneLoaded));
+
+            SceneManager.add_sceneLoaded((System.Action<Scene, LoadSceneMode>)(OnSceneLoaded));
             this.StartCoroutine(CoCheckUpdates());
-            
+
             foreach (var file in Directory.GetFiles(Paths.PluginPath, "*.old"))
             {
                 File.Delete(file);
@@ -110,111 +123,147 @@ namespace TheOtherRoles.Modules
             if (selectSfx == null)
                 selectSfx = AccountManager.Instance.accountTab.resendEmailButton.GetComponent<PassiveButton>().ClickSound;
 
-            if (RequiredUpdateData is null) {
+            if (RequiredUpdateData is null)
+            {
                 showPopUp = false;
                 return;
             }
 
             var template = GameObject.Find("ExitGameButton");
             if (!template) return;
-            
+
             var button = Instantiate(template, null);
             var buttonTransform = button.transform;
-            var pos = buttonTransform.localPosition;
-            pos.y += 1.2f;
-            buttonTransform.localPosition = pos;
+            //buttonTransform.localPosition = new Vector3(-2f, -2f);
+            button.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.458f, 0.124f);
 
             PassiveButton passiveButton = button.GetComponent<PassiveButton>();
-            SpriteRenderer buttonSprite = button.GetComponent<SpriteRenderer>();
             passiveButton.OnClick = new Button.ButtonClickedEvent();
-            passiveButton.OnClick.AddListener((Action) (() =>
+            passiveButton.OnClick.AddListener((Action)(() =>
             {
                 this.StartCoroutine(CoUpdate());
                 button.SetActive(false);
             }));
 
-            var text = button.transform.GetChild(0).GetComponent<TMP_Text>();
+            var text = button.transform.GetComponentInChildren<TMPro.TMP_Text>();
             string t = ModTranslation.GetString("Mod-Updater", 1);
             if (TORUpdate is null && SubmergedUpdate is not null) t = SubmergedCompatibility.Loaded ? ModTranslation.GetString("Mod-Updater", 2) : ModTranslation.GetString("Mod-Updater", 3);
 
             StartCoroutine(Effects.Lerp(0.1f, (System.Action<float>)(p => text.SetText(t))));
 
-            buttonSprite.color = text.color = Color.red;
-            passiveButton.OnMouseOut.AddListener((Action)(() => buttonSprite.color = text.color = Color.red));
+            passiveButton.OnMouseOut.AddListener((Action)(() => text.color = Color.red));
+            passiveButton.OnMouseOver.AddListener((Action)(() => text.color = Color.white));
 
             var isSubmerged = TORUpdate == null;
             var mgr = FindObjectOfType<MainMenuManager>(true);
 
-            if (!isSubmerged) {
-                try {
+            if (!isSubmerged)
+            {
+                try
+                {
                     string updateVersion = TORUpdate.Content[^5..];
-                    if (Version.Parse(TheOtherRolesPlugin.VersionString).BaseVersion() < Version.Parse(updateVersion).BaseVersion()) {
+                    if (Version.Parse(TheOtherRolesPlugin.VersionString).BaseVersion() < Version.Parse(updateVersion).BaseVersion())
+                    {
                         passiveButton.OnClick.RemoveAllListeners();
                         passiveButton.OnClick = new Button.ButtonClickedEvent();
-                        passiveButton.OnClick.AddListener((Action)(() => {
+                        passiveButton.OnClick.AddListener((Action)(() =>
+                        {
                             mgr.StartCoroutine(CoShowAnnouncement(ModTranslation.GetString("Mod-Updater", 4)));
                         }));
                     }
-                } catch {  
+                }
+                catch
+                {
                     TheOtherRolesPlugin.Logger.LogError("parsing version for auto updater failed :(");
                 }
 
             }
 
             if (isSubmerged && !SubmergedCompatibility.Loaded) showPopUp = false;
-            if (showPopUp) {
+            if (showPopUp)
+            {
                 var data = isSubmerged ? SubmergedUpdate : TORUpdate;
 
                 var announcement = string.Format(ModTranslation.GetString("Mod-Updater", 5), isSubmerged ? ModTranslation.GetString("Opt-General", 68) : "THE OTHER ROLES MR", data.Version, data.Content);
                 mgr.StartCoroutine(CoShowAnnouncement(announcement));
+                mgr.StartCoroutine(CoShowAnnouncement(announcement, shortTitle: isSubmerged ? "Submerged Update" : "TOR Update", date: isSubmerged ? SubmergedUpdate.TimeString : TORUpdate.TimeString));
             }
             showPopUp = false;
         }
-        
+
         [HideFromIl2Cpp]
         public IEnumerator CoUpdate()
         {
             updateInProgress = true;
             var isSubmerged = TORUpdate is null;
             var updateName = (isSubmerged ? ModTranslation.GetString("Opt-General", 68) : "The Other Roles MR");
-            
+
             var popup = Instantiate(TwitchManager.Instance.TwitchPopup);
             popup.TextAreaTMP.fontSize *= 0.7f;
             popup.TextAreaTMP.enableAutoSizing = false;
-            
+
             popup.Show();
 
             var button = popup.transform.GetChild(2).gameObject;
             button.SetActive(false);
             popup.TextAreaTMP.text = string.Format(ModTranslation.GetString("Mod-Updater", 6), updateName);
-            
+
             var download = Task.Run(DownloadUpdate);
             while (!download.IsCompleted) yield return null;
-            
+
             button.SetActive(true);
             popup.TextAreaTMP.text = download.Result ? string.Format(ModTranslation.GetString("Mod-Updater", 7), updateName) : ModTranslation.GetString("Mod-Updater", 8);
         }
 
+        private static int announcementNumber = 501;
         [HideFromIl2Cpp]
-        public IEnumerator CoShowAnnouncement(string announcement)
+        public IEnumerator CoShowAnnouncement(string announcement, bool show = true, string shortTitle = "TOR Update", string title = "", string date = "")
         {
-            var popUp = Instantiate(FindObjectOfType<AnnouncementPopUp>(true));
+            var mgr = FindObjectOfType<MainMenuManager>(true);
+            var popUpTemplate = UnityEngine.Object.FindObjectOfType<AnnouncementPopUp>(true);
+            if (popUpTemplate == null)
+            {
+                TheOtherRolesPlugin.Logger.LogError("couldnt show credits, popUp is null");
+                yield return null;
+            }
+            var popUp = UnityEngine.Object.Instantiate(popUpTemplate);
+
             popUp.gameObject.SetActive(true);
-            yield return popUp.Init();
-            var last = DataManager.Announcements.LastViewedAnnouncement;
-            last.Id = 1;
-            last.Text = announcement;
-            SelectableHyperLinkHelper.DestroyGOs(popUp.selectableHyperLinks, name);
-            popUp.AnnounceTextMeshPro.enableAutoSizing = true;
-            popUp.AnnounceTextMeshPro.text = announcement;
+            Assets.InnerNet.Announcement creditsAnnouncement = new()
+            {
+                Id = "torAnnouncement",
+                Language = 0,
+                Number = announcementNumber++,
+                Title = title == "" ? "The Other Roles Announcement" : title,
+                ShortTitle = shortTitle,
+                SubTitle = "",
+                PinState = false,
+                Date = date == "" ? DateTime.Now.Date.ToString() : date,
+                Text = announcement,
+            };
+            mgr.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
+                if (p == 1)
+                {
+                    var backup = DataManager.Player.Announcements.allAnnouncements;
+                    DataManager.Player.Announcements.allAnnouncements = new();
+                    popUp.Init(false);
+                    DataManager.Player.Announcements.SetAnnouncements(new Announcement[] { creditsAnnouncement });
+                    popUp.CreateAnnouncementList();
+                    popUp.UpdateAnnouncementText(creditsAnnouncement.Number);
+                    popUp.visibleAnnouncements[0].PassiveButton.OnClick.RemoveAllListeners();
+                    DataManager.Player.Announcements.allAnnouncements = backup;
+                }
+            })));
         }
 
         [HideFromIl2Cpp]
         public static IEnumerator CoCheckUpdates()
         {
+            // Since running the update check task causes a crash for some users, allow the user to disable the updater by creating a file called noupdater.txt
+            // in their Among Us folder (root)
+            if (Il2CppSystem.IO.File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\noupdater.txt")) yield break;
             var torUpdateCheck = Task.Run(() => Instance.GetGithubUpdate("miru-y", "TheOtherRoles-MR"));
             while (!torUpdateCheck.IsCompleted) yield return null;
-            Announcement.updateData = torUpdateCheck.Result;
             if (torUpdateCheck.Result != null && torUpdateCheck.Result.IsNewer(Version.Parse(TheOtherRolesPlugin.VersionString)))
             {
                 Instance.TORUpdate = torUpdateCheck.Result;
@@ -222,15 +271,16 @@ namespace TheOtherRoles.Modules
 
             if (CheckForSubmergedUpdates)
             {
-                var submergedUpdateCheck = Task.Run(() => Instance.GetGithubUpdate("SubmergedAmongUs", "Submerged"));
-                while (!submergedUpdateCheck.IsCompleted) yield return null;
-                if (submergedUpdateCheck.Result != null && (!SubmergedCompatibility.Loaded || submergedUpdateCheck.Result.IsNewer(SubmergedCompatibility.Version)))
-                {
-                    Instance.SubmergedUpdate = submergedUpdateCheck.Result;
-                }
+                //var submergedUpdateCheck = Task.Run(() => Instance.GetGithubUpdate("SubmergedAmongUs", "Submerged"));
+                //while (!submergedUpdateCheck.IsCompleted) yield return null;
+                //if (submergedUpdateCheck.Result != null && (!SubmergedCompatibility.Loaded || submergedUpdateCheck.Result.IsNewer(SubmergedCompatibility.Version)))
+                //{
+                //    Instance.SubmergedUpdate = submergedUpdateCheck.Result;
+                //if (Instance.SubmergedUpdate.Tag.Equals("2022.10.26")) Instance.SubmergedUpdate = null;
+                //}
             }
-            
-            Instance.OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+
+            //Instance.OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
         }
 
         [HideFromIl2Cpp]
@@ -239,12 +289,21 @@ namespace TheOtherRoles.Modules
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "TheOtherRoles MR Updater");
 
-            var req = await client.GetAsync($"https://api.github.com/repos/{owner}/{repo}/releases/latest", HttpCompletionOption.ResponseContentRead);
-            if (!req.IsSuccessStatusCode) return null;
+            try
+            {
+                var req = await client.GetAsync($"https://api.github.com/repos/{owner}/{repo}/releases/latest", HttpCompletionOption.ResponseContentRead);
+                if (!req.IsSuccessStatusCode) return null;
 
-            var dataString = await req.Content.ReadAsStringAsync();
-            JObject data = JObject.Parse(dataString);
-            return new UpdateData(data);
+                if (!req.IsSuccessStatusCode) return null;
+
+                var dataString = await req.Content.ReadAsStringAsync();
+                JObject data = JObject.Parse(dataString);
+                return new UpdateData(data);
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
         }
 
         private bool TryUpdateSubmergedInternally()
@@ -272,26 +331,28 @@ namespace TheOtherRoles.Modules
             }
             return true;
         }
-            
-        
+
+
         [HideFromIl2Cpp]
         public async Task<bool> DownloadUpdate()
         {
             var isSubmerged = TORUpdate is null;
             if (isSubmerged && TryUpdateSubmergedInternally()) return true;
             var data = isSubmerged ? SubmergedUpdate : TORUpdate;
-            
+
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("User-Agent", "TheOtherRoles MR Updater");
-            
+
             JToken assets = data.Request["assets"];
             string downloadURI = "";
-            for (JToken current = assets.First; current != null; current = current.Next) 
+            for (JToken current = assets.First; current != null; current = current.Next)
             {
                 string browser_download_url = current["browser_download_url"]?.ToString();
-                if (browser_download_url != null && current["content_type"] != null) {
+                if (browser_download_url != null && current["content_type"] != null)
+                {
                     if (current["content_type"].ToString().Equals("application/x-msdownload") &&
-                        browser_download_url.EndsWith(".dll")) {
+                        browser_download_url.EndsWith(".dll"))
+                    {
                         downloadURI = browser_download_url;
                         break;
                     }

@@ -3,11 +3,13 @@ using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 using Types = TheOtherRoles.CustomOption.CustomOptionType;
 
-namespace TheOtherRoles {
-    public class CustomOptionHolder {
-        public static TranslationInfo[] rates = new[] {new TranslationInfo("0%"), new TranslationInfo("10%"), new TranslationInfo("20%"), new TranslationInfo("30%"), new TranslationInfo("40%"), new TranslationInfo("50%"), new TranslationInfo("60%"), new TranslationInfo("70%"), new TranslationInfo("80%"), new TranslationInfo("90%"), new TranslationInfo("100%")};
-        public static TranslationInfo[] ratesModifier = new[] {new TranslationInfo("1"), new TranslationInfo("2"), new TranslationInfo("3")};
-        public static TranslationInfo[] presets = new[] {new TranslationInfo("Opt-General", 1), new TranslationInfo("Opt-General", 2), new TranslationInfo("Opt-General", 3), new TranslationInfo("Opt-General", 4), new TranslationInfo("Opt-General", 5)};
+namespace TheOtherRoles
+{
+    public class CustomOptionHolder
+    {
+        public static TranslationInfo[] rates = new[] { new TranslationInfo("0%"), new TranslationInfo("10%"), new TranslationInfo("20%"), new TranslationInfo("30%"), new TranslationInfo("40%"), new TranslationInfo("50%"), new TranslationInfo("60%"), new TranslationInfo("70%"), new TranslationInfo("80%"), new TranslationInfo("90%"), new TranslationInfo("100%") };
+        public static TranslationInfo[] ratesModifier = new[] { new TranslationInfo("1"), new TranslationInfo("2"), new TranslationInfo("3"), new TranslationInfo("4"), new TranslationInfo("5"), new TranslationInfo("6"), new TranslationInfo("7"), new TranslationInfo("8"), new TranslationInfo("9"), new TranslationInfo("10"), new TranslationInfo("11"), new TranslationInfo("12"), new TranslationInfo("13"), new TranslationInfo("14"), new TranslationInfo("15") };
+        public static TranslationInfo[] presets = new[] { new TranslationInfo("Opt-General", 1), new TranslationInfo("Opt-General", 2), new TranslationInfo("Opt-General", 3), new TranslationInfo("Opt-General", 4), new TranslationInfo("Opt-General", 5), new TranslationInfo("Opt-General", 94), new TranslationInfo("Opt-General", 95) };
 
         public static readonly Color AdminColor = new Color32(30, 144, 255, 255);
         public static readonly Color VitalColor = Color.green;
@@ -19,12 +21,16 @@ namespace TheOtherRoles {
         public static CustomOption activateRoles;
         public static CustomOption crewmateRolesCountMin;
         public static CustomOption crewmateRolesCountMax;
+        public static CustomOption crewmateRolesFill;
         public static CustomOption neutralRolesCountMin;
         public static CustomOption neutralRolesCountMax;
         public static CustomOption impostorRolesCountMin;
         public static CustomOption impostorRolesCountMax;
         public static CustomOption modifiersCountMin;
         public static CustomOption modifiersCountMax;
+
+        public static CustomOption enableCodenameHorsemode;
+        public static CustomOption enableCodenameDisableHorses;
 
         // MR ========================================================
         public static CustomOption enabledTaskVsMode;
@@ -150,12 +156,14 @@ namespace TheOtherRoles {
         public static CustomOption mayorTasksNeededToSeeVoteColors;
         public static CustomOption mayorMeetingButton;
         public static CustomOption mayorMaxRemoteMeetings;
+        public static CustomOption mayorChooseSingleVote;
 
         public static CustomOption portalmakerSpawnRate;
         public static CustomOption portalmakerCooldown;
         public static CustomOption portalmakerUsePortalCooldown;
         public static CustomOption portalmakerLogOnlyColorType;
         public static CustomOption portalmakerLogHasTime;
+        public static CustomOption portalmakerCanPortalFromAnywhere;
 
         public static CustomOption engineerSpawnRate;
         public static CustomOption engineerNumberOfFixes;
@@ -244,7 +252,7 @@ namespace TheOtherRoles {
 
         public static CustomOption cleanerSpawnRate;
         public static CustomOption cleanerCooldown;
-        
+
         public static CustomOption warlockSpawnRate;
         public static CustomOption warlockCooldown;
         public static CustomOption warlockRootTime;
@@ -269,6 +277,7 @@ namespace TheOtherRoles {
         public static CustomOption mediumCooldown;
         public static CustomOption mediumDuration;
         public static CustomOption mediumOneTimeUse;
+        public static CustomOption mediumChanceAdditionalInfo;
 
         public static CustomOption madmateSpawnRate;
         public static CustomOption madmateCanDieToSheriff;
@@ -294,6 +303,7 @@ namespace TheOtherRoles {
         public static CustomOption thiefHasImpVision;
         public static CustomOption thiefCanUseVents;
         public static CustomOption thiefCanKillSheriff;
+        public static CustomOption thiefCanStealWithGuess;
 
 
         public static CustomOption trapperSpawnRate;
@@ -304,6 +314,14 @@ namespace TheOtherRoles {
         public static CustomOption trapperAnonymousMap;
         public static CustomOption trapperInfoType;
         public static CustomOption trapperTrapDuration;
+
+        public static CustomOption bomberSpawnRate;
+        public static CustomOption bomberBombDestructionTime;
+        public static CustomOption bomberBombDestructionRange;
+        public static CustomOption bomberBombHearRange;
+        public static CustomOption bomberDefuseDuration;
+        public static CustomOption bomberBombCooldown;
+        public static CustomOption bomberBombActiveAfter;
 
         // MR ========================================================
         public static CustomOption yasunaSpawnRate;
@@ -320,10 +338,10 @@ namespace TheOtherRoles {
         public static CustomOption taskMasterExtraShortTasks;
         public static CustomOption taskMasterExtraLongTasks;
 
-        public static CustomOption doorHackerSpawnRate;
-        public static CustomOption doorHackerNumberOfUses;
-        public static CustomOption doorHackerCooldown;
-        public static CustomOption doorHackerDuration;
+        //public static CustomOption doorHackerSpawnRate;
+        //public static CustomOption doorHackerNumberOfUses;
+        //public static CustomOption doorHackerCooldown;
+        //public static CustomOption doorHackerDuration;
 
         public static CustomOption killerCreatorSpawnRate;
         public static CustomOption madmateKillerCanDieToSheriff;
@@ -370,7 +388,7 @@ namespace TheOtherRoles {
         public static CustomOption modifierSunglasses;
         public static CustomOption modifierSunglassesQuantity;
         public static CustomOption modifierSunglassesVision;
-        
+
         public static CustomOption modifierMini;
         public static CustomOption modifierMiniGrowingUpDuration;
         public static CustomOption modifierMiniGrowingUpInMeeting;
@@ -397,6 +415,9 @@ namespace TheOtherRoles {
         public static CustomOption hidePlayerNames;
         public static CustomOption allowParallelMedBayScans;
         public static CustomOption shieldFirstKill;
+        public static CustomOption finishTasksBeforeHauntingOrZoomingOut;
+        public static CustomOption camsNightVision;
+        public static CustomOption camsNoNightVisionIfImpVision;
 
         // MR ========================================================
         public static CustomOption enableRandomizationInFixWiringTask;
@@ -417,12 +438,14 @@ namespace TheOtherRoles {
         public static CustomOption dynamicMapEnablePolus;
         public static CustomOption dynamicMapEnableAirShip;
         public static CustomOption dynamicMapEnableSubmerged;
+        public static CustomOption dynamicMapSeparateSettings;
 
         //Guesser Gamemode
         public static CustomOption guesserGamemodeCrewNumber;
         public static CustomOption guesserGamemodeNeutralNumber;
         public static CustomOption guesserGamemodeImpNumber;
         public static CustomOption guesserForceJackalGuesser;
+        public static CustomOption guesserForceThiefGuesser;
         public static CustomOption guesserGamemodeHaveModifier;
         public static CustomOption guesserGamemodeNumberOfShots;
         public static CustomOption guesserGamemodeHasMultipleShotsPerMeeting;
@@ -463,25 +486,34 @@ namespace TheOtherRoles {
 
         internal static Dictionary<byte, byte[]> blockedRolePairings = new Dictionary<byte, byte[]>();
 
-        public static string cs(Color c, string s) {
+        public static string cs(Color c, string s)
+        {
             return string.Format("<color=#{0:X2}{1:X2}{2:X2}{3:X2}>{4}</color>", ToByte(c.r), ToByte(c.g), ToByte(c.b), ToByte(c.a), s);
         }
- 
-        private static byte ToByte(float f) {
+
+        private static byte ToByte(float f)
+        {
             f = Mathf.Clamp01(f);
             return (byte)(f * 255);
         }
 
-        public static void Load() {
-            
-            
+        public static void Load()
+        {
+
+            CustomOption.vanillaSettings = TheOtherRolesPlugin.Instance.Config.Bind("Preset0", "VanillaOptions", "");
             // Role Options
             presetSelection = CustomOption.Create(0, Types.General, new TranslationInfo("Opt-General", 6, new Color(204f / 255f, 204f / 255f, 0, 1f)), presets, null, true);
             activateRoles = CustomOption.Create(1, Types.General, new TranslationInfo("Opt-General", 7, new Color(204f / 255f, 204f / 255f, 0, 1f)), true, null, true);
 
+            if (Utilities.EventUtility.canBeEnabled) enableCodenameHorsemode = CustomOption.Create(10423, Types.General, new TranslationInfo("Opt-General", 97, Color.green), false, null, true);
+            if (Utilities.EventUtility.canBeEnabled) enableCodenameDisableHorses = CustomOption.Create(10424, Types.General, new TranslationInfo("Opt-General", 102, Color.green), false, enableCodenameHorsemode, false);
+            if (Utilities.EventUtility.canBeEnabled) enableCodenameDisableHorses = CustomOption.Create(10424, Types.General, new TranslationInfo("Opt-General", 102, Color.green), false, enableCodenameHorsemode, false);
+
+
             // Using new id's for the options to not break compatibilty with older versions
             crewmateRolesCountMin = CustomOption.Create(300, Types.General, new TranslationInfo("Opt-General", 8, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f, null, true);
             crewmateRolesCountMax = CustomOption.Create(301, Types.General, new TranslationInfo("Opt-General", 9, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f);
+            crewmateRolesFill = CustomOption.Create(308, Types.General, new TranslationInfo("Opt-General", 98, new Color(204f / 255f, 204f / 255f, 0, 1f)), false);
             neutralRolesCountMin = CustomOption.Create(302, Types.General, new TranslationInfo("Opt-General", 10, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f);
             neutralRolesCountMax = CustomOption.Create(303, Types.General, new TranslationInfo("Opt-General", 11, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f);
             impostorRolesCountMin = CustomOption.Create(304, Types.General, new TranslationInfo("Opt-General", 12, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f);
@@ -570,11 +602,11 @@ namespace TheOtherRoles {
             kataomoiSearchCooldown = CustomOption.Create(910000307, Types.Neutral, new TranslationInfo("Opt-Kataomoi", 7), 10f, 2.5f, 60f, 2.5f, kataomoiSpawnRate);
             kataomoiSearchDuration = CustomOption.Create(910000308, Types.Neutral, new TranslationInfo("Opt-Kataomoi", 8), 10f, 1f, 30f, 1f, kataomoiSpawnRate);
 
-            // DOOR HACKER (Impostor)
-            doorHackerSpawnRate = CustomOption.Create(910000200, Types.Impostor, new TranslationInfo(RoleId.DoorHacker, DoorHacker.color), rates, null, true);
-            doorHackerNumberOfUses = CustomOption.Create(910000203, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 1), 0f, 0f, 15, 1f, doorHackerSpawnRate);
-            doorHackerCooldown = CustomOption.Create(910000201, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 2), 30f, 0f, 60f, 2.5f, doorHackerSpawnRate);
-            doorHackerDuration = CustomOption.Create(910000202, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 3), 5f, 1f, 30f, 0.5f, doorHackerSpawnRate);
+            // DOOR HACKER (Impostor) Remove tin Among Us 2023.03.28
+            //doorHackerSpawnRate = CustomOption.Create(910000200, Types.Impostor, new TranslationInfo(RoleId.DoorHacker, DoorHacker.color), rates, null, true);
+            //doorHackerNumberOfUses = CustomOption.Create(910000203, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 1), 0f, 0f, 15, 1f, doorHackerSpawnRate);
+            //doorHackerCooldown = CustomOption.Create(910000201, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 2), 30f, 0f, 60f, 2.5f, doorHackerSpawnRate);
+            //doorHackerDuration = CustomOption.Create(910000202, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 3), 5f, 1f, 30f, 0.5f, doorHackerSpawnRate);
 
             // KILLER CREATOR (Impostor)
             killerCreatorSpawnRate = CustomOption.Create(910000400, Types.Impostor, new TranslationInfo(RoleId.KillerCreator, KillerCreator.color), rates, null, true);
@@ -630,7 +662,7 @@ namespace TheOtherRoles {
             warlockRootTime = CustomOption.Create(272, Types.Impostor, new TranslationInfo("Opt-Warlock", 2), 5f, 0f, 15f, 1f, warlockSpawnRate);
 
             bountyHunterSpawnRate = CustomOption.Create(320, Types.Impostor, new TranslationInfo(RoleId.BountyHunter, BountyHunter.color), rates, null, true);
-            bountyHunterBountyDuration = CustomOption.Create(321, Types.Impostor, new TranslationInfo("Opt-BountyHunter", 1),  60f, 10f, 180f, 10f, bountyHunterSpawnRate);
+            bountyHunterBountyDuration = CustomOption.Create(321, Types.Impostor, new TranslationInfo("Opt-BountyHunter", 1), 60f, 10f, 180f, 10f, bountyHunterSpawnRate);
             bountyHunterReducedCooldown = CustomOption.Create(322, Types.Impostor, new TranslationInfo("Opt-BountyHunter", 2), 2.5f, 0f, 30f, 2.5f, bountyHunterSpawnRate);
             bountyHunterPunishmentTime = CustomOption.Create(323, Types.Impostor, new TranslationInfo("Opt-BountyHunter", 3), 20f, 0f, 60f, 2.5f, bountyHunterSpawnRate);
             bountyHunterShowArrow = CustomOption.Create(324, Types.Impostor, new TranslationInfo("Opt-BountyHunter", 4), true, bountyHunterSpawnRate);
@@ -651,12 +683,20 @@ namespace TheOtherRoles {
             ninjaTraceColorTime = CustomOption.Create(384, Types.Impostor, new TranslationInfo("Opt-Ninja", 4), 2f, 0f, 20f, 0.5f, ninjaSpawnRate);
             ninjaInvisibleDuration = CustomOption.Create(385, Types.Impostor, new TranslationInfo("Opt-Ninja", 5), 3f, 0f, 20f, 1f, ninjaSpawnRate);
 
+            bomberSpawnRate = CustomOption.Create(460, Types.Impostor, new TranslationInfo(RoleId.Bomber, Bomber.color), rates, null, true);
+            bomberBombDestructionTime = CustomOption.Create(461, Types.Impostor, new TranslationInfo("Opt-Bomber", 1), 20f, 2.5f, 120f, 2.5f, bomberSpawnRate);
+            bomberBombDestructionRange = CustomOption.Create(462, Types.Impostor, new TranslationInfo("Opt-Bomber", 2), 50f, 5f, 150f, 5f, bomberSpawnRate);
+            bomberBombHearRange = CustomOption.Create(463, Types.Impostor, new TranslationInfo("Opt-Bomber", 3), 60f, 5f, 150f, 5f, bomberSpawnRate);
+            bomberDefuseDuration = CustomOption.Create(464, Types.Impostor, new TranslationInfo("Opt-Bomber", 4), 3f, 0.5f, 30f, 0.5f, bomberSpawnRate);
+            bomberBombCooldown = CustomOption.Create(465, Types.Impostor, new TranslationInfo("Opt-Bomber", 5), 15f, 2.5f, 30f, 2.5f, bomberSpawnRate);
+            bomberBombActiveAfter = CustomOption.Create(466, Types.Impostor, new TranslationInfo("Opt-Bomber", 6), 3f, 0.5f, 15f, 0.5f, bomberSpawnRate);
+
             guesserSpawnRate = CustomOption.Create(310, Types.Neutral, new TranslationInfo(RoleId.NiceGuesser, Guesser.color), rates, null, true);
             guesserIsImpGuesserRate = CustomOption.Create(311, Types.Neutral, new TranslationInfo("Opt-Guesser", 1), rates, guesserSpawnRate);
             guesserNumberOfShots = CustomOption.Create(312, Types.Neutral, new TranslationInfo("Opt-Guesser", 2), 2f, 1f, 15f, 1f, guesserSpawnRate);
             guesserHasMultipleShotsPerMeeting = CustomOption.Create(313, Types.Neutral, new TranslationInfo("Opt-Guesser", 3), false, guesserSpawnRate);
-            guesserKillsThroughShield  = CustomOption.Create(315, Types.Neutral, new TranslationInfo("Opt-Guesser", 4), true, guesserSpawnRate);
-            guesserEvilCanKillSpy  = CustomOption.Create(316, Types.Neutral, new TranslationInfo("Opt-Guesser", 5), true, guesserSpawnRate);
+            guesserKillsThroughShield = CustomOption.Create(315, Types.Neutral, new TranslationInfo("Opt-Guesser", 4), true, guesserSpawnRate);
+            guesserEvilCanKillSpy = CustomOption.Create(316, Types.Neutral, new TranslationInfo("Opt-Guesser", 5), true, guesserSpawnRate);
             guesserSpawnBothRate = CustomOption.Create(317, Types.Neutral, new TranslationInfo("Opt-Guesser", 6), rates, guesserSpawnRate);
             guesserCantGuessSnitchIfTaksDone = CustomOption.Create(318, Types.Neutral, new TranslationInfo("Opt-Guesser", 7), true, guesserSpawnRate);
 
@@ -700,6 +740,7 @@ namespace TheOtherRoles {
             mayorTasksNeededToSeeVoteColors = CustomOption.Create(82, Types.Crewmate, new TranslationInfo("Opt-Mayor", 2), 5f, 0f, 20f, 1f, mayorCanSeeVoteColors);
             mayorMeetingButton = CustomOption.Create(83, Types.Crewmate, new TranslationInfo("Opt-Mayor", 3), true, mayorSpawnRate);
             mayorMaxRemoteMeetings = CustomOption.Create(84, Types.Crewmate, new TranslationInfo("Opt-Mayor", 4), 1f, 1f, 5f, 1f, mayorMeetingButton);
+            mayorChooseSingleVote = CustomOption.Create(85, Types.Crewmate, new TranslationInfo("Opt-Mayor", 5), new[] { new TranslationInfo("Opt-Mayor", 6), new TranslationInfo("Opt-Mayor", 7), new TranslationInfo("Opt-Mayor", 8) }, mayorSpawnRate);
 
             engineerSpawnRate = CustomOption.Create(90, Types.Crewmate, new TranslationInfo(RoleId.Engineer, Engineer.color), rates, null, true);
             engineerNumberOfFixes = CustomOption.Create(91, Types.Crewmate, new TranslationInfo("Opt-Engineer", 1), 1f, 1f, 3f, 1f, engineerSpawnRate);
@@ -725,7 +766,7 @@ namespace TheOtherRoles {
             lighterDuration = CustomOption.Create(114, Types.Crewmate, new TranslationInfo("Opt-Lighter", 4), 5f, 2.5f, 60f, 2.5f, lighterSpawnRate);
 
             detectiveSpawnRate = CustomOption.Create(120, Types.Crewmate, new TranslationInfo(RoleId.Detective, Detective.color), rates, null, true);
-            detectiveAnonymousFootprints = CustomOption.Create(121, Types.Crewmate, new TranslationInfo("Opt-Detective", 1), false, detectiveSpawnRate); 
+            detectiveAnonymousFootprints = CustomOption.Create(121, Types.Crewmate, new TranslationInfo("Opt-Detective", 1), false, detectiveSpawnRate);
             detectiveFootprintIntervall = CustomOption.Create(122, Types.Crewmate, new TranslationInfo("Opt-Detective", 2), 0.5f, 0.25f, 10f, 0.25f, detectiveSpawnRate);
             detectiveFootprintDuration = CustomOption.Create(123, Types.Crewmate, new TranslationInfo("Opt-Detective", 3), 5f, 0.25f, 10f, 0.25f, detectiveSpawnRate);
             detectiveReportNameDuration = CustomOption.Create(124, Types.Crewmate, new TranslationInfo("Opt-Detective", 4), 0, 0, 60, 2.5f, detectiveSpawnRate);
@@ -737,7 +778,7 @@ namespace TheOtherRoles {
             timeMasterShieldDuration = CustomOption.Create(133, Types.Crewmate, new TranslationInfo("Opt-TimeMaster", 3), 3f, 1f, 20f, 1f, timeMasterSpawnRate);
 
             medicSpawnRate = CustomOption.Create(140, Types.Crewmate, new TranslationInfo(RoleId.Medic, Medic.color), rates, null, true);
-            medicShowShielded = CustomOption.Create(143, Types.Crewmate, new TranslationInfo("Opt-Medic", 1), new[] { new TranslationInfo("Opt-Medic", 100), new TranslationInfo("Opt-Medic", 101), new TranslationInfo("Opt-Medic", 102)}, medicSpawnRate);
+            medicShowShielded = CustomOption.Create(143, Types.Crewmate, new TranslationInfo("Opt-Medic", 1), new[] { new TranslationInfo("Opt-Medic", 100), new TranslationInfo("Opt-Medic", 101), new TranslationInfo("Opt-Medic", 102) }, medicSpawnRate);
             medicShowAttemptToShielded = CustomOption.Create(144, Types.Crewmate, new TranslationInfo("Opt-Medic", 2), false, medicSpawnRate);
             medicSetOrShowShieldAfterMeeting = CustomOption.Create(145, Types.Crewmate, new TranslationInfo("Opt-Medic", 3), new[] { new TranslationInfo("Opt-Medic", 110), new TranslationInfo("Opt-Medic", 111), new TranslationInfo("Opt-Medic", 112) }, medicSpawnRate);
             medicShowAttemptToMedic = CustomOption.Create(146, Types.Crewmate, new TranslationInfo("Opt-Medic", 4), false, medicSpawnRate);
@@ -752,7 +793,7 @@ namespace TheOtherRoles {
             seerMode = CustomOption.Create(161, Types.Crewmate, new TranslationInfo("Opt-Seer", 1), new[] { new TranslationInfo("Opt-Seer", 100), new TranslationInfo("Opt-Seer", 101), new TranslationInfo("Opt-Seer", 102) }, seerSpawnRate);
             seerLimitSoulDuration = CustomOption.Create(163, Types.Crewmate, new TranslationInfo("Opt-Seer", 2), false, seerSpawnRate);
             seerSoulDuration = CustomOption.Create(162, Types.Crewmate, new TranslationInfo("Opt-Seer", 3), 15f, 0f, 120f, 5f, seerLimitSoulDuration);
-        
+
             hackerSpawnRate = CustomOption.Create(170, Types.Crewmate, new TranslationInfo(RoleId.Hacker, Hacker.color), rates, null, true);
             hackerCooldown = CustomOption.Create(171, Types.Crewmate, new TranslationInfo("Opt-Hacker", 1), 30f, 5f, 60f, 5f, hackerSpawnRate);
             hackerHackeringDuration = CustomOption.Create(172, Types.Crewmate, new TranslationInfo("Opt-Hacker", 2), 10f, 2.5f, 60f, 2.5f, hackerSpawnRate);
@@ -767,7 +808,7 @@ namespace TheOtherRoles {
             trackerCanTrackCorpses = CustomOption.Create(203, Types.Crewmate, new TranslationInfo("Opt-Tracker", 3), true, trackerSpawnRate);
             trackerCorpsesTrackingCooldown = CustomOption.Create(204, Types.Crewmate, new TranslationInfo("Opt-Tracker", 4), 30f, 5f, 120f, 5f, trackerCanTrackCorpses);
             trackerCorpsesTrackingDuration = CustomOption.Create(205, Types.Crewmate, new TranslationInfo("Opt-Tracker", 5), 5f, 2.5f, 30f, 2.5f, trackerCanTrackCorpses);
-                           
+
             snitchSpawnRate = CustomOption.Create(210, Types.Crewmate, new TranslationInfo(RoleId.Snitch, Snitch.color), rates, null, true);
             snitchLeftTasksForReveal = CustomOption.Create(211, Types.Crewmate, new TranslationInfo("Opt-Snitch", 1), 1f, 0f, 5f, 1f, snitchSpawnRate);
             snitchIncludeTeamJackal = CustomOption.Create(212, Types.Crewmate, new TranslationInfo("Opt-Snitch", 2), false, snitchSpawnRate);
@@ -784,27 +825,30 @@ namespace TheOtherRoles {
             portalmakerUsePortalCooldown = CustomOption.Create(392, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 2), 30f, 10f, 60f, 2.5f, portalmakerSpawnRate);
             portalmakerLogOnlyColorType = CustomOption.Create(393, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 3), true, portalmakerSpawnRate);
             portalmakerLogHasTime = CustomOption.Create(394, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 4), true, portalmakerSpawnRate);
+            portalmakerCanPortalFromAnywhere = CustomOption.Create(395, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 5), true, portalmakerSpawnRate);
 
             securityGuardSpawnRate = CustomOption.Create(280, Types.Crewmate, new TranslationInfo(RoleId.SecurityGuard, SecurityGuard.color), rates, null, true);
-            securityGuardCooldown = CustomOption.Create(281, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 1), 30f, 10f, 60f, 2.5f, securityGuardSpawnRate);
-            securityGuardTotalScrews = CustomOption.Create(282, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 2), 7f, 1f, 15f, 1f, securityGuardSpawnRate);
-            securityGuardCamPrice = CustomOption.Create(283, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 3), 2f, 1f, 15f, 1f, securityGuardSpawnRate);
-            securityGuardVentPrice = CustomOption.Create(284, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 4), 1f, 1f, 15f, 1f, securityGuardSpawnRate);
-            securityGuardCamDuration = CustomOption.Create(285, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 5), 10f, 2.5f, 60f, 2.5f, securityGuardSpawnRate);
-            securityGuardCamMaxCharges = CustomOption.Create(286, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 6), 5f, 1f, 30f, 1f, securityGuardSpawnRate);
-            securityGuardCamRechargeTasksNumber = CustomOption.Create(287, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 7), 3f, 1f, 10f, 1f, securityGuardSpawnRate);
-            securityGuardNoMove = CustomOption.Create(288, Types.Crewmate, new TranslationInfo("Opt-Portalmaker", 8), true, securityGuardSpawnRate);
+            securityGuardCooldown = CustomOption.Create(281, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 1), 30f, 10f, 60f, 2.5f, securityGuardSpawnRate);
+            securityGuardTotalScrews = CustomOption.Create(282, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 2), 7f, 1f, 15f, 1f, securityGuardSpawnRate);
+            securityGuardCamPrice = CustomOption.Create(283, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 3), 2f, 1f, 15f, 1f, securityGuardSpawnRate);
+            securityGuardVentPrice = CustomOption.Create(284, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 4), 1f, 1f, 15f, 1f, securityGuardSpawnRate);
+            securityGuardCamDuration = CustomOption.Create(285, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 5), 10f, 2.5f, 60f, 2.5f, securityGuardSpawnRate);
+            securityGuardCamMaxCharges = CustomOption.Create(286, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 6), 5f, 1f, 30f, 1f, securityGuardSpawnRate);
+            securityGuardCamRechargeTasksNumber = CustomOption.Create(287, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 7), 3f, 1f, 10f, 1f, securityGuardSpawnRate);
+            securityGuardNoMove = CustomOption.Create(288, Types.Crewmate, new TranslationInfo("Opt-SecurityGuard", 8), true, securityGuardSpawnRate);
 
             mediumSpawnRate = CustomOption.Create(360, Types.Crewmate, new TranslationInfo(RoleId.Medium, Medium.color), rates, null, true);
             mediumCooldown = CustomOption.Create(361, Types.Crewmate, new TranslationInfo("Opt-Medium", 1), 30f, 5f, 120f, 5f, mediumSpawnRate);
             mediumDuration = CustomOption.Create(362, Types.Crewmate, new TranslationInfo("Opt-Medium", 2), 3f, 0f, 15f, 1f, mediumSpawnRate);
             mediumOneTimeUse = CustomOption.Create(363, Types.Crewmate, new TranslationInfo("Opt-Medium", 3), false, mediumSpawnRate);
+            mediumChanceAdditionalInfo = CustomOption.Create(364, Types.Crewmate, new TranslationInfo("Opt-Medium", 4), rates, mediumSpawnRate);
 
             thiefSpawnRate = CustomOption.Create(400, Types.Neutral, new TranslationInfo(RoleId.Thief, Thief.color), rates, null, true);
             thiefCooldown = CustomOption.Create(401, Types.Neutral, new TranslationInfo("Opt-Thief", 1), 30f, 5f, 120f, 5f, thiefSpawnRate);
             thiefCanKillSheriff = CustomOption.Create(402, Types.Neutral, new TranslationInfo("Opt-Thief", 2), true, thiefSpawnRate);
             thiefHasImpVision = CustomOption.Create(403, Types.Neutral, new TranslationInfo("Opt-Thief", 3), true, thiefSpawnRate);
             thiefCanUseVents = CustomOption.Create(404, Types.Neutral, new TranslationInfo("Opt-Thief", 4), true, thiefSpawnRate);
+            thiefCanStealWithGuess = CustomOption.Create(405, Types.Neutral, new TranslationInfo("Opt-Thief", 5), false, thiefSpawnRate);
 
             trapperSpawnRate = CustomOption.Create(410, Types.Crewmate, new TranslationInfo(RoleId.Trapper, Trapper.color), rates, null, true);
             trapperCooldown = CustomOption.Create(420, Types.Crewmate, new TranslationInfo("Opt-Trapper", 1), 30f, 5f, 120f, 5f, trapperSpawnRate);
@@ -877,6 +921,7 @@ namespace TheOtherRoles {
             guesserGamemodeNeutralNumber = CustomOption.Create(2002, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 2, Guesser.color), 15f, 1f, 15f, 1f, null, true);
             guesserGamemodeImpNumber = CustomOption.Create(2003, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 3, Guesser.color), 15f, 1f, 15f, 1f, null, true);
             guesserForceJackalGuesser = CustomOption.Create(2007, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 4), false, null, true);
+            guesserForceThiefGuesser = CustomOption.Create(2011, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 11), false, null, true);
             guesserGamemodeHaveModifier = CustomOption.Create(2004, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 5), true, null);
             guesserGamemodeNumberOfShots = CustomOption.Create(2005, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 6), 3f, 1f, 15f, 1f, null);
             guesserGamemodeHasMultipleShotsPerMeeting = CustomOption.Create(2006, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 7), false, null);
@@ -921,19 +966,23 @@ namespace TheOtherRoles {
             hidePlayerNames = CustomOption.Create(6, Types.General, new TranslationInfo("Opt-General", 60), false);
             allowParallelMedBayScans = CustomOption.Create(7, Types.General, new TranslationInfo("Opt-General", 61), false);
             shieldFirstKill = CustomOption.Create(8, Types.General, new TranslationInfo("Opt-General", 62), false);
-            dynamicMap = CustomOption.Create(500, Types.General, new TranslationInfo("Opt-General", 63), false, null, false);
+            finishTasksBeforeHauntingOrZoomingOut = CustomOption.Create(510, Types.General, new TranslationInfo("Opt-General", 99), true);
+            camsNightVision = CustomOption.Create(511, Types.General, new TranslationInfo("Opt-General", 100), false, null, true);
+            camsNoNightVisionIfImpVision = CustomOption.Create(512, Types.General, new TranslationInfo("Opt-General", 101), false, camsNightVision, false);
+            dynamicMap = CustomOption.Create(500, Types.General, new TranslationInfo("Opt-General", 63), true, null, false);
             dynamicMapEnableSkeld = CustomOption.Create(501, Types.General, new TranslationInfo("Opt-General", 64), rates, dynamicMap, false);
             dynamicMapEnableMira = CustomOption.Create(502, Types.General, new TranslationInfo("Opt-General", 65), rates, dynamicMap, false);
             dynamicMapEnablePolus = CustomOption.Create(503, Types.General, new TranslationInfo("Opt-General", 66), rates, dynamicMap, false);
             dynamicMapEnableAirShip = CustomOption.Create(504, Types.General, new TranslationInfo("Opt-General", 67), rates, dynamicMap, false);
             dynamicMapEnableSubmerged = CustomOption.Create(505, Types.General, new TranslationInfo("Opt-General", 68), rates, dynamicMap, false);
+            dynamicMapSeparateSettings = CustomOption.Create(509, Types.General, new TranslationInfo("Opt-General", 96), false, dynamicMap, false);
 
-            blockedRolePairings.Add((byte)RoleId.Vampire, new [] { (byte)RoleId.Warlock});
-            blockedRolePairings.Add((byte)RoleId.Warlock, new [] { (byte)RoleId.Vampire});
-            blockedRolePairings.Add((byte)RoleId.Spy, new [] { (byte)RoleId.Mini});
-            blockedRolePairings.Add((byte)RoleId.Mini, new [] { (byte)RoleId.Spy});
-            blockedRolePairings.Add((byte)RoleId.Vulture, new [] { (byte)RoleId.Cleaner});
-            blockedRolePairings.Add((byte)RoleId.Cleaner, new [] { (byte)RoleId.Vulture});
+            blockedRolePairings.Add((byte)RoleId.Vampire, new[] { (byte)RoleId.Warlock });
+            blockedRolePairings.Add((byte)RoleId.Warlock, new[] { (byte)RoleId.Vampire });
+            blockedRolePairings.Add((byte)RoleId.Spy, new[] { (byte)RoleId.Mini });
+            blockedRolePairings.Add((byte)RoleId.Mini, new[] { (byte)RoleId.Spy });
+            blockedRolePairings.Add((byte)RoleId.Vulture, new[] { (byte)RoleId.Cleaner });
+            blockedRolePairings.Add((byte)RoleId.Cleaner, new[] { (byte)RoleId.Vulture });
         }
     }
 }
