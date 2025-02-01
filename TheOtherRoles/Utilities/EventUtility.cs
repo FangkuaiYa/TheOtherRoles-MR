@@ -4,7 +4,6 @@ using System.Text;
 using UnityEngine;
 using TheOtherRoles;
 using TheOtherRoles.Patches;
-using TheOtherRoles.Players;
 using static TheOtherRoles.TheOtherRoles;
 using System.Linq;
 using InnerNet;
@@ -36,7 +35,7 @@ public static class EventUtility {
     public static void meetingEndsUpdate() {
         if (!isEnabled) return;
         // TODO - Implement Horse hats
-        // CachedPlayer.LocalPlayer.PlayerControl.RpcSetHat(CustomHatLoader.horseHatProductIds[rnd.Next(CustomHatLoader.horseHatProductIds.Count)]);
+        // PlayerControl.LocalPlayer.RpcSetHat(CustomHatLoader.horseHatProductIds[rnd.Next(CustomHatLoader.horseHatProductIds.Count)]);
     }
 
 

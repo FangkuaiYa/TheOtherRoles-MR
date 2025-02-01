@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Hazel;
 using TheOtherRoles.Modules;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 
@@ -43,7 +42,7 @@ namespace TheOtherRoles.Objects
             var trapRenderer = trap.AddComponent<SpriteRenderer>();
             trapRenderer.sprite = getTrapSprite();
             trap.SetActive(false);
-            if (CachedPlayer.LocalPlayer.PlayerControl.PlayerId == Trapper.trapper.PlayerId) trap.SetActive(true);
+            if (PlayerControl.LocalPlayer.PlayerId == Trapper.trapper.PlayerId) trap.SetActive(true);
             trapRenderer.color = Color.white * new Vector4(1, 1, 1, 0.5f);
             this.instanceId = ++instanceCounter;
             traps.Add(this);
@@ -87,14 +86,14 @@ namespace TheOtherRoles.Objects
             Trap t = traps.FirstOrDefault(x => x.instanceId == (int)trapId);
             PlayerControl player = Helpers.playerById(playerId);
             if (Trapper.trapper == null || t == null || player == null) return;
-            bool localIsTrapper = CachedPlayer.LocalPlayer.PlayerControl.PlayerId == Trapper.trapper.PlayerId;
+            bool localIsTrapper = PlayerControl.LocalPlayer.PlayerId == Trapper.trapper.PlayerId;
             if (!trapPlayerIdMap.ContainsKey(playerId)) trapPlayerIdMap.Add(playerId, t);
             t.usedCount++;
             t.triggerable = false;
-            if (playerId == CachedPlayer.LocalPlayer.PlayerControl.PlayerId || playerId == Trapper.trapper.PlayerId)
+            if (playerId == PlayerControl.LocalPlayer.PlayerId || playerId == Trapper.trapper.PlayerId)
             {
                 t.trap.SetActive(true);
-                SoundEffectsManager.play(AssetLoader.customAssets.trapperTrap);
+                SoundEffectsManager.play("trapperTrap");
             }
             player.moveable = false;
             player.NetTransform.Halt();
@@ -125,7 +124,7 @@ namespace TheOtherRoles.Objects
         public static void Update()
         {
             if (Trapper.trapper == null) return;
-            PlayerControl player = CachedPlayer.LocalPlayer.PlayerControl;
+            PlayerControl player = PlayerControl.LocalPlayer;
             Vent vent = MapUtilities.CachedShipStatus.AllVents[0];
             float closestDistance = float.MaxValue;
 
@@ -146,7 +145,7 @@ namespace TheOtherRoles.Objects
             }
             if (target != null && player.PlayerId != Trapper.trapper.PlayerId && !player.Data.IsDead)
             {
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.TriggerTrap, Hazel.SendOption.Reliable, -1);
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TriggerTrap, Hazel.SendOption.Reliable, -1);
                 writer.Write(player.PlayerId);
                 writer.Write(target.instanceId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);

@@ -19,22 +19,21 @@ using Il2CppSystem.Text;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Modules.CustomHats;
 using TheOtherRoles.Patches;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.Patches.OnGameEndPatch;
 
 namespace TheOtherRoles
 {
-    [BepInPlugin(Id, "The Other Roles", VersionString)]
+    [BepInPlugin(Id, "The Other Roles MR", VersionString)]
     [BepInDependency(SubmergedCompatibility.SUBMERGED_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInProcess("Among Us.exe")]
     [ReactorModFlags(ModFlags.RequireOnAllClients)]
     public class TheOtherRolesPlugin : BasePlugin
     {
-        public const string Id = "me.eisbison.theotherroles";
+        public const string Id = "me.miru-y.theotherrolesmr";
 
-        public const string VersionString = "2.9.10";
+        public const string VersionString = "2.9.11";
         public static uint betaDays = 0;  // amount of days for the build to be usable (0 for infinite!)
 
         public static System.Version Version = System.Version.Parse(VersionString);
@@ -99,10 +98,10 @@ namespace TheOtherRoles
 
         public override void Load()
         {
-            AssetLoader.LoadAssets();
             Logger = Log;
             Instance = this;
             //_ = Helpers.checkBeta(); // Exit if running an expired beta
+            _ = Patches.CredentialsPatch.MOTD.loadMOTDs();
             ModTranslation.Load();
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             ViewSeacretMode = Config.Bind("Custom", "View Seacret Mode", false);
@@ -123,8 +122,10 @@ namespace TheOtherRoles
             defaultRegions = ServerManager.DefaultRegions;
             // Removes vanilla Servers
             //ServerManager.DefaultRegions = new Il2CppReferenceArray<IRegionInfo>(new IRegionInfo[0]);
-
             UpdateRegions();
+
+            // Reactor Credits (future use?)
+            // Reactor.Utilities.ReactorCredits.Register("TheOtherRoles", VersionString, betaDays > 0, location => location == Reactor.Utilities.ReactorCredits.Location.PingTracker);
 
             DebugMode = Config.Bind("Custom", "Enable Debug Mode", "false");
             Harmony.PatchAll();
@@ -265,7 +266,7 @@ namespace TheOtherRoles
                     GameData.Instance.AddPlayer(playerControl);
                     AmongUsClient.Instance.Spawn(playerControl, -2, InnerNet.SpawnFlags.None);
 
-                    playerControl.transform.position = CachedPlayer.LocalPlayer.PlayerControl.transform.position;
+                    playerControl.transform.position = PlayerControl.LocalPlayer.transform.position;
 #if true
                     playerControl.GetComponent<DummyBehaviour>().enabled = true;
                     playerControl.NetTransform.enabled = false;
@@ -283,7 +284,7 @@ namespace TheOtherRoles
                 // Terminate round
                 if (Input.GetKeyDown(KeyCode.L))
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ForceEnd, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ForceEnd, Hazel.SendOption.Reliable, -1);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.forceEnd();
                 }
@@ -345,12 +346,12 @@ namespace TheOtherRoles
 
                 if (Input.GetKeyDown(KeyCode.Alpha2))
                 {
-                    MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
-                    killWriter.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
-                    killWriter.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
+                    killWriter.Write(PlayerControl.LocalPlayer.PlayerId);
+                    killWriter.Write(PlayerControl.LocalPlayer.PlayerId);
                     killWriter.Write(byte.MaxValue);
                     AmongUsClient.Instance.FinishRpcImmediately(killWriter);
-                    RPCProcedure.uncheckedMurderPlayer(CachedPlayer.LocalPlayer.PlayerControl.PlayerId, CachedPlayer.LocalPlayer.PlayerControl.PlayerId, Byte.MaxValue);
+                    RPCProcedure.uncheckedMurderPlayer(PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.PlayerId, Byte.MaxValue);
                 }
             }
  

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheOtherRoles.Objects;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 
@@ -14,7 +13,7 @@ namespace TheOtherRoles.Patches
     [HarmonyPatch(typeof(MapBehaviour))]
     static class MapBehaviourPatch
     {
-        public static Dictionary<PlayerControl, SpriteRenderer> herePoints = new();
+        public static Dictionary<Byte, SpriteRenderer> herePoints = new();
 
         public static Sprite Vent = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Vent.png", 150f);
 
@@ -38,17 +37,17 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.FixedUpdate))]
         static void Postfix(MapBehaviour __instance)
         {
-            if (__instance.infectedOverlay.gameObject.active && CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool())
+            if (__instance.infectedOverlay.gameObject.active && PlayerControl.LocalPlayer.Data.IsDead && CustomOptionHolder.deadImpsBlockSabotage.getBool())
             {
                 __instance.Close();
             }
 
             __instance.HerePoint.transform.SetLocalZ(-2.1f);
-            if (Trapper.trapper != null && CachedPlayer.LocalPlayer.PlayerControl.PlayerId == Trapper.trapper.PlayerId)
+            if (Trapper.trapper != null && PlayerControl.LocalPlayer.PlayerId == Trapper.trapper.PlayerId)
             {
                 foreach (PlayerControl player in Trapper.playersOnMap)
                 {
-                    if (herePoints.ContainsKey(player)) continue;
+                    if (herePoints.ContainsKey(player.PlayerId)) continue;
                     Vector3 v = Trap.trapPlayerIdMap[player.PlayerId].trap.transform.position;
                     v /= MapUtilities.CachedShipStatus.MapScale;
                     v.x *= Mathf.Sign(MapUtilities.CachedShipStatus.transform.localScale.x);
@@ -60,44 +59,54 @@ namespace TheOtherRoles.Patches
                     if (Trapper.anonymousMap) player.CurrentOutfit.ColorId = 6;
                     player.SetPlayerMaterialColors(herePoint);
                     player.CurrentOutfit.ColorId = colorId;
-                    herePoints.Add(player, herePoint);
+                    herePoints.Add(player.PlayerId, herePoint);
                 }
-                foreach (var s in herePoints.Where(x => !Trapper.playersOnMap.Contains(x.Key)).ToList())
+                foreach (var s in herePoints.Where(x => !Trapper.playersOnMap.Contains(Helpers.playerById(x.Key))).ToList())
                 {
                     UnityEngine.Object.Destroy(s.Value);
                     herePoints.Remove(s.Key);
                 }
             }
             // Show location of all players on the map for ghosts!
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && (!CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor || CustomOptionHolder.deadImpsBlockSabotage.getBool()))
+            if (PlayerControl.LocalPlayer.Data.IsDead && (!PlayerControl.LocalPlayer.Data.Role.IsImpostor || CustomOptionHolder.deadImpsBlockSabotage.getBool()))
             {
-                foreach (PlayerControl player in CachedPlayer.AllPlayers)
+                foreach (PlayerControl player in PlayerControl.AllPlayerControls)
                 {
-                    if (player == CachedPlayer.LocalPlayer.PlayerControl)
+                    if (player == PlayerControl.LocalPlayer)
                         continue;
                     var alpha = player.Data.IsDead ? 0.25f : 1f;
                     Vector3 v = player.transform.position;
                     v /= MapUtilities.CachedShipStatus.MapScale;
                     v.x *= Mathf.Sign(MapUtilities.CachedShipStatus.transform.localScale.x);
                     v.z = -2.1f;
-                    if (herePoints.ContainsKey(player))
+                    if (herePoints.TryGetValue(player.PlayerId, out _))
                     {
-                        herePoints[player].transform.localPosition = v;
-                        herePoints[player].color = herePoints[player].color.SetAlpha(alpha);
+                        herePoints[player.PlayerId].transform.localPosition = v;
+                        herePoints[player.PlayerId].color = herePoints[player.PlayerId].color.SetAlpha(alpha);
                         continue;
                     }
+
+                    string pointName = $"TOR HerePoint {player.PlayerId}";
+                    var doublePoint = GameObject.Find(pointName);
+                    if (doublePoint != null)
+                    {
+                        doublePoint.Destroy();
+                    }
+
                     var herePoint = UnityEngine.Object.Instantiate(__instance.HerePoint, __instance.HerePoint.transform.parent, true);
+
+                    herePoint.name = pointName;
                     herePoint.transform.localPosition = v;
                     herePoint.enabled = true;
 
                     int colorId = player.CurrentOutfit.ColorId;
                     player.SetPlayerMaterialColors(herePoint);
-                    herePoints.Add(player, herePoint);
+                    herePoints.Add(player.PlayerId, herePoint);
                 }
             }
             foreach (var vent in MapUtilities.CachedShipStatus.AllVents)
             {
-                if ((vent.name.StartsWith("JackInThe") && !(CachedPlayer.LocalPlayer.PlayerControl == Trickster.trickster || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead))) continue; //for trickster vents
+                if ((vent.name.StartsWith("JackInThe") && !(PlayerControl.LocalPlayer == Trickster.trickster || PlayerControl.LocalPlayer.Data.IsDead))) continue; //for trickster vents
 
                 if (!TheOtherRolesPlugin.ShowVentsOnMap.Value)
                 {
@@ -110,7 +119,7 @@ namespace TheOtherRoles.Patches
                 }
 
                 var Instance = DestroyableSingleton<MapTaskOverlay>.Instance;
-                var task = CachedPlayer.LocalPlayer.PlayerControl.myTasks.ToArray().FirstOrDefault(x => x.TaskType == TaskTypes.VentCleaning);
+                var task = PlayerControl.LocalPlayer.myTasks.ToArray().FirstOrDefault(x => x.TaskType == TaskTypes.VentCleaning);
 
                 var location = vent.transform.position / MapUtilities.CachedShipStatus.MapScale;
                 location.z = -2f; //show above sabotage buttons

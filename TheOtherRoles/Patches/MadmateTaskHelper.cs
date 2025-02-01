@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 
@@ -18,7 +17,7 @@ namespace TheOtherRoles.Patches
 
         public static void SetMadmateTasks()
         {
-            PlayerControl me = CachedPlayer.LocalPlayer.PlayerControl;
+            PlayerControl me = PlayerControl.LocalPlayer;
             if (me == null)
                 return;
             NetworkedPlayerInfo playerById = GameData.Instance.GetPlayerById(me.PlayerId);

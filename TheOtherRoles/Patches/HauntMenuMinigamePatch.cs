@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using AmongUs.GameOptions;
 using System.Linq;
-using TheOtherRoles.Players;
 using System;
 using TheOtherRoles.CustomGameModes;
 
@@ -71,7 +70,7 @@ namespace TheOtherRoles.Patches
         public static void UpdatePostfix(HauntMenuMinigame __instance)
         {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode != GameModes.Normal) return;
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor && Vampire.vampire != CachedPlayer.LocalPlayer.PlayerControl)
+            if (PlayerControl.LocalPlayer.Data.Role.IsImpostor && Vampire.vampire != PlayerControl.LocalPlayer)
                 __instance.gameObject.transform.localPosition = new UnityEngine.Vector3(-6f, -1.1f, __instance.gameObject.transform.localPosition.z);
             return;
         }
@@ -81,10 +80,10 @@ namespace TheOtherRoles.Patches
         public static void showOrHideAbilityButtonPostfix(AbilityButton __instance)
         {
             bool isGameMode = GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek || PropHunt.isPropHuntGM || HideNSeek.isHideNSeekGM;
-            if (CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && (CustomOptionHolder.finishTasksBeforeHauntingOrZoomingOut.getBool() || isGameMode))
+            if (PlayerControl.LocalPlayer.Data.IsDead && (CustomOptionHolder.finishTasksBeforeHauntingOrZoomingOut.getBool() || isGameMode))
             {
                 // player has haunt button.
-                var (playerCompleted, playerTotal) = TasksHandler.taskInfo(CachedPlayer.LocalPlayer.PlayerControl.Data);
+                var (playerCompleted, playerTotal) = TasksHandler.taskInfo(PlayerControl.LocalPlayer.Data);
                 int numberOfLeftTasks = playerTotal - playerCompleted;
                 if (numberOfLeftTasks <= 0 || isGameMode)
                     __instance.Show();

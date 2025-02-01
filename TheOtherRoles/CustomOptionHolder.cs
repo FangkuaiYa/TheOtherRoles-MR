@@ -114,6 +114,10 @@ namespace TheOtherRoles
         public static CustomOption jesterCanCallEmergency;
         public static CustomOption jesterHasImpostorVision;
 
+        public static CustomOption amnesiacSpawnRate;
+        public static CustomOption amnesiacShowArrows;
+        public static CustomOption amnesiacResetRole;
+        
         public static CustomOption arsonistSpawnRate;
         public static CustomOption arsonistCooldown;
         public static CustomOption arsonistDuration;
@@ -420,6 +424,8 @@ namespace TheOtherRoles
         public static CustomOption modifierChameleonFadeDuration;
         public static CustomOption modifierChameleonMinVisibility;
 
+        public static CustomOption modifierArmored;
+
         public static CustomOption modifierShifter;
 
         public static CustomOption maxNumberOfMeetings;
@@ -466,6 +472,7 @@ namespace TheOtherRoles
         public static CustomOption guesserGamemodeKillsThroughShield;
         public static CustomOption guesserGamemodeEvilCanKillSpy;
         public static CustomOption guesserGamemodeCantGuessSnitchIfTaksDone;
+        public static CustomOption guesserGamemodeCrewGuesserNumberOfTasks;
         public static CustomOption guesserGamemodeSidekickIsAlwaysGuesser;
 
         // Hide N Seek Gamemode
@@ -662,7 +669,7 @@ namespace TheOtherRoles
             madmateKillerCanFixCommsTask = CustomOption.Create(910000406, Types.Impostor, new TranslationInfo("Opt-KillerCreator", 7), false, killerCreatorSpawnRate);
             // ===========================================================
 
-            mafiaSpawnRate = CustomOption.Create(10, Types.Impostor, new TranslationInfo(RoleId.Mafioso, Janitor.color), rates, null, true);
+            mafiaSpawnRate = CustomOption.Create(10, Types.Impostor, new TranslationInfo("Opt-Mafia", 2, Janitor.color), rates, null, true);
             janitorCooldown = CustomOption.Create(11, Types.Impostor, new TranslationInfo("Opt-Mafia", 1), 30f, 10f, 60f, 2.5f, mafiaSpawnRate);
 
             morphlingSpawnRate = CustomOption.Create(20, Types.Impostor, new TranslationInfo(RoleId.Morphling, Morphling.color), rates, null, true);
@@ -756,6 +763,10 @@ namespace TheOtherRoles
             jesterCanCallEmergency = CustomOption.Create(61, Types.Neutral, new TranslationInfo("Opt-Jester", 1), true, jesterSpawnRate);
             jesterHasImpostorVision = CustomOption.Create(62, Types.Neutral, new TranslationInfo("Opt-Jester", 2), false, jesterSpawnRate);
 
+            amnesiacSpawnRate = CustomOption.Create(616, Types.Neutral, new TranslationInfo(RoleId.Amnesiac, Amnesiac.color), rates, null, true);
+            amnesiacShowArrows = CustomOption.Create(617, Types.Neutral, new TranslationInfo("Opt-Amnesiac", 1), true, amnesiacSpawnRate);
+            amnesiacResetRole = CustomOption.Create(618, Types.Neutral, new TranslationInfo("Opt-Amnesiac", 2), true, amnesiacSpawnRate);
+            
             arsonistSpawnRate = CustomOption.Create(290, Types.Neutral, new TranslationInfo(RoleId.Arsonist, Arsonist.color), rates, null, true);
             arsonistCooldown = CustomOption.Create(291, Types.Neutral, new TranslationInfo("Opt-Arsonist", 1), 12.5f, 2.5f, 60f, 2.5f, arsonistSpawnRate);
             arsonistDuration = CustomOption.Create(292, Types.Neutral, new TranslationInfo("Opt-Arsonist", 2), 3f, 1f, 10f, 1f, arsonistSpawnRate);
@@ -969,22 +980,24 @@ namespace TheOtherRoles
             modifierChameleonFadeDuration = CustomOption.Create(1093, Types.Modifier, new TranslationInfo("Opt-Chameleon", 3), 1f, 0.25f, 10f, 0.25f, modifierChameleon);
             modifierChameleonMinVisibility = CustomOption.Create(1094, Types.Modifier, new TranslationInfo("Opt-Chameleon", 4), new[] { new TranslationInfo("0%"), new TranslationInfo("10%"), new TranslationInfo("20%"), new TranslationInfo("30%"), new TranslationInfo("40%"), new TranslationInfo("50%") }, modifierChameleon);
 
+            modifierArmored = CustomOption.Create(1101, Types.Modifier, new TranslationInfo(RoleId.Armored, Color.yellow), rates, null, true);
+
             modifierShifter = CustomOption.Create(1100, Types.Modifier, new TranslationInfo(RoleId.Shifter, Color.yellow), rates, null, true);
 
             // Guesser Gamemode (2000 - 2999)
-            guesserGamemodeCrewNumber = CustomOption.Create(2001, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 1, Guesser.color), 15f, 1f, 15f, 1f, null, true, heading: "Amount of Guessers");
-            guesserGamemodeNeutralNumber = CustomOption.Create(2002, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 2, Guesser.color), 15f, 1f, 15f, 1f, null);
-            guesserGamemodeImpNumber = CustomOption.Create(2003, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 3, Guesser.color), 15f, 1f, 15f, 1f, null);
+            guesserGamemodeCrewNumber = CustomOption.Create(2001, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 1, Guesser.color), 15f, 0f, 15f, 1f, null, true, heading: "Amount of Guessers");
+            guesserGamemodeNeutralNumber = CustomOption.Create(2002, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 2, Guesser.color), 15f, 0f, 15f, 1f, null);
+            guesserGamemodeImpNumber = CustomOption.Create(2003, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 3, Guesser.color), 15f, 0f, 15f, 1f, null);
             guesserForceJackalGuesser = CustomOption.Create(2007, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 4), false, null, true, heading: "Force Guessers");
             guesserGamemodeSidekickIsAlwaysGuesser = CustomOption.Create(2012, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 12), false, null);
             guesserForceThiefGuesser = CustomOption.Create(2011, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 11), false, null);
             guesserGamemodeHaveModifier = CustomOption.Create(2004, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 5), true, null, true, heading: "General Guesser Settings");
             guesserGamemodeNumberOfShots = CustomOption.Create(2005, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 6), 3f, 1f, 15f, 1f, null);
             guesserGamemodeHasMultipleShotsPerMeeting = CustomOption.Create(2006, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 7), false, null);
+            guesserGamemodeCrewGuesserNumberOfTasks = CustomOption.Create(2013, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 13), 0f, 0f, 15f, 1f, null);
             guesserGamemodeKillsThroughShield = CustomOption.Create(2008, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 8), true, null);
             guesserGamemodeEvilCanKillSpy = CustomOption.Create(2009, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 9), true, null);
             guesserGamemodeCantGuessSnitchIfTaksDone = CustomOption.Create(2010, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 10), true, null);
-            // Care: 2012 already taken!
 
             // Hide N Seek Gamemode (3000 - 3999)
             hideNSeekMap = CustomOption.Create(3020, Types.HideNSeekMain, new TranslationInfo("Opt-HideNSeek-Main", 1, Color.yellow), new [] { new TranslationInfo("Opt-General", 64), new TranslationInfo("Opt-General", 65), new TranslationInfo("Opt-General", 66), new TranslationInfo("Opt-General", 104), new TranslationInfo("Opt-General", 67), new TranslationInfo("Opt-General", 68) }, null, true, onChange: () => { int map = hideNSeekMap.selection; if (map >= 3) map++; GameOptionsManager.Instance.currentNormalGameOptions.MapId = (byte)map; });

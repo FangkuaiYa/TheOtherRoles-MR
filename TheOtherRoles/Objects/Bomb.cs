@@ -1,7 +1,6 @@
 using System;
 using Hazel;
 using TheOtherRoles.Modules;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 
@@ -56,7 +55,7 @@ namespace TheOtherRoles.Objects
 
             bomb.SetActive(false);
             background.SetActive(false);
-            if (CachedPlayer.LocalPlayer.PlayerControl == Bomber.bomber)
+            if (PlayerControl.LocalPlayer == Bomber.bomber)
             {
                 bomb.SetActive(true);
             }
@@ -72,7 +71,7 @@ namespace TheOtherRoles.Objects
                 {
                     bomb.SetActive(true);
                     background.SetActive(true);
-                    playAtPosition(AssetLoader.customAssets.bombFuseBurning, p, Bomber.destructionTime, Bomber.hearRange, true);
+                    SoundEffectsManager.playAtPosition("bombFuseBurning", p, Bomber.destructionTime, Bomber.hearRange, true);
                     Bomber.isActive = true;
 
                     FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Bomber.destructionTime, new Action<float>((x) =>
@@ -94,50 +93,25 @@ namespace TheOtherRoles.Objects
             if (Bomber.bomber != null)
             {
                 var position = b.bomb.transform.position;
-                var distance = Vector2.Distance(position, CachedPlayer.LocalPlayer.PlayerControl.transform.position);  // every player only checks that for their own client (desynct with positions sucks)
-                if (distance < Bomber.destructionRange && !CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                var distance = Vector2.Distance(position, PlayerControl.LocalPlayer.transform.position);  // every player only checks that for their own client (desynct with positions sucks)
+                if (distance < Bomber.destructionRange && !PlayerControl.LocalPlayer.Data.IsDead)
                 {
-                    Helpers.checkMurderAttemptAndKill(Bomber.bomber, CachedPlayer.LocalPlayer.PlayerControl, false, false, true, true);
+                    Helpers.checkMurderAttemptAndKill(Bomber.bomber, PlayerControl.LocalPlayer, false, false, true, true);
 
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareGhostInfo, Hazel.SendOption.Reliable, -1);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
                     writer.Write((byte)RPCProcedure.GhostInfoTypes.DeathReasonAndKiller);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
                     writer.Write((byte)DeadPlayer.CustomDeathReason.Bomb);
                     writer.Write(Bomber.bomber.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
-                    GameHistory.overrideDeathReasonAndKiller(CachedPlayer.LocalPlayer.PlayerControl, DeadPlayer.CustomDeathReason.Bomb, killer: Bomber.bomber);
+                    GameHistory.overrideDeathReasonAndKiller(PlayerControl.LocalPlayer, DeadPlayer.CustomDeathReason.Bomb, killer: Bomber.bomber);
                 }
-                playAtPosition(AssetLoader.customAssets.bombExplosion, position, range: Bomber.hearRange);
+                SoundEffectsManager.playAtPosition("bombExplosion", position, range: Bomber.hearRange);
             }
             Bomber.clearBomb();
             canDefuse = false;
             Bomber.isActive = false;
-        }
-        public static void playAtPosition(AudioClip audioClip, Vector2 position, float maxDuration = 15f, float range = 5f, bool loop = false)
-        {
-            if (!TORMapOptions.enableSoundEffects || !Constants.ShouldPlaySfx()) return;
-            AudioClip clipToPlay = audioClip;
-
-            AudioSource source = SoundManager.Instance.PlaySound(clipToPlay, false, 1f);
-            source.loop = loop;
-            HudManager.Instance.StartCoroutine(Effects.Lerp(maxDuration, new Action<float>((p) =>
-            {
-                if (source != null)
-                {
-                    if (p == 1)
-                    {
-                        source.Stop();
-                    }
-                    float distance, volume;
-                    distance = Vector2.Distance(position, CachedPlayer.LocalPlayer.PlayerControl.GetTruePosition());
-                    if (distance < range)
-                        volume = 1f - (distance / range);
-                    else
-                        volume = 0f;
-                    source.volume = volume;
-                }
-            })));
         }
 
         public static void update()
@@ -154,7 +128,7 @@ namespace TheOtherRoles.Objects
                 Bomber.clearBomb();
             }
 
-            if (Vector2.Distance(CachedPlayer.LocalPlayer.PlayerControl.GetTruePosition(), Bomber.bomb.bomb.transform.position) > 1f) canDefuse = false;
+            if (Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(), Bomber.bomb.bomb.transform.position) > 1f) canDefuse = false;
             else canDefuse = true;
         }
 

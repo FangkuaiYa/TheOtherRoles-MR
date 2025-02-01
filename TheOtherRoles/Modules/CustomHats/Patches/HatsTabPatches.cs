@@ -7,7 +7,6 @@ using HarmonyLib;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using TheOtherRoles.Players;
 
 namespace TheOtherRoles.Modules.CustomHats.Patches;
 
@@ -133,7 +132,7 @@ internal static class HatsTabPatches
             }
             
             colorChip.transform.localPosition = new Vector3(xPos, yPos, -1f);
-            colorChip.Inner.SetHat(hat, hatsTab.HasLocalPlayer() ? CachedPlayer.LocalPlayer.PlayerControl.Data.DefaultOutfit.ColorId : DataManager.Player.Customization.Color);
+            colorChip.Inner.SetHat(hat, hatsTab.HasLocalPlayer() ? PlayerControl.LocalPlayer.Data.DefaultOutfit.ColorId : DataManager.Player.Customization.Color);
             colorChip.Inner.transform.localPosition = hat.ChipOffset;
             colorChip.Tag = hat;
             colorChip.SelectionHighlight.gameObject.SetActive(false);

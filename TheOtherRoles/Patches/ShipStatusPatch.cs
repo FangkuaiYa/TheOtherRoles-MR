@@ -1,7 +1,6 @@
 using AmongUs.GameOptions;
 using HarmonyLib;
 using TheOtherRoles.CustomGameModes;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
@@ -29,7 +28,7 @@ namespace TheOtherRoles.Patches
                 }
                 else
                 {
-                    __result = __instance.MaxLightRadius * (CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor ? PropHunt.hunterVision : PropHunt.propVision);
+                    __result = __instance.MaxLightRadius * (PlayerControl.LocalPlayer.Data.Role.IsImpostor ? PropHunt.hunterVision : PropHunt.propVision);
                 }
                 return false;
             }

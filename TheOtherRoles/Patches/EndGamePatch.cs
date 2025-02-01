@@ -6,7 +6,6 @@ using System.Text;
 using HarmonyLib;
 using Hazel;
 using TheOtherRoles.CustomGameModes;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
@@ -101,9 +100,9 @@ namespace TheOtherRoles.Patches
     }
 
     [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameEnd))]
-    public class OnGameEndPatch
+    public static class OnGameEndPatch
     {
-        private static GameOverReason gameOverReason;
+        public static GameOverReason gameOverReason = GameOverReason.HumansByTask;
         public static void Prefix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
         {
             gameOverReason = endGameResult.GameOverReason;
@@ -183,13 +182,14 @@ namespace TheOtherRoles.Patches
                 }
             }
 
-            // Remove Jester, Arsonist, Vulture, Jackal, former Jackals and Sidekick, Kataomoi from winners (if they win, they'll be readded)
+            // Remove Jester, Arsonist, Vulture, Amnesiac, Jackal, former Jackals and Sidekick, Kataomoi from winners (if they win, they'll be readded)
             List<PlayerControl> notWinners = new List<PlayerControl>();
             if (Jester.jester != null) notWinners.Add(Jester.jester);
             if (Sidekick.sidekick != null) notWinners.Add(Sidekick.sidekick);
             if (Jackal.jackal != null) notWinners.Add(Jackal.jackal);
             if (Arsonist.arsonist != null) notWinners.Add(Arsonist.arsonist);
             if (Vulture.vulture != null) notWinners.Add(Vulture.vulture);
+            if (Amnesiac.amnesiac != null) notWinners.Add(Amnesiac.amnesiac);
             if (Madmate.madmate != null) notWinners.Add(Madmate.madmate);
             if (Lawyer.lawyer != null) notWinners.Add(Lawyer.lawyer);
             if (Pursuer.pursuer != null) notWinners.Add(Pursuer.pursuer);
@@ -299,7 +299,7 @@ namespace TheOtherRoles.Patches
                 {
                     AdditionalTempData.winCondition = WinCondition.LoversTeamWin;
                     EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
-                    foreach (PlayerControl p in CachedPlayer.AllPlayers)
+                    foreach (PlayerControl p in PlayerControl.AllPlayerControls)
                     {
                         if (p == null) continue;
                         if (p == Lovers.lover1 || p == Lovers.lover2)
@@ -349,7 +349,7 @@ namespace TheOtherRoles.Patches
                 AdditionalTempData.winCondition = WinCondition.TaskMasterTeamWin;
                 bool addCrewmateLovers = !Lovers.existingWithKiller();
                 EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
-                foreach (PlayerControl p in CachedPlayer.AllPlayers)
+                foreach (PlayerControl p in PlayerControl.AllPlayerControls)
                 {
                     if (p == null) continue;
                     if (addCrewmateLovers && (p == Lovers.lover1 || p == Lovers.lover2))
@@ -478,7 +478,7 @@ namespace TheOtherRoles.Patches
                 }).ToList<CachedPlayerData>();
                 for (int i = 0; i < list.Count; i++)
                 {
-                    CachedPlayerData cachedPlayerData2 = list[i];
+                    CachedPlayerData playerControlData2 = list[i];
                     int num2 = (i % 2 == 0) ? -1 : 1;
                     int num3 = (i + 1) / 2;
                     float offsetX = isTaskVsMode ? 2f : 1f;
@@ -493,9 +493,9 @@ namespace TheOtherRoles.Patches
                     Vector3 vector = new Vector3(num7, num7, 1f);
                     poolablePlayer.transform.localScale = vector;
                     if (isHappyBirthdayMode)
-                        cachedPlayerData2.IsDead = false;
-                    poolablePlayer.UpdateFromPlayerOutfit(cachedPlayerData2.Outfit, PlayerMaterial.MaskType.ComplexUI, cachedPlayerData2.IsDead, true);
-                    if (cachedPlayerData2.IsDead)
+                        playerControlData2.IsDead = false;
+                    poolablePlayer.UpdateFromPlayerOutfit(playerControlData2.Outfit, PlayerMaterial.MaskType.ComplexUI, playerControlData2.IsDead, true);
+                    if (playerControlData2.IsDead)
                     {
                         poolablePlayer.SetBodyAsGhost();
                         poolablePlayer.SetDeadFlipX(i % 2 == 0);
@@ -504,14 +504,14 @@ namespace TheOtherRoles.Patches
                     {
                         poolablePlayer.SetFlipX(i % 2 == 0);
                     }
-                    poolablePlayer.UpdateFromPlayerOutfit(cachedPlayerData2.Outfit, PlayerMaterial.MaskType.None, cachedPlayerData2.IsDead, true);
+                    poolablePlayer.UpdateFromPlayerOutfit(playerControlData2.Outfit, PlayerMaterial.MaskType.None, playerControlData2.IsDead, true);
 
                     if (!isHappyBirthdayMode)
                     {
                         poolablePlayer.cosmetics.nameText.color = isTaskVsMode ? TaskRacer.getRankTextColor(i + 1) : Color.white;
                         poolablePlayer.cosmetics.nameText.transform.localScale = new Vector3(1f / vector.x, 1f / vector.y, 1f / vector.z);
                         poolablePlayer.cosmetics.nameText.transform.localPosition = new Vector3(poolablePlayer.cosmetics.nameText.transform.localPosition.x, poolablePlayer.cosmetics.nameText.transform.localPosition.y, -15f);
-                        poolablePlayer.cosmetics.nameText.text = cachedPlayerData2.PlayerName;
+                        poolablePlayer.cosmetics.nameText.text = playerControlData2.PlayerName;
                         if (isTaskVsMode)
                         {
                             poolablePlayer.cosmetics.nameText.text += $"\n{TaskRacer.getRankText(i + 1, true)}";
@@ -519,7 +519,7 @@ namespace TheOtherRoles.Patches
 
                         foreach (var data in AdditionalTempData.playerRoles)
                         {
-                            if (data.PlayerName != cachedPlayerData2.PlayerName) continue;
+                            if (data.PlayerName != playerControlData2.PlayerName) continue;
                             var roles =
                             poolablePlayer.cosmetics.nameText.text += $"\n{string.Join("\n", data.Roles.Select(x => Helpers.cs(x.color, x.name)))}";
                         }
@@ -529,7 +529,7 @@ namespace TheOtherRoles.Patches
                         poolablePlayer.cosmetics.nameText.text = "";
                         {
                             var cake = new Objects.BirthdayCake(poolablePlayer.transform, (Objects.BirthdayCake.CakeType)CustomOptionHolder.happyBirthdayMode_CakeType.getFloat(), new Vector3(-1.4f, 0f, 0f), Vector3.one * 1.75f);
-                            cake.SetColorId(cachedPlayerData2.ColorId);
+                            cake.SetColorId(playerControlData2.ColorId);
                         }
                         {
                             var cakeEmoObj = new GameObject("cake_emo");
@@ -646,6 +646,40 @@ namespace TheOtherRoles.Patches
                     textRenderer.color = Color.green;
                     __instance.BackgroundBar.material.SetColor("_Color", Color.green);
                 }
+                else if (AdditionalTempData.winCondition == WinCondition.Default)
+                {
+                    switch (OnGameEndPatch.gameOverReason)
+                    {
+                        case GameOverReason.ImpostorDisconnect:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 23);
+                            textRenderer.color = Color.red;
+                            break;
+                        case GameOverReason.ImpostorByKill:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 24);
+                            textRenderer.color = Color.red;
+                            break;
+                        case GameOverReason.ImpostorBySabotage:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 25);
+                            textRenderer.color = Color.red;
+                            break;
+                        case GameOverReason.ImpostorByVote:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 26);
+                            textRenderer.color = Color.red;
+                            break;
+                        case GameOverReason.HumansByTask:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 27);
+                            textRenderer.color = Color.white;
+                            break;
+                        case GameOverReason.HumansDisconnect:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 28);
+                            textRenderer.color = Color.white;
+                            break;
+                        case GameOverReason.HumansByVote:
+                            textRenderer.text = ModTranslation.GetString("EndGame", 29);
+                            textRenderer.color = Color.white;
+                            break;
+                    }
+                }
 
                 foreach (WinCondition cond in AdditionalTempData.additionalWinConditions)
                 {
@@ -725,11 +759,11 @@ namespace TheOtherRoles.Patches
 
                 if (RPCProcedure.uncheckedEndGameReason != (byte)CustomGameOverReason.Unused)
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
                         (byte)CustomRPC.UncheckedEndGame_Response, Hazel.SendOption.Reliable, -1);
-                    writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
-                    RPCProcedure.uncheckedEndGameResponse(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    RPCProcedure.uncheckedEndGameResponse(PlayerControl.LocalPlayer.PlayerId);
                     if (!AmongUsClient.Instance.AmHost)
                         RPCProcedure.uncheckedEndGameReason = (byte)CustomGameOverReason.Unused;
                 }
@@ -771,7 +805,7 @@ namespace TheOtherRoles.Patches
 
             public static void UncheckedEndGame(GameOverReason reason, bool never_used)
             {
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId,
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId,
                     (byte)CustomRPC.UncheckedEndGame, Hazel.SendOption.Reliable, -1);
                 writer.Write((byte)reason);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);

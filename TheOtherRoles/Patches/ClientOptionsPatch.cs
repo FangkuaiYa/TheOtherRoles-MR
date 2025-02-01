@@ -196,7 +196,7 @@ namespace TheOtherRoles.Patches
                     option.updateSelection(v);
                 }
                 CustomOption.ShareOptionSelections();
-                //CachedPlayer.LocalPlayer.PlayerControl.RpcSyncSettings(GameOptionsData.hostOptionsData);Hmm?Need not it?
+                PlayerControl.LocalPlayer.RpcSyncSettings(GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameOptionsManager.Instance.currentGameOptions, false)); // Hmm?Need not it?
             }
 
             public void Rename(string newPresetName)
@@ -545,9 +545,9 @@ namespace TheOtherRoles.Patches
             }
 
             OnCreateNewPreset();
-            Thread.Sleep(1);
+            //Thread.Sleep(1);
             createNewPresetEditName.Close();
-            Thread.Sleep(3);
+            //Thread.Sleep(3);
             PlayerControl.LocalPlayer.transform.position = new Vector3(-01.58f, 02.37f, 00.00f);
         }
 

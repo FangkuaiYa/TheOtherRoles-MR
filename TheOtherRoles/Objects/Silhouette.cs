@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 namespace TheOtherRoles.Objects
@@ -35,7 +34,7 @@ namespace TheOtherRoles.Objects
             this.visibleForEveryOne = visibleForEveryOne;
             gameObject = new GameObject("Silhouette");
             gameObject.AddSubmergedComponent(SubmergedCompatibility.Classes.ElevatorMover);
-            //Vector3 position = new Vector3(p.x, p.y, CachedPlayer.LocalPlayer.PlayerControl.transform.localPosition.z + 0.001f); // just behind player
+            //Vector3 position = new Vector3(p.x, p.y, PlayerControl.LocalPlayer.transform.localPosition.z + 0.001f); // just behind player
             Vector3 position = new Vector3(p.x, p.y, p.y / 1000f + 0.01f);
             gameObject.transform.position = position;
             gameObject.transform.localPosition = position;
@@ -43,7 +42,7 @@ namespace TheOtherRoles.Objects
             renderer.sprite = getSilhouetteSprite();
             timeRemaining = duration;
             renderer.color = renderer.color.SetAlpha(Yoyo.SilhouetteVisibility);
-            bool visible = visibleForEveryOne || CachedPlayer.LocalPlayer.PlayerControl == Yoyo.yoyo || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead;
+            bool visible = visibleForEveryOne || PlayerControl.LocalPlayer == Yoyo.yoyo || PlayerControl.LocalPlayer.Data.IsDead;
             gameObject.SetActive(visible);
             silhouettes.Add(this);
         }
@@ -58,7 +57,7 @@ namespace TheOtherRoles.Objects
             foreach (Silhouette current in new List<Silhouette>(silhouettes))
             {
                 current.timeRemaining -= Time.fixedDeltaTime;
-                bool visible = current.visibleForEveryOne || CachedPlayer.LocalPlayer.PlayerControl == Yoyo.yoyo || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead;
+                bool visible = current.visibleForEveryOne || PlayerControl.LocalPlayer == Yoyo.yoyo || PlayerControl.LocalPlayer.Data.IsDead;
                 current.gameObject.SetActive(visible);
                 if (visible && current.timeRemaining > 0 && current.timeRemaining < 0.5)
                 {

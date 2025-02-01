@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using AmongUs.GameOptions;
 using HarmonyLib;
 using TheOtherRoles.CustomGameModes;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
@@ -45,7 +47,7 @@ namespace TheOtherRoles.Patches
                 float offset = (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started) ? 0.75f : 0f;
                 if (customPreset)
                 {
-                    customPreset.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + 3 * Vector3.left + new Vector3(0, 0.8f, 0);
+                    customPreset.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + 3 * Vector3.left + new Vector3(0.5f, 0.8f, 0);
                     if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started && customPreset.gameObject.activeSelf)
                         customPreset.gameObject.SetActive(false);
                 }
@@ -78,9 +80,9 @@ namespace TheOtherRoles.Patches
                     try
                     {
                         var GameModeText = GameObject.Find("GameModeText")?.GetComponent<TextMeshPro>();
-                        GameModeText.text = gameModeText == "" ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek ? "Van. HideNSeek" : "Classic") : gameModeText;
+                        GameModeText.text = gameModeText == "" ? (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek ? ModTranslation.GetString("lobbyText", 4) : ModTranslation.GetString("lobbyText", 5)) : gameModeText;
                         var ModeLabel = GameObject.Find("ModeLabel")?.GetComponentInChildren<TextMeshPro>();
-                        ModeLabel.text = "Game Mode";
+                        ModeLabel.text = ModTranslation.GetString("lobbyText", 3);
                     }
                     catch { }
                 }
@@ -153,16 +155,62 @@ namespace TheOtherRoles.Patches
                 if (renderer != null)
                 {
                     float fadeDuration = 1f;
-                    instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) => {
+                    instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) =>
+                    {
                         renderer.color = new Color(1, 1, 1, 1 - p);
                         if (p == 1)
                         {
                             renderer.sprite = TORMapOptions.enableHorseMode ? horseBannerSprite : bannerSprite;
-                            instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) => {
+                            instance.StartCoroutine(Effects.Lerp(fadeDuration, new Action<float>((p) =>
+                            {
                                 renderer.color = new Color(1, 1, 1, p);
                             })));
                         }
                     })));
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.LateUpdate))]
+        public static class MOTD
+        {
+            public static List<string> motds = new();
+            private static float timer;
+            private static float maxTimer = 5f;
+            private static int currentIndex;
+
+            public static void Postfix()
+            {
+                if (motds.Count == 0)
+                {
+                    timer = maxTimer;
+                    return;
+                }
+                if (motds.Count > currentIndex && LogoPatch.motdText != null)
+                    LogoPatch.motdText.SetText(motds[currentIndex]);
+                else return;
+
+                // fade in and out:
+                float alpha = Mathf.Clamp01(Mathf.Min(new float[] { timer, maxTimer - timer }));
+                if (motds.Count == 1) alpha = 1;
+                LogoPatch.motdText.color = LogoPatch.motdText.color.SetAlpha(alpha);
+                timer -= Time.deltaTime;
+                if (timer <= 0)
+                {
+                    timer = maxTimer;
+                    currentIndex = (currentIndex + 1) % motds.Count;
+                }
+            }
+
+            public static async Task loadMOTDs()
+            {
+                HttpClient client = new();
+                HttpResponseMessage response = await client.GetAsync("https://raw.githubusercontent.com/TheOtherRolesAU/MOTD/main/motd.txt");
+                response.EnsureSuccessStatusCode();
+                string motds = await response.Content.ReadAsStringAsync();
+                foreach (string line in motds.Split("\n", StringSplitOptions.RemoveEmptyEntries))
+                {
+                    MOTD.motds.Add(line);
                 }
             }
         }

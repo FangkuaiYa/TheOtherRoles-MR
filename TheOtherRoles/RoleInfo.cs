@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
@@ -34,13 +33,8 @@ namespace TheOtherRoles
         TranslationInfo introDescription_ = null;
         TranslationInfo shortDescription_ = null;
 
-        public static RoleInfo jester = new RoleInfo(Jester.color, RoleId.Jester, true);
-        public static RoleInfo mayor = new RoleInfo(Mayor.color, RoleId.Mayor);
-        public static RoleInfo portalmaker = new RoleInfo(Portalmaker.color, RoleId.Portalmaker);
-        public static RoleInfo engineer = new RoleInfo(Engineer.color, RoleId.Engineer);
-        public static RoleInfo sheriff = new RoleInfo(Sheriff.color, RoleId.Sheriff);
-        public static RoleInfo deputy = new RoleInfo(Sheriff.color, RoleId.Deputy);
-        public static RoleInfo lighter = new RoleInfo(Lighter.color, RoleId.Lighter);
+        // Impostor Role
+        public static RoleInfo impostor = new RoleInfo(Palette.ImpostorRed, RoleId.Impostor);
         public static RoleInfo godfather = new RoleInfo(Godfather.color, RoleId.Godfather);
         public static RoleInfo mafioso = new RoleInfo(Mafioso.color, RoleId.Mafioso);
         public static RoleInfo janitor = new RoleInfo(Janitor.color, RoleId.Janitor);
@@ -53,6 +47,40 @@ namespace TheOtherRoles
         public static RoleInfo cleaner = new RoleInfo(Cleaner.color, RoleId.Cleaner);
         public static RoleInfo warlock = new RoleInfo(Warlock.color, RoleId.Warlock);
         public static RoleInfo bountyHunter = new RoleInfo(BountyHunter.color, RoleId.BountyHunter);
+        public static RoleInfo witch = new RoleInfo(Witch.color, RoleId.Witch);
+        public static RoleInfo ninja = new RoleInfo(Ninja.color, RoleId.Ninja);
+        public static RoleInfo bomber = new RoleInfo(Bomber.color, RoleId.Bomber);
+        public static RoleInfo yoyo = new RoleInfo(Yoyo.color, RoleId.Yoyo);
+        public static RoleInfo madmate = new RoleInfo(Madmate.color, RoleId.Madmate);
+        public static RoleInfo evilYasuna = new RoleInfo(Palette.ImpostorRed, RoleId.EvilYasuna);
+        //public static RoleInfo doorHacker = new RoleInfo(DoorHacker.color, RoleId.DoorHacker);
+        public static RoleInfo killerCreator = new RoleInfo(KillerCreator.color, RoleId.KillerCreator);
+        public static RoleInfo madmateKiller = new RoleInfo(MadmateKiller.color, RoleId.MadmateKiller);
+
+        // Neutral Role
+        public static RoleInfo jester = new RoleInfo(Jester.color, RoleId.Jester, true);
+        public static RoleInfo jackal = new RoleInfo(Jackal.color, RoleId.Jackal, true);
+        public static RoleInfo sidekick = new RoleInfo(Sidekick.color, RoleId.Sidekick, true);
+        public static RoleInfo arsonist = new RoleInfo(Arsonist.color, RoleId.Arsonist, true);
+        public static RoleInfo badGuesser = new RoleInfo(Palette.ImpostorRed, RoleId.EvilGuesser);
+        public static RoleInfo vulture = new RoleInfo(Vulture.color, RoleId.Vulture, true);
+        public static RoleInfo amnesiac = new RoleInfo(Amnesiac.color, RoleId.Amnesiac, true);
+        public static RoleInfo lawyer = new RoleInfo(Lawyer.color, RoleId.Lawyer, true);
+        public static RoleInfo prosecutor = new RoleInfo(Lawyer.color, RoleId.Prosecutor, true);
+        public static RoleInfo pursuer = new RoleInfo(Pursuer.color, RoleId.Pursuer);
+        public static RoleInfo thief = new RoleInfo(Thief.color, RoleId.Thief, true);
+        public static RoleInfo kataomoi = new RoleInfo(Kataomoi.color, RoleId.Kataomoi, true);
+        public static RoleInfo yasuna = new RoleInfo(Yasuna.color, RoleId.Yasuna);
+        public static RoleInfo yasunaJr = new RoleInfo(YasunaJr.color, RoleId.YasunaJr);
+
+        // Crewmate Role
+        public static RoleInfo goodGuesser = new RoleInfo(Guesser.color, RoleId.NiceGuesser);
+        public static RoleInfo mayor = new RoleInfo(Mayor.color, RoleId.Mayor);
+        public static RoleInfo portalmaker = new RoleInfo(Portalmaker.color, RoleId.Portalmaker);
+        public static RoleInfo engineer = new RoleInfo(Engineer.color, RoleId.Engineer);
+        public static RoleInfo sheriff = new RoleInfo(Sheriff.color, RoleId.Sheriff);
+        public static RoleInfo deputy = new RoleInfo(Sheriff.color, RoleId.Deputy);
+        public static RoleInfo lighter = new RoleInfo(Lighter.color, RoleId.Lighter);
         public static RoleInfo detective = new RoleInfo(Detective.color, RoleId.Detective);
         public static RoleInfo timeMaster = new RoleInfo(TimeMaster.color, RoleId.TimeMaster);
         public static RoleInfo medic = new RoleInfo(Medic.color, RoleId.Medic);
@@ -61,41 +89,18 @@ namespace TheOtherRoles
         public static RoleInfo hacker = new RoleInfo(Hacker.color, RoleId.Hacker);
         public static RoleInfo tracker = new RoleInfo(Tracker.color, RoleId.Tracker);
         public static RoleInfo snitch = new RoleInfo(Snitch.color, RoleId.Snitch);
-        public static RoleInfo jackal = new RoleInfo(Jackal.color, RoleId.Jackal, true);
-        public static RoleInfo sidekick = new RoleInfo(Sidekick.color, RoleId.Sidekick, true);
         public static RoleInfo spy = new RoleInfo(Spy.color, RoleId.Spy);
         public static RoleInfo securityGuard = new RoleInfo(SecurityGuard.color, RoleId.SecurityGuard);
-        public static RoleInfo arsonist = new RoleInfo(Arsonist.color, RoleId.Arsonist, true);
-        public static RoleInfo goodGuesser = new RoleInfo(Guesser.color, RoleId.NiceGuesser);
-        public static RoleInfo badGuesser = new RoleInfo(Palette.ImpostorRed, RoleId.EvilGuesser);
-        public static RoleInfo vulture = new RoleInfo(Vulture.color, RoleId.Vulture, true);
         public static RoleInfo medium = new RoleInfo(Medium.color, RoleId.Medium);
-        public static RoleInfo madmate = new RoleInfo(Madmate.color, RoleId.Madmate);
         public static RoleInfo trapper = new RoleInfo(Trapper.color, RoleId.Trapper);
-        public static RoleInfo lawyer = new RoleInfo(Lawyer.color, RoleId.Lawyer, true);
-        public static RoleInfo prosecutor = new RoleInfo(Lawyer.color, RoleId.Prosecutor, true);
-        public static RoleInfo pursuer = new RoleInfo(Pursuer.color, RoleId.Pursuer);
-        public static RoleInfo impostor = new RoleInfo(Palette.ImpostorRed, RoleId.Impostor);
+        public static RoleInfo taskMaster = new RoleInfo(TaskMaster.color, RoleId.TaskMaster);
         public static RoleInfo crewmate = new RoleInfo(Color.white, RoleId.Crewmate);
-        public static RoleInfo witch = new RoleInfo(Witch.color, RoleId.Witch);
-        public static RoleInfo ninja = new RoleInfo(Ninja.color, RoleId.Ninja);
-        public static RoleInfo thief = new RoleInfo(Thief.color, RoleId.Thief, true);
-        public static RoleInfo bomber = new RoleInfo(Bomber.color, RoleId.Bomber);
-        public static RoleInfo yoyo = new RoleInfo(Yoyo.color, RoleId.Yoyo);
 
+        // Custom Game Mode Role
         public static RoleInfo hunter = new RoleInfo(Palette.ImpostorRed, RoleId.Impostor, false, false, ModTranslation.GetRoleName(RoleId.Hunter, Palette.ImpostorRed), ModTranslation.GetRoleIntroDesc(RoleId.Hunter, Palette.ImpostorRed), ModTranslation.GetRoleShortDesc(RoleId.Hunter, Palette.ImpostorRed));
         public static RoleInfo hunted = new RoleInfo(Color.white, RoleId.Crewmate, false, false, ModTranslation.GetRoleName(RoleId.Hunted, Color.white), ModTranslation.GetRoleIntroDesc(RoleId.Hunted, Color.white), ModTranslation.GetRoleShortDesc(RoleId.Hunted, Color.white));
         
         public static RoleInfo prop = new RoleInfo(Color.white, RoleId.Crewmate);
-
-        public static RoleInfo yasuna = new RoleInfo(Yasuna.color, RoleId.Yasuna);
-        public static RoleInfo yasunaJr = new RoleInfo(YasunaJr.color, RoleId.YasunaJr);
-        public static RoleInfo evilYasuna = new RoleInfo(Palette.ImpostorRed, RoleId.EvilYasuna);
-        public static RoleInfo taskMaster = new RoleInfo(TaskMaster.color, RoleId.TaskMaster);
-        //public static RoleInfo doorHacker = new RoleInfo(DoorHacker.color, RoleId.DoorHacker);
-        public static RoleInfo kataomoi = new RoleInfo(Kataomoi.color, RoleId.Kataomoi, true);
-        public static RoleInfo killerCreator = new RoleInfo(KillerCreator.color, RoleId.KillerCreator);
-        public static RoleInfo madmateKiller = new RoleInfo(MadmateKiller.color, RoleId.MadmateKiller);
 
         // Task Vs Mode
         public static RoleInfo taskRacer = new RoleInfo(TaskRacer.color, RoleId.TaskRacer);
@@ -111,6 +116,7 @@ namespace TheOtherRoles
         public static RoleInfo vip = new RoleInfo(Color.yellow, RoleId.Vip, false, true);
         public static RoleInfo invert = new RoleInfo(Color.yellow, RoleId.Invert, false, true);
         public static RoleInfo chameleon = new RoleInfo(Color.yellow, RoleId.Chameleon, false, true);
+        public static RoleInfo armored = new RoleInfo(Color.yellow, RoleId.Armored, false, true);
         public static RoleInfo shifter = new RoleInfo(Color.yellow, RoleId.Shifter, false, true);
 
 
@@ -139,6 +145,7 @@ namespace TheOtherRoles
             jackal,
             sidekick,
             vulture,
+            amnesiac,
             pursuer,
             lawyer,
             thief,
@@ -173,6 +180,7 @@ namespace TheOtherRoles
             vip,
             invert,
             chameleon,
+            armored,
             shifter,
             yasuna,
             yasunaJr,
@@ -196,7 +204,7 @@ namespace TheOtherRoles
             if (showModifier)
             {
                 // after dead modifier
-                if (!CustomOptionHolder.modifiersAreHidden.getBool() || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended)
+                if (!CustomOptionHolder.modifiersAreHidden.getBool() || PlayerControl.LocalPlayer.Data.IsDead || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended)
                 {
                     if (Bait.bait.Any(x => x.PlayerId == p.PlayerId)) infos.Add(bait);
                     if (Bloody.bloody.Any(x => x.PlayerId == p.PlayerId)) infos.Add(bloody);
@@ -209,6 +217,7 @@ namespace TheOtherRoles
                 if (p == Mini.mini) infos.Add(mini);
                 if (Invert.invert.Any(x => x.PlayerId == p.PlayerId)) infos.Add(invert);
                 if (Chameleon.chameleon.Any(x => x.PlayerId == p.PlayerId)) infos.Add(chameleon);
+                if (p == Armored.armored) infos.Add(armored);
                 if (p == Shifter.shifter) infos.Add(shifter);
             }
 
@@ -254,6 +263,7 @@ namespace TheOtherRoles
             if (p == Guesser.evilGuesser) infos.Add(badGuesser);
             if (p == BountyHunter.bountyHunter) infos.Add(bountyHunter);
             if (p == Vulture.vulture) infos.Add(vulture);
+            if (p == Amnesiac.amnesiac) infos.Add(amnesiac);
             if (p == Medium.medium) infos.Add(medium);
             if (p == Madmate.madmate) infos.Add(madmate);
             if (p == Lawyer.lawyer && !Lawyer.isProsecutor) infos.Add(lawyer);
@@ -302,13 +312,21 @@ namespace TheOtherRoles
                     roleList[0] = RoleInfo.crewmate;
 
                 roleName = String.Join(" ", roleList.Select(x => useColors ? Helpers.cs(x.color, x.name) : x.name).ToArray());
-                if (Lawyer.target != null && p.PlayerId == Lawyer.target.PlayerId && CachedPlayer.LocalPlayer.PlayerControl != Lawyer.target) roleName += (useColors ? Helpers.cs(Pursuer.color, " §") : " §");
-                if (HandleGuesser.isGuesserGm && HandleGuesser.isGuesser(p.PlayerId)) roleName += ModTranslation.GetString("Game-Guesser", 1);
+                if (Lawyer.target != null && p.PlayerId == Lawyer.target.PlayerId && PlayerControl.LocalPlayer != Lawyer.target) roleName += (useColors ? Helpers.cs(Pursuer.color, " §") : " §");
+                if (HandleGuesser.isGuesserGm && HandleGuesser.isGuesser(p.PlayerId))
+                {
+                    int remainingShots = HandleGuesser.remainingShots(p.PlayerId);
+                    var (playerCompleted, playerTotal) = TasksHandler.taskInfo(p.Data);
+                    if (!Helpers.isEvil(p) && playerCompleted < HandleGuesser.tasksToUnlock || remainingShots == 0)
+                        roleName += Helpers.cs(Color.gray, ModTranslation.GetString("Game-Guesser", 1));
+                    else
+                        roleName += Helpers.cs(Color.white, ModTranslation.GetString("Game-Guesser", 1));
+                }
                 if (!suppressGhostInfo && p != null)
                 {
-                    if (p == Shifter.shifter && (CachedPlayer.LocalPlayer.PlayerControl == Shifter.shifter || Helpers.shouldShowGhostInfo()) && Shifter.futureShift != null)
+                    if (p == Shifter.shifter && (PlayerControl.LocalPlayer == Shifter.shifter || Helpers.shouldShowGhostInfo()) && Shifter.futureShift != null)
                         roleName += Helpers.cs(Color.yellow, " ← " + Shifter.futureShift.Data.PlayerName);
-                    if (p == Vulture.vulture && (CachedPlayer.LocalPlayer.PlayerControl == Vulture.vulture || Helpers.shouldShowGhostInfo()))
+                    if (p == Vulture.vulture && (PlayerControl.LocalPlayer == Vulture.vulture || Helpers.shouldShowGhostInfo()))
                         roleName = roleName + Helpers.cs(Vulture.color, string.Format(ModTranslation.GetString("Opt-GhostInfo", 1), Vulture.vultureNumberToWin - Vulture.eatenBodies));
                     if (Helpers.shouldShowGhostInfo())
                     {
@@ -333,7 +351,7 @@ namespace TheOtherRoles
                         if (Arsonist.dousedPlayers.Contains(p))
                             roleName = Helpers.cs(Arsonist.color, "♨ ") + roleName;
                         if (p == Arsonist.arsonist)
-                            roleName = roleName + Helpers.cs(Arsonist.color, string.Format(ModTranslation.GetString("Opt-GhostInfo", 9), CachedPlayer.AllPlayers.Count(x => { return x.PlayerControl != Arsonist.arsonist && !x.Data.IsDead && !x.Data.Disconnected && !Arsonist.dousedPlayers.Any(y => y.PlayerId == x.PlayerId); })));
+                            roleName = roleName + Helpers.cs(Arsonist.color, string.Format(ModTranslation.GetString("Opt-GhostInfo", 9), PlayerControl.AllPlayerControls.ToArray().Count(x => { return x != Arsonist.arsonist && !x.Data.IsDead && !x.Data.Disconnected && !Arsonist.dousedPlayers.Any(y => y.PlayerId == x.PlayerId); })));
                         if (p == Jackal.fakeSidekick)
                             roleName = Helpers.cs(Sidekick.color, ModTranslation.GetString("Opt-GhostInfo", 10)) + roleName;
                         // Death Reason on Ghosts

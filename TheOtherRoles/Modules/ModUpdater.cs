@@ -20,8 +20,8 @@ namespace TheOtherRoles.Modules
 {
     public class ModUpdater : MonoBehaviour
     {
-        public const string RepositoryOwner = "TheOtherRolesAU";
-        public const string RepositoryName = "TheOtherRoles";
+        public const string RepositoryOwner = "FangkuaiYa";
+        public const string RepositoryName = "TheOtherRoles-MR";
         public static ModUpdater Instance { get; private set; }
 
         public ModUpdater(IntPtr ptr) : base(ptr) { }
@@ -274,7 +274,7 @@ namespace TheOtherRoles.Modules
         [JsonPropertyName("assets")]
         public List<GithubAsset> Assets { get; set; }
 
-        public Version Version => Version.Parse(Tag.Replace("v", string.Empty));
+        public Version Version => Version.Parse(Tag.Replace("MR_v", string.Empty));
 
         public bool IsNewer(Version version)
         {

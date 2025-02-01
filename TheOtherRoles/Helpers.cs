@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +9,6 @@ using Hazel;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Patches;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using Unity.Services.Core.Telemetry.Internal;
 using UnityEngine;
@@ -128,39 +127,39 @@ namespace TheOtherRoles
             StreamReader textStreamReader = new StreamReader(stream);
             return textStreamReader.ReadToEnd();
         }
-        public static AudioClip loadAudioClipFromResources(string path, string clipName = "UNNAMED_TOR_AUDIO_CLIP")
-        {
-            // must be "raw (headerless) 2-channel signed 32 bit pcm (le)" (can e.g. use Audacity?to export)
-            try
-            {
+
+        /* This function has been removed from TOR because we switched to assetbundles for compressed audio. leaving it here for reference - Gendelo
+        public static AudioClip loadAudioClipFromResources(string path, string clipName = "UNNAMED_TOR_AUDIO_CLIP") {
+
+            // must be "raw (headerless) 2-channel signed 32 bit pcm (le) 48kHz" (can e.g. use Audacity® to export )
+            try {
                 Assembly assembly = Assembly.GetExecutingAssembly();
                 Stream stream = assembly.GetManifestResourceStream(path);
                 var byteAudio = new byte[stream.Length];
                 _ = stream.Read(byteAudio, 0, (int)stream.Length);
                 float[] samples = new float[byteAudio.Length / 4]; // 4 bytes per sample
                 int offset;
-                for (int i = 0; i < samples.Length; i++)
-                {
+                for (int i = 0; i < samples.Length; i++) {
                     offset = i * 4;
                     samples[i] = (float)BitConverter.ToInt32(byteAudio, offset) / Int32.MaxValue;
                 }
                 int channels = 2;
                 int sampleRate = 48000;
                 AudioClip audioClip = AudioClip.Create(clipName, samples.Length / 2, channels, sampleRate, false);
+                audioClip.hideFlags |= HideFlags.HideAndDontSave | HideFlags.DontSaveInEditor;
                 audioClip.SetData(samples, 0);
                 return audioClip;
-            }
-            catch
-            {
+            } catch {
                 System.Console.WriteLine("Error loading AudioClip from resources: " + path);
             }
             return null;
 
-            /* Usage example:
-            AudioClip exampleClip = Helpers.loadAudioClipFromResources("TheOtherRoles.Resources.exampleClip.raw");
-            if (Constants.ShouldPlaySfx()) SoundManager.Instance.PlaySound(exampleClip, false, 0.8f);
-            */
-        }
+            // Usage example:
+            //AudioClip exampleClip = Helpers.loadAudioClipFromResources("TheOtherRoles.Resources.exampleClip.raw");
+            //if (Constants.ShouldPlaySfx()) SoundManager.Instance.PlaySound(exampleClip, false, 0.8f);
+            
+        }*/
+
         public static bool existVitals()
         {
             switch ((MapId)GameOptionsManager.Instance.currentNormalGameOptions.MapId)
@@ -212,7 +211,7 @@ namespace TheOtherRoles
         }
         public static PlayerControl playerById(byte id)
         {
-            foreach (PlayerControl player in CachedPlayer.AllPlayers)
+            foreach (PlayerControl player in PlayerControl.AllPlayerControls)
                 if (player.PlayerId == id)
                     return player;
             return null;
@@ -221,7 +220,7 @@ namespace TheOtherRoles
         public static Dictionary<byte, PlayerControl> allPlayersById()
         {
             Dictionary<byte, PlayerControl> res = new Dictionary<byte, PlayerControl>();
-            foreach (PlayerControl player in CachedPlayer.AllPlayers)
+            foreach (PlayerControl player in PlayerControl.AllPlayerControls)
                 res.Add(player.PlayerId, player);
             return res;
         }
@@ -230,7 +229,7 @@ namespace TheOtherRoles
         {
             // Murder the bitten player and reset bitten (regardless whether the kill was successful or not)
             Helpers.checkMurderAttemptAndKill(Vampire.vampire, Vampire.bitten, true, false);
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.VampireSetBitten, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VampireSetBitten, Hazel.SendOption.Reliable, -1);
             writer.Write(byte.MaxValue);
             writer.Write(byte.MaxValue);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -316,7 +315,15 @@ namespace TheOtherRoles
             if (player == Madmate.madmate)
                 return !Madmate.noticeImpostors;
 
-            return (player == Jester.jester || player == Jackal.jackal || player == Sidekick.sidekick || player == Arsonist.arsonist || player == Vulture.vulture || Jackal.formerJackals.Any(x => x == player) || player == Kataomoi.kataomoi || player == MadmateKiller.madmateKiller);
+            return player == Jester.jester ||
+                   player == Jackal.jackal ||
+                   player == Sidekick.sidekick ||
+                   player == Arsonist.arsonist ||
+                   player == Vulture.vulture ||
+                   Jackal.formerJackals.Any(x => x == player) ||
+                   player == Kataomoi.kataomoi ||
+                   player == Amnesiac.amnesiac ||
+                   player == MadmateKiller.madmateKiller;
         }
 
         public static bool canBeErased(this PlayerControl player)
@@ -326,7 +333,7 @@ namespace TheOtherRoles
 
         public static bool shouldShowGhostInfo()
         {
-            return CachedPlayer.LocalPlayer.PlayerControl != null && CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && TORMapOptions.ghostsSeeInformation || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended;
+            return PlayerControl.LocalPlayer != null && PlayerControl.LocalPlayer.Data.IsDead && TORMapOptions.ghostsSeeInformation || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended;
         }
 
 
@@ -373,7 +380,7 @@ namespace TheOtherRoles
         }
         public static bool MushroomSabotageActive()
         {
-            return CachedPlayer.LocalPlayer.PlayerControl.myTasks.ToArray().Any((x) => x.TaskType == TaskTypes.MushroomMixupSabotage);
+            return PlayerControl.LocalPlayer.myTasks.ToArray().Any((x) => x.TaskType == TaskTypes.MushroomMixupSabotage);
         }
 
         public static bool sabotageActive()
@@ -448,7 +455,7 @@ namespace TheOtherRoles
 
         public static bool hidePlayerName(PlayerControl target)
         {
-            return hidePlayerName(CachedPlayer.LocalPlayer.PlayerControl, target);
+            return hidePlayerName(PlayerControl.LocalPlayer, target);
         }
 
         public static bool hidePlayerName(PlayerControl source, PlayerControl target)
@@ -502,7 +509,7 @@ namespace TheOtherRoles
             target.RawSetColor(colorId);
             target.RawSetVisor(visorId, colorId);
             target.RawSetHat(hatId, colorId);
-            target.RawSetName(hidePlayerName(CachedPlayer.LocalPlayer.PlayerControl, target) ? "" : playerName);
+            target.RawSetName(hidePlayerName(PlayerControl.LocalPlayer, target) ? "" : playerName);
 
 
             SkinViewData nextSkin = null;
@@ -563,6 +570,56 @@ namespace TheOtherRoles
             })));
         }
 
+        public static void turnToCrewmate(PlayerControl player)
+        {
+
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TurnToCrewmate, Hazel.SendOption.Reliable, -1);
+            writer.Write(player.PlayerId);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            RPCProcedure.turnToCrewmate(player.PlayerId);
+            foreach (var player2 in PlayerControl.AllPlayerControls)
+            {
+                if (player2.Data.Role.IsImpostor && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
+                {
+                    player.cosmetics.nameText.color = Palette.White;
+                }
+            }
+
+        }
+
+        public static void turnToCrewmate(List<PlayerControl> players, PlayerControl player)
+        {
+            foreach (PlayerControl p in players)
+            {
+                if (p == player) continue;
+                turnToCrewmate(p);
+            }
+        }
+        public static void turnToImpostorRPC(PlayerControl player)
+        {
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TurnToImpostor, Hazel.SendOption.Reliable, -1);
+            writer.Write(player.PlayerId);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+            RPCProcedure.turnToImpostor(player.PlayerId);
+        }
+
+        public static void turnToImpostor(PlayerControl player)
+        {
+            player.Data.Role.TeamType = RoleTeamTypes.Impostor;
+            RoleManager.Instance.SetRole(player, RoleTypes.Impostor);
+            player.SetKillTimer(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown);
+
+            System.Console.WriteLine("PROOF I AM IMP VANILLA ROLE: " + player.Data.Role.IsImpostor);
+
+            foreach (var player2 in PlayerControl.AllPlayerControls)
+            {
+                if (player2.Data.Role.IsImpostor && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
+                {
+                    player.cosmetics.nameText.color = Palette.ImpostorRed;
+                }
+            }
+        }
+
         public static void Destroy(this UnityObject obj)
         {
             UnityObject.Destroy(obj);
@@ -591,14 +648,33 @@ namespace TheOtherRoles
                 roleCouldUse = true;
             else if (player.Data?.Role != null && player.Data.Role.CanVent)
             {
-                if (Janitor.janitor != null && Janitor.janitor == CachedPlayer.LocalPlayer.PlayerControl)
+                if (Janitor.janitor != null && Janitor.janitor == PlayerControl.LocalPlayer)
                     roleCouldUse = false;
-                else if (Mafioso.mafioso != null && Mafioso.mafioso == CachedPlayer.LocalPlayer.PlayerControl && Godfather.godfather != null && !Godfather.godfather.Data.IsDead)
+                else if (Mafioso.mafioso != null && Mafioso.mafioso == PlayerControl.LocalPlayer && Godfather.godfather != null && !Godfather.godfather.Data.IsDead)
                     roleCouldUse = false;
                 else
                     roleCouldUse = true;
             }
             return roleCouldUse;
+        }
+
+        public static bool checkArmored(PlayerControl target, bool breakShield, bool showShield, bool additionalCondition = true)
+        {
+            if (target != null && Armored.armored != null && Armored.armored == target && !Armored.isBrokenArmor && additionalCondition)
+            {
+                if (breakShield)
+                {
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.BreakArmor, Hazel.SendOption.Reliable, -1);
+                    AmongUsClient.Instance.FinishRpcImmediately(writer);
+                    RPCProcedure.breakArmor();
+                }
+                if (showShield)
+                {
+                    target.ShowFailedMurder();
+                }
+                return true;
+            }
+            return false;
         }
 
         public static MurderAttemptResult checkMuderAttempt(PlayerControl killer, PlayerControl target, bool blockRewind = false, bool ignoreBlank = false, bool ignoreIfKillerIsDead = false, bool ignoreMedic = false)
@@ -617,7 +693,7 @@ namespace TheOtherRoles
             // Handle blank shot
             if (Pursuer.blankedList.Any(x => x.PlayerId == killer.PlayerId))
             {
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.SetBlanked, Hazel.SendOption.Reliable, -1);
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetBlanked, Hazel.SendOption.Reliable, -1);
                 writer.Write(killer.PlayerId);
                 writer.Write((byte)0);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -632,7 +708,7 @@ namespace TheOtherRoles
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)CustomRPC.ShieldedMurderAttempt, Hazel.SendOption.Reliable, -1);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
                 RPCProcedure.shieldedMurderAttempt();
-                SoundEffectsManager.play(AssetLoader.customAssets.fail);
+                SoundEffectsManager.play("fail");
                 return MurderAttemptResult.SuppressKill;
             }
 
@@ -657,8 +733,16 @@ namespace TheOtherRoles
             // Thief if hit crew only kill if setting says so, but also kill the thief.
             else if (Thief.isFailedThiefKill(target, killer, targetRole))
             {
-                Thief.suicideFlag = true;
+                if (!checkArmored(killer, true, true))
+                    Thief.suicideFlag = true;
                 return MurderAttemptResult.SuppressKill;
+            }
+
+            // Block Armored with armor kill
+
+            else if (checkArmored(target, true, killer == PlayerControl.LocalPlayer, Sheriff.sheriff == null || killer.PlayerId != Sheriff.sheriff.PlayerId || isEvil(target) && Sheriff.canKillNeutrals || isKiller(target)))
+            {
+                return MurderAttemptResult.BlankKill;
             }
 
             // Block hunted with time shield kill
@@ -682,7 +766,7 @@ namespace TheOtherRoles
         }
         public static void MurderPlayer(PlayerControl killer, PlayerControl target, bool showAnimation)
         {
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
             writer.Write(killer.PlayerId);
             writer.Write(target.PlayerId);
             writer.Write(showAnimation ? Byte.MaxValue : 0);
@@ -704,7 +788,7 @@ namespace TheOtherRoles
                 HudManager.Instance.StartCoroutine(Effects.Lerp(10f, new Action<float>((p) => {
                     if (!TransportationToolPatches.isUsingTransportation(target) && Vampire.bitten != null)
                     {
-                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.VampireSetBitten, Hazel.SendOption.Reliable, -1);
+                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VampireSetBitten, Hazel.SendOption.Reliable, -1);
                         writer.Write(byte.MaxValue);
                         writer.Write(byte.MaxValue);
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -718,7 +802,7 @@ namespace TheOtherRoles
 
         public static void shareGameVersion()
         {
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.VersionHandshake, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VersionHandshake, Hazel.SendOption.Reliable, -1);
             writer.Write((byte)TheOtherRolesPlugin.Version.Major);
             writer.Write((byte)TheOtherRolesPlugin.Version.Minor);
             writer.Write((byte)TheOtherRolesPlugin.Version.Build);
@@ -733,7 +817,7 @@ namespace TheOtherRoles
         public static List<PlayerControl> getKillerTeamMembers(PlayerControl player)
         {
             List<PlayerControl> team = new List<PlayerControl>();
-            foreach (PlayerControl p in CachedPlayer.AllPlayers)
+            foreach (PlayerControl p in PlayerControl.AllPlayerControls)
             {
                 if (player.Data.Role.IsImpostor && p.Data.Role.IsImpostor && player.PlayerId != p.PlayerId && team.All(x => x.PlayerId != p.PlayerId)) team.Add(p);
                 else if (player == Jackal.jackal && p == Sidekick.sidekick) team.Add(p);

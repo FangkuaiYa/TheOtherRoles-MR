@@ -263,6 +263,10 @@
         "0": "Blink",
         "13": "\u77ac\u79fb"
     },
+    "Button,64": {
+        "0": "Remember",
+        "13": "\u56de\u5fc6"
+    },
     "GameModeText,1": {
         "0": "TOR Guesser",
         "13": "\u8d4c\u602a\u6a21\u5f0f"
@@ -798,9 +802,9 @@
         "13": "\u5206\u914d\u6982\u7387"
     },
     "Opt-General,74": {
-        "0": "Crewmate Roles Settings",
+        "0": "Fill: ",
         "11": "\u30af\u30eb\u30fc\u5f79\u8077\u8a2d\u5b9a",
-        "13": "\u8239\u5458\u804c\u4e1a\u8bbe\u7f6e"
+        "13": "\u586b\u5145: "
     },
     "Opt-General,75": {
         "0": "Modifier Settings",
@@ -2090,6 +2094,30 @@
         "0": "Blink to a location",
         "13": "\u6807\u8bb0\u70b9\u5e76\u95ea\u73b0"
     },
+    "Role-Name,72": {
+        "0": "Armored",
+        "13": "\u88c5\u7532\u5175"
+    },
+    "Role-IntroDesc,72": {
+        "0": "You are protected from one murder attempt",
+        "13": "\u4f60\u53d7\u5230\u4fdd\u62a4\uff0c\u514d\u906d\u4e00\u6b21\u8c0b\u6740\u4f01\u56fe"
+    },
+    "Role-ShortDesc,72": {
+        "0": "You are protected from one murder attempt",
+        "13": "\u4f60\u6709\u4e00\u6b21\u514d\u6b7b\u673a\u4f1a"
+    },
+    "Role-Name,73": {
+        "0": "Amnesiac",
+        "13": "\u5931\u5fc6\u8005"
+    },
+    "Role-IntroDesc,73": {
+        "0": "Steal roles from the dead",
+        "13": "\u4f60\u5931\u5fc6\u4e86"
+    },
+    "Role-ShortDesc,73": {
+        "0": "You forgor",
+        "13": "\u7a83\u53d6\u6b7b\u4ea1\u73a9\u5bb6\u7684\u804c\u4e1a"
+    },
     "Opt-Yasuna,1": {
         "0": "Chance That The Yasuna Is An Impostor",
         "11": "\u30a4\u30d3\u30eb\u30e4\u30b9\u30ca\u306b\u306a\u308b\u78ba\u7387",
@@ -2220,10 +2248,14 @@
         "11": "\u30de\u30c3\u30c9\u30e1\u30a4\u30c8\u30ad\u30e9\u30fc\u306b\u306a\u308b\u3068\u30b3\u30df\u30e5\u30b5\u30dc\u3092\u76f4\u305b\u308b",
         "13": "\u75af\u72c2\u6740\u624b\u53ef\u4ee5\u4fee\u7406\u901a\u8baf"
     },
+    "Opt-Mafia,2": {
+        "0": "Mafia",
+        "13": "\u9ed1\u624b\u515a"
+    },
     "Opt-Mafia,1": {
         "0": "Janitor Cooldown",
         "11": "\u30b8\u30e3\u30cb\u30bf\u30fc\u306e\u6383\u9664\u30af\u30fc\u30eb\u30bf\u30a4\u30e0",
-        "13": "\u5c0f\u5f1f\u6280\u80fd\u51b7\u5374"
+        "13": "\u6e05\u6d01\u5de5\u6280\u80fd\u51b7\u5374"
     },
     "Opt-Morphling,1": {
         "0": "Morphling Cooldown",
@@ -2450,6 +2482,14 @@
         "11": "\u30bf\u30b9\u30af\u5b8c\u4e86\u3057\u305f\u30b9\u30cb\u30c3\u30c1\u3092\u6483\u3066\u306a\u3044",
         "13": "\u8d4c\u602a\u65e0\u6cd5\u731c\u6d4b\u5b8c\u6210\u4efb\u52a1\u7684\u544a\u5bc6\u8005"
     },
+    "Opt-Amnesiac,1": {
+        "0": "Show arrows to dead bodies",
+        "13": "\u663e\u793a\u6307\u5411\u5c38\u4f53\u7684\u7bad\u5934"
+    },
+    "Opt-Amnesiac,2": {
+        "0": "Reset role when taken",
+        "13": "\u91cd\u7f6e\u83b7\u53d6\u804c\u4e1a\u7684\u4f7f\u7528\u6b21\u6570"
+    },
     "Opt-Jester,1": {
         "0": "Jester Can Call Emergency Meeting",
         "11": "\u7dca\u6025\u4f1a\u8b70\u30dc\u30bf\u30f3\u3092\u62bc\u305b\u308b",
@@ -2521,10 +2561,12 @@
         "13": "\u8c7a\u72fc\u548c\u8ddf\u73ed\u62e5\u6709\u5185\u9b3c\u89c6\u91ce"
     },
     "Opt-Jackal,11": {
-        "0": "Jackal Can Sabotage Lights"
+        "0": "Jackal Can Sabotage Lights",
+        "13": "\u8c7a\u72fc\u53ef\u4ee5\u7834\u574f\u706f\u5149"
     },
     "Opt-Jackal,12": {
-        "0": "Sidekick Can Sabotage Lights"
+        "0": "Sidekick Can Sabotage Lights",
+        "13": "\u8ddf\u73ed\u53ef\u4ee5\u7834\u574f\u706f\u5149"
     },
     "Opt-Vulture,1": {
         "0": "Vulture Cooldown",
@@ -3080,7 +3122,7 @@
     },
     "Opt-Thief,5": {
         "0": "Thief Can Guess To Steal A Role (If Guesser)",
-        "13": "\u7a83\u8d3c\u53ef\u4ee5\u901a\u8fc7\u8d4c\u6740\u7a83\u53d6\u804c\u4e1a(\u90fd\u602a\u6a21\u5f0f)"
+        "13": "\u7a83\u8d3c\u53ef\u4ee5\u901a\u8fc7\u8d4c\u6740\u7a83\u53d6\u804c\u4e1a(\u8d4c\u602a\u6a21\u5f0f)"
     },
     "Opt-Trapper,1": {
         "0": "Trapper Cooldown",
@@ -3387,6 +3429,10 @@
     "Opt-Guessers-General,12": {
         "0": "Sidekick Is Always Guesser",
         "13": "\u8ddf\u73ed\u59cb\u7ec8\u662f\u8d4c\u602a"
+    },
+    "Opt-Guessers-General,13": {
+        "0": "Number Of Tasks Needed To Unlock Shooting\nFor Crew Guesser",
+        "13": "\u8239\u5458\u8d4c\u602a\u89e3\u9501\u731c\u6d4b\u6280\u80fd\u6240\u9700\u5b8c\u6210\u4efb\u52a1\u6570"
     },
     "Opt-HideNSeek-Main,1": {
         "0": "Map",
@@ -3908,9 +3954,9 @@
         "13": "<color=#FF0000FF>{0}\u7684The Other Roles MR v{1}\u662f\u4fee\u6539\u7248 <size=30%>({2})</size>\n</color>"
     },
     "GameStart,5": {
-        "0": "The host has no or a different version of The Other Roles\nYou will be kicked in {0}s",
+        "0": "<color=#FF0000FF>The host has no or a different version of The Other Roles\nYou will be kicked in {0}s</color>",
         "11": "\u30db\u30b9\u30c8\u304cTOR\u3092\u5c0e\u5165\u3057\u3066\u3044\u306a\u3044\u307e\u305f\u306f\u30d0\u30fc\u30b8\u30e7\u30f3\u304c\u9055\u3046\n\u3042\u3068{0}\u79d2\u3067\u30ad\u30c3\u30af\u3055\u308c\u307e\u3059",
-        "13": "\u623f\u4e3b\u6ca1\u6709\u6216\u4e0d\u540c\u7248\u672c\u7684The Other Roles MR\n\u4f60\u5c06\u5728{0}\u79d2\u540e\u81ea\u52a8\u9000\u51fa"
+        "13": "<color=#FF0000FF>\u623f\u4e3b\u6ca1\u6709\u6216\u4e0d\u540c\u7248\u672c\u7684The Other Roles MR\n\u4f60\u5c06\u5728{0}\u79d2\u540e\u81ea\u52a8\u9000\u51fa</color>"
     },
     "GameStart,6": {
         "0": "<color=#FF0000FF>Players With Different Versions:\n</color>",
@@ -4062,6 +4108,34 @@
         "0": "<color=#FF0000FF>(Kills: {0})</color>",
         "11": "<color=#FF0000FF>({0}\u30ad\u30eb)</color>",
         "13": "<color=#FF0000FF>(\u51fb\u6740\u6570:{0})</color>"
+    },
+    "EndGame,23": {
+        "0": "Last Crewmate Disconnected",
+        "13": "\u6700\u540e\u4e00\u540d\u8239\u5458\u65ad\u8fde"
+    },
+    "EndGame,24": {
+        "0": "Impostors Win - By Kill",
+        "13": "\u4f2a\u88c5\u8005\u9635\u8425\u80dc\u5229 - \u4eba\u6570\u4f18\u52bf(\u51fb\u6740)"
+    },
+    "EndGame,25": {
+        "0": "Impostors Win - By Sabotage",
+        "13": "\u4f2a\u88c5\u8005\u9635\u8425\u80dc\u5229 - \u7834\u574f\u80dc\u5229"
+    },
+    "EndGame,26": {
+        "0": "Impostors Win - By Vote, Guess or DC",
+        "13": "\u4f2a\u88c5\u8005\u9635\u8425\u80dc\u5229 - \u4eba\u6570\u4f18\u52bf(\u9a71\u9010,\u731c\u6d4b\u6216\u65ad\u8fde)"
+    },
+    "EndGame,27": {
+        "0": "Crew Wins - Task Win",
+        "13": "\u8239\u5458\u9635\u8425\u80dc\u5229 - \u4efb\u52a1\u83b7\u80dc"
+    },
+    "EndGame,28": {
+        "0": "Crew Wins - No Evil Killers Left",
+        "13": "\u8239\u5458\u9635\u8425\u80dc\u5229 - \u6ca1\u6709\u90aa\u6076\u804c\u4e1a"
+    },
+    "EndGame,29": {
+        "0": "Crew Wins - No Evil Killers Left",
+        "13": "\u8239\u5458\u9635\u8425\u80dc\u5229 - \u6ca1\u6709\u90aa\u6076\u804c\u4e1a"
     },
     "Mod-Updater,1": {
         "0": "Update\nThe Other Roles MR",
@@ -4289,5 +4363,25 @@
     "Opt-Medium,17": {
         "0": "It seems like my killer is the {0}.",
         "13": "\u6211\u60f3\u90a3\u6740\u6211\u7684\u51f6\u624b\u804c\u4e1a\u5e94\u8be5\u662f{0}."
+    },
+    "lobbyText,1": {
+        "0": "Prev Lobby: {0}   [LShift]",
+        "13": "\u8fd4\u56de\u4e0a\u4e00\u4e2a\u623f\u4ef7: {0}   [LShift]"
+    },
+    "lobbyText,2": {
+        "0": "\nClipboard: {0}  [RShift]",
+        "13": "\n\u526a\u5207\u677f\u4e0a\u7684\u623f\u53f7: {0}  [RShift]"
+    },
+    "lobbyText,3": {
+        "0": "Game Mod",
+        "13": "\u6e38\u620f\u6a21\u5f0f"
+    },
+    "lobbyText,4": {
+        "0": "Van. HideNSeek",
+        "13": "\u8fdb\u9636\u6349\u8ff7\u85cf"
+    },
+    "lobbyText,5": {
+        "0": "Classic",
+        "13": "\u7ecf\u5178\u6a21\u5f0f"
     }
 }

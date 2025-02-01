@@ -23,13 +23,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
 using HarmonyLib;
-using TheOtherRoles.Utilities;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
+using System;
+using TheOtherRoles.Utilities;
+using UnityEngine.Events;
 
 namespace TheOtherRoles.Patches
 {
@@ -38,6 +37,7 @@ namespace TheOtherRoles.Patches
     {
         private static TextBoxTMP ipField;
         private static TextBoxTMP portField;
+        private static GameObject serverWarning;
 
         public static void Postfix(RegionMenu __instance)
         {
@@ -92,8 +92,7 @@ namespace TheOtherRoles.Patches
                 ipField.AllowSymbols = true;
                 ipField.ForceUppercase = false;
                 ipField.SetText(TheOtherRolesPlugin.Ip.Value);
-                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) =>
-                {
+                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
                     ipField.outputText.SetText(TheOtherRolesPlugin.Ip.Value);
                     ipField.SetText(TheOtherRolesPlugin.Ip.Value);
                 })));
@@ -104,7 +103,6 @@ namespace TheOtherRoles.Patches
                 ipField.OnChange.AddListener((UnityAction)onEnterOrIpChange);
                 ipField.OnFocusLost.AddListener((UnityAction)onFocusLost);
                 ipField.gameObject.SetActive(isCustomRegion);
-                ipField.text = "";
 
                 void onEnterOrIpChange()
                 {
@@ -128,9 +126,7 @@ namespace TheOtherRoles.Patches
                 portField.transform.localPosition = new Vector3(3.225f, -1.55f, -100f);
                 portField.characterLimit = 5;
                 portField.SetText(TheOtherRolesPlugin.Port.Value.ToString());
-                portField.text = "";
-                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) =>
-                {
+                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
                     portField.outputText.SetText(TheOtherRolesPlugin.Port.Value.ToString());
                     portField.SetText(TheOtherRolesPlugin.Port.Value.ToString());
                 })));
@@ -162,6 +158,31 @@ namespace TheOtherRoles.Patches
                     TheOtherRolesPlugin.UpdateRegions();
                 }
             }
+
+            /*if (serverWarning == null) {
+                var tmplt = __instance.ButtonPool.activeChildren[^1] ;
+                serverWarning = new GameObject("serverWarning");  // GameObject.Instantiate(tmplt.transform.GetChild(0).gameObject, tmplt.transform);
+                var comp = serverWarning.AddComponent<TMPro.TextMeshPro>();  // serverWarning.GetComponent<TMPro.TextMeshPro>();
+                //serverWarning.transform.SetParent(tmplt.transform, true);
+                comp.fontSize = 0.2f;
+                serverWarning.transform.position = new Vector3(5f, 1f, -200f);
+                __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) => {
+                    comp.text = Helpers.cs(Color.red, "Vanilla Servers Are Currently Not Compatible With TORMR");
+                    serverWarning.transform.position = new Vector3(0f, 1f, -200f);
+                })));
+                serverWarning.SetActive(true);
+            }*/
+            var tmplt = __instance.ButtonPool.activeChildren[^1];
+            serverWarning = GameObject.Instantiate(tmplt.transform.GetChild(0).gameObject, tmplt.transform);
+            var comp = serverWarning.GetComponent<TMPro.TextMeshPro>();
+            comp.fontSizeMin = 2;
+            comp.fontSizeMax = 2;
+            serverWarning.transform.localPosition = new Vector3(0f, 6.5f, -10f);
+            __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>((p) =>
+            {
+                comp.text = $"{Helpers.cs(Color.magenta, "You can use the mouse scroll wheel")}";
+            })));
+            serverWarning.SetActive(true);
         }
     }
 
@@ -181,14 +202,27 @@ namespace TheOtherRoles.Patches
             __instance.Open();
             return false;
         }
-        //This code can increase the speed of joining the room(加速进房)Because this mod neednot user Reactor.dll
-        public static List<IRegionInfo> CustomServer = new List<IRegionInfo>();
-        [HarmonyPatch(typeof(AuthManager._CoConnect_d__4), nameof(AuthManager._CoConnect_d__4.MoveNext))]
-        public static class DoNothingInConnect
+        [HarmonyPatch(typeof(RegionMenu))]
+        public class RegionMenuPatch
         {
-            public static bool Prefix(AuthManager __instance)
+            public static Scroller Scroller;
+
+            [HarmonyPatch(nameof(RegionMenu.Awake)), HarmonyPostfix]
+            public static void Awake_Postfix(RegionMenu __instance)
             {
-                return false;
+                if (Scroller != null) return;
+
+                var back = __instance.ButtonPool.transform.FindChild("Backdrop");
+                back.transform.localScale *= 10f;
+
+                Scroller = __instance.ButtonPool.transform.parent.gameObject.AddComponent<Scroller>();
+                Scroller.Inner = __instance.ButtonPool.transform;
+                Scroller.MouseMustBeOverToScroll = true;
+                Scroller.ClickMask = back.GetComponent<BoxCollider2D>();
+                Scroller.ScrollWheelSpeed = 0.7f;
+                Scroller.SetYBoundsMin(0f);
+                Scroller.SetYBoundsMax(4f);
+                Scroller.allowY = true;
             }
         }
     }

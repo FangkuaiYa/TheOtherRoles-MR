@@ -11,6 +11,7 @@ namespace TheOtherRoles.Utilities
         public static bool killsThroughShield = true;
         public static bool evilGuesserCanGuessSpy = true;
         public static bool guesserCantGuessSnitch = false;
+        public static int tasksToUnlock = Mathf.RoundToInt(CustomOptionHolder.guesserGamemodeCrewGuesserNumberOfTasks.getFloat());
 
         public static Sprite getTargetSprite()
         {
@@ -48,6 +49,7 @@ namespace TheOtherRoles.Utilities
                 hasMultipleShotsPerMeeting = CustomOptionHolder.guesserGamemodeHasMultipleShotsPerMeeting.getBool();
                 killsThroughShield = CustomOptionHolder.guesserGamemodeKillsThroughShield.getBool();
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserGamemodeEvilCanKillSpy.getBool();
+                tasksToUnlock = Mathf.RoundToInt(CustomOptionHolder.guesserGamemodeCrewGuesserNumberOfTasks.getFloat());
             }
             else
             {

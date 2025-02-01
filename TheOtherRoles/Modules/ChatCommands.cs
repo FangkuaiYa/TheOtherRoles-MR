@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using HarmonyLib;
 using Hazel;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 
 namespace TheOtherRoles.Modules
@@ -24,7 +23,7 @@ namespace TheOtherRoles.Modules
                     if (text.ToLower().StartsWith("/kick "))
                     {
                         string playerName = text.Substring(5);
-                        PlayerControl target = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data.PlayerName.Equals(playerName));
+                        PlayerControl target = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(x => x.Data.PlayerName.Equals(playerName));
                         if (target != null && AmongUsClient.Instance != null && AmongUsClient.Instance.CanBan())
                         {
                             var client = AmongUsClient.Instance.GetClient(target.OwnerId);
@@ -38,7 +37,7 @@ namespace TheOtherRoles.Modules
                     else if (text.ToLower().StartsWith("/ban "))
                     {
                         string playerName = text.Substring(6);
-                        PlayerControl target = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data.PlayerName.Equals(playerName));
+                        PlayerControl target = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(x => x.Data.PlayerName.Equals(playerName));
                         if (target != null && AmongUsClient.Instance != null && AmongUsClient.Instance.CanBan())
                         {
                             var client = AmongUsClient.Instance.GetClient(target.OwnerId);
@@ -68,7 +67,7 @@ namespace TheOtherRoles.Modules
                         // else its classic!
                         if (AmongUsClient.Instance.AmHost)
                         {
-                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ShareGamemode, Hazel.SendOption.Reliable, -1);
+                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareGamemode, Hazel.SendOption.Reliable, -1);
                             writer.Write((byte)TORMapOptions.gameMode);
                             AmongUsClient.Instance.FinishRpcImmediately(writer);
                             RPCProcedure.shareGamemode((byte)gameMode);
@@ -76,7 +75,7 @@ namespace TheOtherRoles.Modules
                         }
                         else
                         {
-                            __instance.AddChat(CachedPlayer.LocalPlayer.PlayerControl, ModTranslation.GetString("GameStart", 10));
+                            __instance.AddChat(PlayerControl.LocalPlayer, ModTranslation.GetString("GameStart", 10));
                         }
                         handled = true;
                     }
@@ -86,8 +85,8 @@ namespace TheOtherRoles.Modules
                 {
                     if (text.ToLower().Equals("/murder"))
                     {
-                        CachedPlayer.LocalPlayer.PlayerControl.Exiled();
-                        FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(CachedPlayer.LocalPlayer.PlayerControl.Data, CachedPlayer.LocalPlayer.PlayerControl.Data);
+                        PlayerControl.LocalPlayer.Exiled();
+                        FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(PlayerControl.LocalPlayer.Data, PlayerControl.LocalPlayer.Data);
                         handled = true;
                     }
                     else if (text.ToLower().StartsWith("/color "))
@@ -96,21 +95,21 @@ namespace TheOtherRoles.Modules
                         int col;
                         if (!Int32.TryParse(text.Substring(7), out col))
                         {
-                            __instance.AddChat(CachedPlayer.LocalPlayer.PlayerControl, "Unable to parse color id\nUsage: /color {id}");
+                            __instance.AddChat(PlayerControl.LocalPlayer, "Unable to parse color id\nUsage: /color {id}");
                         }
                         col = Math.Clamp(col, 0, Palette.PlayerColors.Length - 1);
-                        CachedPlayer.LocalPlayer.PlayerControl.SetColor(col);
-                        __instance.AddChat(CachedPlayer.LocalPlayer.PlayerControl, "Changed color succesfully"); ;
+                        PlayerControl.LocalPlayer.SetColor(col);
+                        __instance.AddChat(PlayerControl.LocalPlayer, "Changed color succesfully"); ;
                     }
                 }
 
-                if (text.ToLower().StartsWith("/tp ") && CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead)
+                if (text.ToLower().StartsWith("/tp ") && PlayerControl.LocalPlayer.Data.IsDead)
                 {
                     string playerName = text.Substring(4).ToLower();
-                    PlayerControl target = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data.PlayerName.ToLower().Equals(playerName));
+                    PlayerControl target = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(x => x.Data.PlayerName.ToLower().Equals(playerName));
                     if (target != null)
                     {
-                        CachedPlayer.LocalPlayer.PlayerControl.transform.position = target.transform.position;
+                        PlayerControl.LocalPlayer.transform.position = target.transform.position;
                         handled = true;
                     }
                 }
@@ -128,7 +127,7 @@ namespace TheOtherRoles.Modules
         {
             public static void Postfix(HudManager __instance)
             {
-                if (!__instance.Chat.isActiveAndEnabled && (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay || (CachedPlayer.LocalPlayer.PlayerControl.isLover() && Lovers.enableChat)))
+                if (!__instance.Chat.isActiveAndEnabled && (AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay || (PlayerControl.LocalPlayer.isLover() && Lovers.enableChat)))
                     __instance.Chat.SetVisible(true);
             }
         }
@@ -138,8 +137,8 @@ namespace TheOtherRoles.Modules
         {
             public static void Postfix(ChatBubble __instance, [HarmonyArgument(0)] string playerName)
             {
-                PlayerControl sourcePlayer = CachedPlayer.AllPlayers.FirstOrDefault(x => x.Data != null && x.Data.PlayerName.Equals(playerName));
-                if (sourcePlayer != null && CachedPlayer.LocalPlayer.PlayerControl != null && CachedPlayer.LocalPlayer.PlayerControl.Data?.Role?.IsImpostor == true && (Spy.spy != null && sourcePlayer.PlayerId == Spy.spy.PlayerId || Sidekick.sidekick != null && Sidekick.wasTeamRed && sourcePlayer.PlayerId == Sidekick.sidekick.PlayerId || Jackal.jackal != null && Jackal.wasTeamRed && sourcePlayer.PlayerId == Jackal.jackal.PlayerId) && __instance != null) __instance.NameText.color = Palette.ImpostorRed;
+                PlayerControl sourcePlayer = PlayerControl.AllPlayerControls.ToArray().FirstOrDefault(x => x.Data != null && x.Data.PlayerName.Equals(playerName));
+                if (sourcePlayer != null && PlayerControl.LocalPlayer != null && PlayerControl.LocalPlayer.Data?.Role?.IsImpostor == true && (Spy.spy != null && sourcePlayer.PlayerId == Spy.spy.PlayerId || Sidekick.sidekick != null && Sidekick.wasTeamRed && sourcePlayer.PlayerId == Sidekick.sidekick.PlayerId || Jackal.jackal != null && Jackal.wasTeamRed && sourcePlayer.PlayerId == Jackal.jackal.PlayerId) && __instance != null) __instance.NameText.color = Palette.ImpostorRed;
             }
         }
 
@@ -150,8 +149,8 @@ namespace TheOtherRoles.Modules
             {
                 if (__instance != FastDestroyableSingleton<HudManager>.Instance.Chat)
                     return true;
-                PlayerControl localPlayer = CachedPlayer.LocalPlayer.PlayerControl;
-                return localPlayer == null || (MeetingHud.Instance != null || LobbyBehaviour.Instance != null || (localPlayer.Data.IsDead || localPlayer.isLover() && Lovers.enableChat) || (int)sourcePlayer.PlayerId == (int)CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                PlayerControl localPlayer = PlayerControl.LocalPlayer;
+                return localPlayer == null || (MeetingHud.Instance != null || LobbyBehaviour.Instance != null || (localPlayer.Data.IsDead || localPlayer.isLover() && Lovers.enableChat) || (int)sourcePlayer.PlayerId == (int)PlayerControl.LocalPlayer.PlayerId);
 
             }
         }
