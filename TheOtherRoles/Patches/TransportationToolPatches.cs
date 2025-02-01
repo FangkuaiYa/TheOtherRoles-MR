@@ -4,6 +4,7 @@ using System;
 using UnityEngine.Windows.Speech;
 using TheOtherRoles;
 using static UnityEngine.GraphicsBuffer;
+using TheOtherRoles.Players;
 namespace TheOtherRoles.Patches
 {
     [HarmonyPatch]

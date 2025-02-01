@@ -25,19 +25,19 @@ namespace TheOtherRoles.CustomGameModes
         public static float hunterWaitingTime = 15f;
         public static bool isHunter()
         {
-            return isHideNSeekGM && PlayerControl.LocalPlayer != null && PlayerControl.LocalPlayer.Data.Role.IsImpostor;
+            return isHideNSeekGM && CachedPlayer.LocalPlayer.PlayerControl != null && CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor;
         }
 
-        public static List<CachedPlayer> getHunters()
+        public static List<PlayerControl> getHunters()
         {
-            List<CachedPlayer> hunters = new List<CachedPlayer>(CachedPlayer.AllPlayers);
+            List<PlayerControl> hunters = new((IEnumerable<PlayerControl>)PlayerControl.AllPlayerControls);
             hunters.RemoveAll(x => !x.Data.Role.IsImpostor);
             return hunters;
         }
 
         public static bool isHunted()
         {
-            return isHideNSeekGM && PlayerControl.LocalPlayer != null && !PlayerControl.LocalPlayer.Data.Role.IsImpostor;
+            return isHideNSeekGM && CachedPlayer.LocalPlayer.PlayerControl != null && !CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor;
         }
 
         public static void clearAndReload()

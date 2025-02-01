@@ -2,6 +2,8 @@
 using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
+using Reactor.Utilities;
+using Reactor.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,8 @@ using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
+using static TheOtherRoles.Snitch;
+using static UnityEngine.GraphicsBuffer;
 
 namespace TheOtherRoles.CustomGameModes
 {
@@ -124,25 +128,23 @@ namespace TheOtherRoles.CustomGameModes
         {
             return Helpers.loadSpriteFromResources($"TheOtherRoles.Resources.IntroAnimation.intro_{index + 1000}.png", 150f, cache: false);
         }
-        public static void updateWhitelistedObjects()
+
+        public static void updateWhitelistedObjects(bool debug = false)
         {
             string allNames = Helpers.readTextFromResources("TheOtherRoles.Resources.Txt.Props.txt");
-            bool debug = false;
             if (debug)
             {
                 allNames = Helpers.readTextFromFile(System.IO.Directory.GetCurrentDirectory() + "\\Props.txt");
             }
-            TheOtherRolesPlugin.Logger.LogMessage($"after debug");
-            whitelistedObjects = allNames.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
-            TheOtherRolesPlugin.Logger.LogMessage($"after split");
 
-            TheOtherRolesPlugin.Logger.LogMessage($"Last element: {whitelistedObjects.Last()}");
+            whitelistedObjects = allNames.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
+
 
         public static void propTargetAndTimerDisplayUpdate()
         {
 
-            if (!PlayerControl.LocalPlayer.Data.Role.IsImpostor) currentTarget = FindClosestDisguiseObject(PlayerControl.LocalPlayer.gameObject, 1f);
+            if (!CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor) currentTarget = FindClosestDisguiseObject(CachedPlayer.LocalPlayer.PlayerControl.gameObject, 1f);
 
             if (timerText == null)
             {
@@ -183,6 +185,7 @@ namespace TheOtherRoles.CustomGameModes
             {
                 poolablesBackground = new GameObject("poolablesBackground");
                 poolablesBackground.AddComponent<SpriteRenderer>();
+                poolablesBackground.layer = LayerMask.NameToLayer("UI");
                 if (poolablesBackgroundSprite == null) poolablesBackgroundSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.poolablesBackground.jpg", 200f);
             }
             poolablesBackground.transform.SetParent(HudManager.Instance.transform);
@@ -210,11 +213,7 @@ namespace TheOtherRoles.CustomGameModes
                 else
                 {
                     // Display Prop
-                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.CrewmateBlue, pc.Data.PlayerName); ;
-                    if (isCurrentlyRevealed.ContainsKey(pc.PlayerId))
-                    {
-
-                    }
+                    poolablePlayer.cosmetics.nameText.text = Helpers.cs(Palette.CrewmateBlue, pc.Data.PlayerName);
                 }
                 // update currently revealed:
                 if (isCurrentlyRevealed.ContainsKey(pc.PlayerId))
@@ -222,6 +221,7 @@ namespace TheOtherRoles.CustomGameModes
                     if (!revealRenderer.ContainsKey(pc.PlayerId))
                     {
                         var go = new GameObject($"reveal_renderer_{pc.PlayerId}");
+                        go.layer = LayerMask.NameToLayer("UI");
                         go.AddComponent<SpriteRenderer>();
                         go.transform.SetParent(poolablePlayer.transform.parent, false);
                         go.SetActive(true);
@@ -262,7 +262,7 @@ namespace TheOtherRoles.CustomGameModes
                 invisPlayers[playerId] = timeLeft;
                 if (timeLeft > 0)
                 {
-                    pc.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, PlayerControl.LocalPlayer.Data.IsDead || PlayerControl.LocalPlayer.PlayerId == playerId ? 0.1f : 0f);
+                    pc.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead || CachedPlayer.LocalPlayer.PlayerControl.PlayerId == playerId ? 0.1f : 0f);
 
                 }
                 else
@@ -290,18 +290,19 @@ namespace TheOtherRoles.CustomGameModes
 
         public static void dangerMeterUpdate()
         {
+            if (!HudManager.Instance || !HudManager.Instance.DangerMeter) return;
             if (HudManager.Instance.DangerMeter.gameObject.active)
             {
                 float dist = 55f;
                 float dist2 = 15f;
                 float curr = float.MaxValue;
-                foreach (PlayerControl playerControl in PlayerControl.AllPlayerControls.ToArray().Where(x => !x.Data.IsDead && (PlayerControl.LocalPlayer.Data.Role.IsImpostor ? !x.Data.Role.IsImpostor : x.Data.Role.IsImpostor)))
+                foreach (PlayerControl playerControl in PlayerControl.AllPlayerControls.ToArray().Where(x => !x.Data.IsDead && (CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor ? !x.Data.Role.IsImpostor : x.Data.Role.IsImpostor)))
                 {
                     if (invisPlayers.ContainsKey(playerControl.PlayerId)) continue;  // Dont light up for invisible players
                     if (!(playerControl == null))
                     {
 
-                        float sqrMagnitude = (playerControl.transform.position - PlayerControl.LocalPlayer.transform.position).sqrMagnitude;
+                        float sqrMagnitude = (playerControl.transform.position - CachedPlayer.LocalPlayer.PlayerControl.transform.position).sqrMagnitude;
                         if (sqrMagnitude < dist && curr > sqrMagnitude)
                         {
                             curr = sqrMagnitude;
@@ -312,7 +313,7 @@ namespace TheOtherRoles.CustomGameModes
                 float dangerLevel2 = Mathf.Clamp01((dist2 - curr) / dist2);
                 HudManager.Instance.DangerMeter.SetDangerValue(dangerLevel1, dangerLevel2);
             }
-            HudManager.Instance.DangerMeter?.gameObject.SetActive(!PlayerControl.LocalPlayer.Data.IsDead && (!PlayerControl.LocalPlayer.Data.Role.IsImpostor || HudManagerStartPatch.propHuntFindButton.isEffectActive));
+            HudManager.Instance.DangerMeter?.gameObject.SetActive(!CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead && (!CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor || HudManagerStartPatch.propHuntFindButton.isEffectActive));
         }
 
 
@@ -341,8 +342,8 @@ namespace TheOtherRoles.CustomGameModes
 
         public static void transformLayers()
         {  // A bit of a hacky way to make sure that props as well as propable objects are not visible in the dark, while keeping collisions enabled.
-            PlayerControl.LocalPlayer.clearAllTasks();
-            foreach (Collider2D collider in Physics2D.OverlapCircleAll(PlayerControl.LocalPlayer.transform.position, 500))
+            CachedPlayer.LocalPlayer.PlayerControl.clearAllTasks();
+            foreach (Collider2D collider in Physics2D.OverlapCircleAll(CachedPlayer.LocalPlayer.PlayerControl.transform.position, 500))
             {
                 bool whiteListed = false;
                 foreach (var whiteListedWord in whitelistedObjects) if (collider.gameObject.name.Contains(whiteListedWord) && collider.gameObject.GetComponent<SpriteRenderer>() != null) whiteListed = true;
@@ -355,7 +356,7 @@ namespace TheOtherRoles.CustomGameModes
                         duplicatedCollider.Add(newgo);
                     }
 
-                    collider.gameObject.layer = PlayerControl.LocalPlayer.gameObject.layer;
+                    collider.gameObject.layer = CachedPlayer.LocalPlayer.PlayerControl.gameObject.layer;
                 }
             }
         }
@@ -410,7 +411,7 @@ namespace TheOtherRoles.CustomGameModes
                 float bestDist = 9999;
                 if (whitelistedObjects == null || whitelistedObjects.Count == 0 || verbose)
                 {
-                    updateWhitelistedObjects();
+                    updateWhitelistedObjects(true);
                 }
                 foreach (Collider2D collider in Physics2D.OverlapCircleAll(origin.transform.position, radius))
                 {
@@ -472,9 +473,9 @@ namespace TheOtherRoles.CustomGameModes
         [HarmonyPostfix]
         public static void IntroCutsceneDestroyPatch(IntroCutscene __instance)
         {
-            if (!isPropHuntGM || !PlayerControl.LocalPlayer.Data.Role.IsImpostor) return;
-            PlayerControl.LocalPlayer.moveable = false;
-            MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
+            if (!isPropHuntGM || !CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor) return;
+            CachedPlayer.LocalPlayer.PlayerControl.moveable = false;
+            MessageWriter writer2 = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
             writer2.Write(true);
             AmongUsClient.Instance.FinishRpcImmediately(writer2);
             RPCProcedure.propHuntStartTimer(true);
@@ -490,11 +491,11 @@ namespace TheOtherRoles.CustomGameModes
                 if (p == 1f)
                 {
                     // start timer
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.PropHuntStartTimer, Hazel.SendOption.Reliable, -1);
                     writer.Write(false);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.propHuntStartTimer();
-                    PlayerControl.LocalPlayer.moveable = true;
+                    CachedPlayer.LocalPlayer.PlayerControl.moveable = true;
                     HudManager.Instance.FullScreen.enabled = false;
                     introObject.Destroy();
                 }
@@ -544,7 +545,7 @@ namespace TheOtherRoles.CustomGameModes
                 }
                 if (__instance.myPlayer.Data.IsDead)
                 {
-                    __instance.myPlayer.Visible = PlayerControl.LocalPlayer.Data.IsDead;
+                    __instance.myPlayer.Visible = CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead;
                     GameObject.Destroy(__instance.GetComponent<SpriteRenderer>());
                 }
             }
@@ -562,7 +563,7 @@ namespace TheOtherRoles.CustomGameModes
             {
                 __instance.Revive();
                 DestroyableSingleton<RoleManager>.Instance.SetRole(__instance, RoleTypes.Impostor);
-                if (__instance == PlayerControl.LocalPlayer)
+                if (__instance == CachedPlayer.LocalPlayer.PlayerControl)
                 {
                     HudManagerStartPatch.propHuntRevealButton.Timer = revealCooldown;
                     HudManagerStartPatch.propHuntFindButton.Timer = findCooldown;
@@ -602,9 +603,9 @@ namespace TheOtherRoles.CustomGameModes
 
         [HarmonyPatch(typeof(MapConsole), nameof(MapConsole.CanUse))]
         [HarmonyPostfix]
-        public static void AdminCanUsePostfix(MapConsole __instance, GameData.PlayerInfo pc, ref bool canUse, ref bool couldUse, ref float __result)
+        public static void AdminCanUsePostfix(MapConsole __instance, NetworkedPlayerInfo pc, ref bool canUse, ref bool couldUse, ref float __result)
         {
-            if (!PropHunt.isPropHuntGM || !PlayerControl.LocalPlayer.Data.Role.IsImpostor) return;
+            if (!PropHunt.isPropHuntGM || !CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor) return;
             if (canUse)
             {
                 if (HudManagerStartPatch.propHuntAdminButton.Timer > 0)
@@ -619,7 +620,7 @@ namespace TheOtherRoles.CustomGameModes
         [HarmonyPrefix]
         public static bool AdminUsePostfix(MapConsole __instance)
         {
-            if (!PropHunt.isPropHuntGM || !PlayerControl.LocalPlayer.Data.Role.IsImpostor) return true;
+            if (!PropHunt.isPropHuntGM || !CachedPlayer.LocalPlayer.PlayerControl.Data.Role.IsImpostor) return true;
             HudManagerStartPatch.propHuntAdminButton.onClickEvent();
             return false;
         }
@@ -629,7 +630,7 @@ namespace TheOtherRoles.CustomGameModes
         [HarmonyPostfix]
         public static void MurderPlayerPostfix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target)
         {
-            if (!PropHunt.isPropHuntGM || target != PlayerControl.LocalPlayer) return;
+            if (!PropHunt.isPropHuntGM || target != CachedPlayer.LocalPlayer.PlayerControl) return;
             try
             {
                 target.NetTransform.RpcSnapTo(__instance.transform.position);
@@ -663,20 +664,29 @@ namespace TheOtherRoles.CustomGameModes
         [HarmonyPrefix]
         public static bool KillButtonClickPatch(KillButton __instance)
         {
-            if (!PropHunt.isPropHuntGM || __instance.isCoolingDown || PlayerControl.LocalPlayer.Data.IsDead || PlayerControl.LocalPlayer.inVent) return false;
-
-            __instance.SetTarget(PlayerControl.LocalPlayer.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList(), true).ToArray().FirstOrDefault());
+            if (!PropHunt.isPropHuntGM || __instance.isCoolingDown || CachedPlayer.LocalPlayer.PlayerControl.Data.IsDead || CachedPlayer.LocalPlayer.PlayerControl.inVent) return false;
+            var targets = CachedPlayer.LocalPlayer.PlayerControl.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList(), true).ToArray();
+            __instance.SetTarget(CachedPlayer.LocalPlayer.PlayerControl.Data.Role.GetPlayersInAbilityRangeSorted(RoleBehaviour.GetTempPlayerList(), true).ToArray().FirstOrDefault());
 
             if (__instance.currentTarget == null)
             {
-                PlayerControl.LocalPlayer.SetKillTimer(killCooldownMiss);
+                CachedPlayer.LocalPlayer.PlayerControl.SetKillTimer(killCooldownMiss);
             }
             else
             {  // There is a target, execute kill!
-                MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(PlayerControl.LocalPlayer, __instance.currentTarget);
+                MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(CachedPlayer.LocalPlayer.PlayerControl, __instance.currentTarget);
                 __instance.SetTarget(null);
-                PlayerControl.LocalPlayer.SetKillTimer(killCooldownHit);
+                CachedPlayer.LocalPlayer.PlayerControl.SetKillTimer(killCooldownHit);
             }
+            return false;
+        }
+
+        [HarmonyPatch(typeof(RoleBehaviour), nameof(RoleBehaviour.IsValidTarget))]
+        [HarmonyPrefix]
+        public static bool IsValidTarget(RoleBehaviour __instance, NetworkedPlayerInfo target, ref bool __result)
+        {
+            if (!PropHunt.isPropHuntGM) return true;
+            __result = !(target == null) && !target.Disconnected && !target.IsDead && target.PlayerId != __instance.Player.PlayerId && !(target.Role == null) && !(target.Object == null) && !target.Object.inVent && !target.Object.inMovingPlat;
             return false;
         }
 

@@ -103,7 +103,7 @@ namespace TheOtherRoles.Patches
             isFirstSpawn = false;
             if (CustomOptionHolder.airshipSetOriginalCooldown.getBool())
             {
-                PlayerControl.LocalPlayer.SetKillTimerUnchecked(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown);
+                CachedPlayer.LocalPlayer.PlayerControl.SetKillTimerUnchecked(GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown);
                 foreach (var b in CustomButton.buttons)
                 {
                     b.Timer = b.MaxTimer;
@@ -111,7 +111,7 @@ namespace TheOtherRoles.Patches
             }
             else
             {
-                PlayerControl.LocalPlayer.SetKillTimerUnchecked(10f);
+                CachedPlayer.LocalPlayer.PlayerControl.SetKillTimerUnchecked(10f);
                 CustomButton.buttons.ForEach(x => x.Timer = 10f);
             }
         }
@@ -148,13 +148,13 @@ namespace TheOtherRoles.Patches
             // base.Begin(task);
             __instance.MyTask = task;
             __instance.MyNormTask = task as NormalPlayerTask;
-            if (PlayerControl.LocalPlayer)
+            if (CachedPlayer.LocalPlayer.PlayerControl)
             {
                 if (MapBehaviour.Instance)
                 {
                     MapBehaviour.Instance.Close();
                 }
-                PlayerControl.LocalPlayer.NetTransform.Halt();
+                CachedPlayer.LocalPlayer.PlayerControl.NetTransform.Halt();
             }
             __instance.StartCoroutine(__instance.CoAnimateOpen());
 
@@ -178,7 +178,7 @@ namespace TheOtherRoles.Patches
             array = (from s in array.Take(__instance.LocationButtons.Length)
                      orderby s.Location.x, s.Location.y descending
                      select s).ToArray<SpawnInMinigame.SpawnLocation>();
-            PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(new Vector2(-25f, 40f));
+            CachedPlayer.LocalPlayer.PlayerControl.NetTransform.RpcSnapTo(new Vector2(-25f, 40f));
 
             for (int i = 0; i < __instance.LocationButtons.Length; i++)
             {
@@ -196,8 +196,8 @@ namespace TheOtherRoles.Patches
             }
 
 
-            PlayerControl.LocalPlayer.gameObject.SetActive(false);
-            PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(new Vector2(-25f, 40f));
+            CachedPlayer.LocalPlayer.PlayerControl.gameObject.SetActive(false);
+            CachedPlayer.LocalPlayer.PlayerControl.NetTransform.RpcSnapTo(new Vector2(-25f, 40f));
             if (!CustomOptionHolder.airshipRandomSpawn.getBool())
             {
                 __instance.StartCoroutine(__instance.RunTimer());
@@ -273,13 +273,13 @@ namespace TheOtherRoles.Patches
             if (TaskRacer.isValid())
             {
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(
-                    PlayerControl.LocalPlayer.NetId,
+                    CachedPlayer.LocalPlayer.PlayerControl.NetId,
                     (byte)CustomRPC.TaskVsMode_Ready,
                     Hazel.SendOption.Reliable,
                     -1);
-                writer.Write(PlayerControl.LocalPlayer.PlayerId);
+                writer.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
-                RPCProcedure.taskVsModeReady(PlayerControl.LocalPlayer.PlayerId);
+                RPCProcedure.taskVsModeReady(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
             }
         }
 
@@ -294,7 +294,7 @@ namespace TheOtherRoles.Patches
 
         public static void Synchronize(SynchronizeTag tag, byte playerId)
         {
-            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.Synchronize, Hazel.SendOption.Reliable, -1);
+            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.Synchronize, Hazel.SendOption.Reliable, -1);
             writer.Write(playerId);
             writer.Write((int)tag);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -312,15 +312,15 @@ namespace TheOtherRoles.Patches
                     return;
                 }
                 __instance.gotButton = true;
-                PlayerControl.LocalPlayer.gameObject.SetActive(true);
+                CachedPlayer.LocalPlayer.PlayerControl.gameObject.SetActive(true);
                 __instance.StopAllCoroutines();
-                PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(spawnAt);
+                CachedPlayer.LocalPlayer.PlayerControl.NetTransform.RpcSnapTo(spawnAt);
                 FastDestroyableSingleton<HudManager>.Instance.PlayerCam.SnapToTarget();
                 __instance.Close();
             }
             else
             {
-                Synchronize(SynchronizeTag.PreSpawnMinigame, PlayerControl.LocalPlayer.PlayerId);
+                Synchronize(SynchronizeTag.PreSpawnMinigame, CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
                 if (__instance.amClosing != Minigame.CloseState.None)
                 {
                     return;
@@ -367,9 +367,9 @@ namespace TheOtherRoles.Patches
 
                         if (synchronizeData.Align(SynchronizeTag.PreSpawnMinigame, false) || p == 1f)
                         {
-                            PlayerControl.LocalPlayer.gameObject.SetActive(true);
+                            CachedPlayer.LocalPlayer.PlayerControl.gameObject.SetActive(true);
                             __instance.StopAllCoroutines();
-                            PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(spawnAt);
+                            CachedPlayer.LocalPlayer.PlayerControl.NetTransform.RpcSnapTo(spawnAt);
                             FastDestroyableSingleton<HudManager>.Instance.PlayerCam.SnapToTarget();
                             synchronizeData.Reset(SynchronizeTag.PreSpawnMinigame);
                             __instance.Close();

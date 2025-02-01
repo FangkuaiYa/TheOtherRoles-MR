@@ -97,7 +97,7 @@ namespace TheOtherRoles.Objects
                 this.OnClick();
 
                 // Deputy skip onClickEvent if handcuffed
-                if (Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[PlayerControl.LocalPlayer.PlayerId] > 0f) return;
+                if (Deputy.handcuffedKnows.ContainsKey(CachedPlayer.LocalPlayer.PlayerControl.PlayerId) && Deputy.handcuffedKnows[CachedPlayer.LocalPlayer.PlayerControl.PlayerId] > 0f) return;
 
                 if (this.HasEffect && !this.isEffectActive)
                 {
@@ -176,7 +176,7 @@ namespace TheOtherRoles.Objects
 
         public void Update()
         {
-            var localPlayer = PlayerControl.LocalPlayer;
+            var localPlayer = CachedPlayer.LocalPlayer.PlayerControl;
             var moveable = localPlayer.moveable;
 
             if (localPlayer.Data == null || MeetingHud.Instance || ExileController.Instance || !HasButton())
@@ -240,7 +240,7 @@ namespace TheOtherRoles.Objects
             {
                 bool always = CustomOptionHolder.alwaysConsumeKillCooldown.getBool();
                 // オプションがONの場合はベント内はクールダウン減少を止める
-                bool exceptInVent = CustomOptionHolder.stopConsumeKillCooldownInVent.getBool() && PlayerControl.LocalPlayer.inVent;
+                bool exceptInVent = CustomOptionHolder.stopConsumeKillCooldownInVent.getBool() && CachedPlayer.LocalPlayer.PlayerControl.inVent;
                 // オプションがONの場合は配電盤タスク中はクールダウン減少を止める
                 bool exceptOnTask = CustomOptionHolder.stopConsumeKillCooldownOnSwitchingTask.getBool() && Patches.ElectricPatch.onTask;
                 if (HasEffect && isEffectActive)

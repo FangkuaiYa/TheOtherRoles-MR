@@ -57,11 +57,11 @@ namespace TheOtherRoles
         public static ConfigEntry<bool> EnableSoundEffects { get; set; }
         public static ConfigEntry<bool> EnableHorseMode { get; set; }
         public static ConfigEntry<bool> ShowVentsOnMap { get; set; }
+        public static ConfigEntry<bool> ShowChatNotifications { get; set; }
         public static ConfigEntry<string> Ip { get; set; }
         public static ConfigEntry<ushort> Port { get; set; }
         public static ConfigEntry<string> ShowPopUpVersion { get; set; }
 
-        public static Sprite ModStamp;
         public static Sprite CustomPreset;
 
         public static IRegionInfo[] defaultRegions;
@@ -116,10 +116,13 @@ namespace TheOtherRoles
             EnableHorseMode = Config.Bind("Custom", "Enable Horse Mode", false);
             ShowPopUpVersion = Config.Bind("Custom", "Show PopUp", "0");
             ShowVentsOnMap = Config.Bind("Custom", "Show vent positions on minimap", false);
+            ShowChatNotifications = Config.Bind("Custom", "Show Chat Notifications", true);
 
             Ip = Config.Bind("Custom", "Custom Server IP", "127.0.0.1");
             Port = Config.Bind("Custom", "Custom Server Port", (ushort)22023);
             defaultRegions = ServerManager.DefaultRegions;
+            // Removes vanilla Servers
+            //ServerManager.DefaultRegions = new Il2CppReferenceArray<IRegionInfo>(new IRegionInfo[0]);
 
             UpdateRegions();
 
@@ -191,12 +194,6 @@ namespace TheOtherRoles
             if (isSave)
                 Instance.Config.Save();
         }
-
-        public static Sprite GetModStamp()
-        {
-            if (ModStamp) return ModStamp;
-            return ModStamp = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.ModStamp.png", 150f);
-        }
         public static Sprite GetCustomPreset()
         {
             if (CustomPreset) return CustomPreset;
@@ -259,7 +256,7 @@ namespace TheOtherRoles
             if (Input.GetKey(KeyCode.LeftControl))
             {
                 // Spawn dummys
-                if (Input.GetKeyDown(KeyCode.F))
+                /*if (Input.GetKeyDown(KeyCode.F))
                 {
                     var playerControl = UnityEngine.Object.Instantiate(AmongUsClient.Instance.PlayerPrefab);
                     var i = playerControl.PlayerId = (byte)GameData.Instance.GetAvailableId();
@@ -268,7 +265,7 @@ namespace TheOtherRoles
                     GameData.Instance.AddPlayer(playerControl);
                     AmongUsClient.Instance.Spawn(playerControl, -2, InnerNet.SpawnFlags.None);
 
-                    playerControl.transform.position = PlayerControl.LocalPlayer.transform.position;
+                    playerControl.transform.position = CachedPlayer.LocalPlayer.PlayerControl.transform.position;
 #if true
                     playerControl.GetComponent<DummyBehaviour>().enabled = true;
                     playerControl.NetTransform.enabled = false;
@@ -281,12 +278,12 @@ namespace TheOtherRoles
                     playerControl.SetName(Helpers.RandomString(10));
                     playerControl.SetColor((byte)Helpers.random.Next(Palette.PlayerColors.Length));
                     GameData.Instance.RpcSetTasks(playerControl.PlayerId, new byte[0]);
-                }
+                }*/
 
                 // Terminate round
                 if (Input.GetKeyDown(KeyCode.L))
                 {
-                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ForceEnd, Hazel.SendOption.Reliable, -1);
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.ForceEnd, Hazel.SendOption.Reliable, -1);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
                     RPCProcedure.forceEnd();
                 }
@@ -348,12 +345,12 @@ namespace TheOtherRoles
 
                 if (Input.GetKeyDown(KeyCode.Alpha2))
                 {
-                    MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
-                    killWriter.Write(PlayerControl.LocalPlayer.PlayerId);
-                    killWriter.Write(PlayerControl.LocalPlayer.PlayerId);
+                    MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
+                    killWriter.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
+                    killWriter.Write(CachedPlayer.LocalPlayer.PlayerControl.PlayerId);
                     killWriter.Write(byte.MaxValue);
                     AmongUsClient.Instance.FinishRpcImmediately(killWriter);
-                    RPCProcedure.uncheckedMurderPlayer(PlayerControl.LocalPlayer.PlayerId, PlayerControl.LocalPlayer.PlayerId, Byte.MaxValue);
+                    RPCProcedure.uncheckedMurderPlayer(CachedPlayer.LocalPlayer.PlayerControl.PlayerId, CachedPlayer.LocalPlayer.PlayerControl.PlayerId, Byte.MaxValue);
                 }
             }
  
