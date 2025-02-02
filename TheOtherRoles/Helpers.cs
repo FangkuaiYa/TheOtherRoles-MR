@@ -538,7 +538,15 @@ namespace TheOtherRoles
             if (enforceNightVisionUpdate) Patches.SurveillanceMinigamePatch.enforceNightVision(target);
             Chameleon.update();  // so that morphling and camo wont make the chameleons visible
         }
+        public static string camelString(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
 
+            string firstLetter = input[..1].ToUpper();
+            string remainingLetters = input[1..].ToLower();
+            return firstLetter + remainingLetters;
+        }
         public static void showFlash(Color color, float duration = 1f, string message = "")
         {
             if (FastDestroyableSingleton<HudManager>.Instance == null || FastDestroyableSingleton<HudManager>.Instance.FullScreen == null) return;

@@ -240,6 +240,7 @@ namespace TheOtherRoles
                 case RoleId.Yoyo: id = 71; break;
                 case RoleId.Armored: id = 72; break;
                 case RoleId.Amnesiac: id = 73; break;
+                case RoleId.Disperser: id = 74; break;
             }
 
             return id;

@@ -52,11 +52,11 @@ namespace TheOtherRoles
         public CustomOptionType type;
         public Action onChange = null;
         TranslationInfo translationInfo = null;
-        public string heading = "";
+        public TranslationInfo heading = null;
 
         // Option creation
 
-        public CustomOption(int id, CustomOptionType type, TranslationInfo translationInfo, System.Object[] selections, System.Object defaultValue, CustomOption parent, bool isHeader, Action onChange = null, string heading = "")
+        public CustomOption(int id, CustomOptionType type, TranslationInfo translationInfo, System.Object[] selections, System.Object defaultValue, CustomOption parent, bool isHeader, Action onChange = null, TranslationInfo heading = null)
         {
             this.id = id;
             this.translationInfo = translationInfo;
@@ -79,12 +79,12 @@ namespace TheOtherRoles
             options.Add(this);
         }
 
-        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, TranslationInfo[] selections, CustomOption parent = null, bool isHeader = false, Action onChange = null, string heading = "")
+        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, TranslationInfo[] selections, CustomOption parent = null, bool isHeader = false, Action onChange = null, TranslationInfo heading = null)
         {
             return new CustomOption(id, type, translationInfo, selections, "", parent, isHeader, onChange, heading);
         }
 
-        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, float defaultValue, float min, float max, float step, CustomOption parent = null, bool isHeader = false, Action onChange = null, string heading = "")
+        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, float defaultValue, float min, float max, float step, CustomOption parent = null, bool isHeader = false, Action onChange = null, TranslationInfo heading = null)
         {
             List<object> selections = new();
             for (float s = min; s <= max; s += step)
@@ -92,7 +92,7 @@ namespace TheOtherRoles
             return new CustomOption(id, type, translationInfo, selections.ToArray(), defaultValue, parent, isHeader, onChange, heading);
         }
 
-        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, bool defaultValue, CustomOption parent = null, bool isHeader = false, Action onChange = null, string heading = "")
+        public static CustomOption Create(int id, CustomOptionType type, TranslationInfo translationInfo, bool defaultValue, CustomOption parent = null, bool isHeader = false, Action onChange = null, TranslationInfo heading = null)
         {
             return new CustomOption(id, type, translationInfo, new[] { new TranslationInfo("Opt-General", 69), new TranslationInfo("Opt-General", 70) }, defaultValue ? new TranslationInfo("Opt-General", 70) : new TranslationInfo("Opt-General", 69), parent, isHeader, onChange, heading);
         }
@@ -595,7 +595,7 @@ namespace TheOtherRoles
                     headers++; // for header
                     CategoryHeaderMasked categoryHeaderMasked = UnityEngine.Object.Instantiate<CategoryHeaderMasked>(__instance.categoryHeaderOrigin);
                     categoryHeaderMasked.SetHeader(StringNames.ImpostorsCategory, 61);
-                    categoryHeaderMasked.Title.text = option.heading != "" ? option.heading : option.getTitle();
+                    categoryHeaderMasked.Title.text = option.heading != null ? option.heading.GetString() : option.getTitle();
                     if ((int)optionType == 99)
                         categoryHeaderMasked.Title.text = new Dictionary<CustomOptionType, string>() { { CustomOptionType.Impostor, ModTranslation.GetString("Opt-General", 81) }, { CustomOptionType.Neutral, ModTranslation.GetString("Opt-General", 80) },
                             { CustomOptionType.Crewmate, ModTranslation.GetString("Opt-General", 79) }, { CustomOptionType.Modifier, ModTranslation.GetString("Opt-General", 82) } }[curType];
@@ -632,7 +632,7 @@ namespace TheOtherRoles
                 var settingTuple = handleSpecialOptionsView(option, option.getTitle(), option.selections[value].ToString());
                 viewSettingsInfoPanel.SetInfo(StringNames.ImpostorsCategory, settingTuple.Item2, 61);
                 viewSettingsInfoPanel.titleText.text = settingTuple.Item1;
-                if (option.isHeader && (int)optionType != 99 && option.heading == "" && (option.type == CustomOptionType.Neutral || option.type == CustomOptionType.Crewmate || option.type == CustomOptionType.Impostor || option.type == CustomOptionType.Modifier))
+                if (option.isHeader && (int)optionType != 99 && option.heading == null && (option.type == CustomOptionType.Neutral || option.type == CustomOptionType.Crewmate || option.type == CustomOptionType.Impostor || option.type == CustomOptionType.Modifier))
                 {
                     viewSettingsInfoPanel.titleText.text = ModTranslation.GetString("Opt-General", 73);
                 }
@@ -847,7 +847,7 @@ namespace TheOtherRoles
                 {
                     CategoryHeaderMasked categoryHeaderMasked = UnityEngine.Object.Instantiate<CategoryHeaderMasked>(menu.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, menu.settingsContainer);
                     categoryHeaderMasked.SetHeader(StringNames.ImpostorsCategory, 20);
-                    categoryHeaderMasked.Title.text = option.heading != "" ? option.heading : option.getTitle();
+                    categoryHeaderMasked.Title.text = option.heading != null ? option.heading.GetString() : option.getTitle();
                     categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
                     categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
                     num -= 0.63f;
@@ -872,7 +872,7 @@ namespace TheOtherRoles
                 var stringOption = optionBehaviour as StringOption;
                 stringOption.OnValueChanged = new Action<OptionBehaviour>((o) => { });
                 stringOption.TitleText.text = option.getTitle();
-                if (option.isHeader && option.heading == "" && (option.type == CustomOptionType.Neutral || option.type == CustomOptionType.Crewmate || option.type == CustomOptionType.Impostor || option.type == CustomOptionType.Modifier))
+                if (option.isHeader && option.heading == null && (option.type == CustomOptionType.Neutral || option.type == CustomOptionType.Crewmate || option.type == CustomOptionType.Impostor || option.type == CustomOptionType.Modifier))
                 {
                     stringOption.TitleText.text = ModTranslation.GetString("Opt-General", 73);
                 }
@@ -904,6 +904,9 @@ namespace TheOtherRoles
             GameObject.Find("What Is This?")?.Destroy();
             GameObject.Find("GamePresetButton")?.Destroy();
             GameObject.Find("RoleSettingsButton")?.Destroy();
+            GameObject.Find("PlayerOptionsMenu(Clone)/Background/Overlay").Destroy();
+            //GameObject.Find("PlayerOptionsMenu(Clone)/MainArea/ROLES TAB/Scroller").Destroy();
+            //GameObject.Find("MainArea/ROLES TAB/HeaderButtons").SetActive(false);
             __instance.ChangeTab(1, false);
         }
 
@@ -977,7 +980,7 @@ namespace TheOtherRoles
                 // Guesser if applicable
                 if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
                 {
-                    createCustomButton(__instance, next++, "GuesserSettings", ModTranslation.GetString("Opt-General", 76));
+                    //createCustomButton(__instance, next++, "GuesserSettings", ModTranslation.GetString("Opt-General", 76));
                     createGameOptionsMenu(__instance, CustomOptionType.Guesser, "GuesserSettings");
                 }
                 // IMp
@@ -998,15 +1001,15 @@ namespace TheOtherRoles
             else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
             {
                 // create Main HNS settings
-                createCustomButton(__instance, next++, "HideNSeekMain", ModTranslation.GetString("Opt-General", 77));
+                //createCustomButton(__instance, next++, "HideNSeekMain", ModTranslation.GetString("Opt-General", 77));
                 createGameOptionsMenu(__instance, CustomOptionType.HideNSeekMain, "HideNSeekMain");
                 // create HNS Role settings
-                createCustomButton(__instance, next++, "HideNSeekRoles", ModTranslation.GetString("Opt-General", 72));
+                //createCustomButton(__instance, next++, "HideNSeekRoles", ModTranslation.GetString("Opt-General", 72));
                 createGameOptionsMenu(__instance, CustomOptionType.HideNSeekRoles, "HideNSeekRoles");
             }
             else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
             {
-                createCustomButton(__instance, next++, "PropHunt", ModTranslation.GetString("Opt-General", 103));
+                //createCustomButton(__instance, next++, "PropHunt", ModTranslation.GetString("Opt-General", 103));
                 createGameOptionsMenu(__instance, CustomOptionType.PropHunt, "PropHunt");
             }
         }

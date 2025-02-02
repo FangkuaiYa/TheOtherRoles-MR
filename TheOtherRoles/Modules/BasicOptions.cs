@@ -6,7 +6,8 @@ using AmongUs.GameOptions;
 
 namespace TheOtherRoles
 {
-    public static class BasicOptions
+    // Remove in 2025.2.1
+    /*public static class BasicOptions
     {
         public static void Save(Dictionary<int, string> optionTable, StreamWriter sw)
         {
@@ -157,7 +158,7 @@ namespace TheOtherRoles
 
         public static void Init()
         {
-            defaultData = new GameOptionsData(null);
+            var defaultData = new NormalGameOptionsV08(null);
 
             // Generic options : 890000000-
             //keywords = new Option<InnerNet.GameKeywords>(890000000, defaultData.Keywords);
@@ -325,7 +326,5 @@ namespace TheOtherRoles
         static Option<bool> anonymousVotes;
         static Option<TaskBarMode> taskBarMode;
         static Option<bool> isDefaults;
-
-        static GameOptionsData defaultData = null;
-    }
+    }*/
 }

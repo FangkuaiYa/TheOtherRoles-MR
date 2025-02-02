@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib;
 using Hazel;
 using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.Modules;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
@@ -148,6 +149,8 @@ namespace TheOtherRoles.Patches
                     RPCProcedure.setFirstKill(target.PlayerId);
                 }
             }
+
+            HudManager.Instance.ShowVanillaKeyGuide();
 
             TORMapOptions.firstKillName = "";
 

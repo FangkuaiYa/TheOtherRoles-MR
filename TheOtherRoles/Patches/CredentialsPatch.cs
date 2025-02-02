@@ -8,7 +8,6 @@ using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.UI.Button;
 
 namespace TheOtherRoles.Patches
 {
@@ -19,7 +18,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
         public static class PingTrackerPatch
         {
-            public static GameObject customPreset;
+            /*public static GameObject customPreset;
             static void Prefix(PingTracker __instance)
             {
                 if (customPreset == null)
@@ -51,7 +50,7 @@ namespace TheOtherRoles.Patches
                     if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started && customPreset.gameObject.activeSelf)
                         customPreset.gameObject.SetActive(false);
                 }
-            }
+            }*/
 
             static void Postfix(PingTracker __instance)
             {

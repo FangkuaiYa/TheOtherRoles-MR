@@ -83,6 +83,7 @@ namespace TheOtherRoles
             AntiTeleport.clearAndReload();
             Tiebreaker.clearAndReload();
             Sunglasses.clearAndReload();
+            Disperser.clearAndReload();
             Mini.clearAndReload();
             Vip.clearAndReload();
             Invert.clearAndReload();
@@ -3336,6 +3337,31 @@ namespace TheOtherRoles
             vision = CustomOptionHolder.modifierSunglassesVision.getSelection() + 1;
         }
     }
+
+    public static class Disperser
+    {
+        public static PlayerControl disperser;
+        public static Color color = new Color32(48, 21, 89, byte.MaxValue);
+
+        public static float cooldown = 30f;
+        public static float remainingDisperses = 1;
+        public static bool dispersesToVent;
+        private static Sprite buttonSprite;
+
+        public static Sprite getButtonSprite()
+        {
+            if (buttonSprite) return buttonSprite;
+            buttonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Disperse.png", 115f);
+            return buttonSprite;
+        }
+        public static void clearAndReload()
+        {
+            disperser = null;
+            cooldown = CustomOptionHolder.modifierDisperserCooldown.getFloat();
+            remainingDisperses = CustomOptionHolder.modifierDisperserNumberOfUses.getFloat();
+        }
+    }
+
     public static class Mini
     {
         public static PlayerControl mini;

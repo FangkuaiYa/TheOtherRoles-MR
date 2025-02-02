@@ -267,6 +267,10 @@
         "0": "Remember",
         "13": "\u56de\u5fc6"
     },
+    "Button,65": {
+        "0": "Disperse",
+        "13": "\u5206\u6563"
+    },
     "GameModeText,1": {
         "0": "TOR Guesser",
         "13": "\u8d4c\u602a\u6a21\u5f0f"
@@ -745,7 +749,7 @@
     "Opt-General,63": {
         "0": "Play On A Random Map",
         "11": "\u6bce\u56de\u30de\u30c3\u30d7\u304c\u30e9\u30f3\u30c0\u30e0\u306b",
-        "13": "\u5728\u968f\u673a\u5730\u56fe\u4e0a\u64ad\u653e"
+        "13": "\u968f\u673a\u5730\u56fe\u9884\u8bbe"
     },
     "Opt-General,64": {
         "0": "Skeld",
@@ -952,6 +956,54 @@
     "Opt-General,110": {
         "0": "Role Overview",
         "13": "\u804c\u4e1a\u603b\u89c8"
+    },
+    "Opt-General,111": {
+        "0": "Amount of Guessers",
+        "13": "\u8d4c\u602a\u6570\u91cf"
+    },
+    "Opt-General,112": {
+        "0": "Force Guessers",
+        "13": "\u5f3a\u5236\u4e3a\u8d4c\u602a"
+    },
+    "Opt-General,113": {
+        "0": "General Guesser Settings",
+        "13": "\u5e38\u89c4\u8d4c\u602a\u8bbe\u7f6e"
+    },
+    "Opt-General,114": {
+        "0": "Hunter Lights Settings",
+        "13": "\u730e\u4eba\u706f\u5149\u8bbe\u7f6e"
+    },
+    "Opt-General,115": {
+        "0": "Hunter Shields Settings",
+        "13": "\u730e\u4eba\u62a4\u76fe\u8bbe\u7f6e"
+    },
+    "Opt-General,116": {
+        "0": "General PropHunt Settings",
+        "13": "\u53d8\u5f62\u72e9\u730e\u5e38\u89c4\u8bbe\u7f6e"
+    },
+    "Opt-General,117": {
+        "0": "Hunter Settings",
+        "13": "\u730e\u4eba\u8bbe\u7f6e"
+    },
+    "Opt-General,118": {
+        "0": "Prop Settings",
+        "13": "\u9053\u5177\u8bbe\u7f6e"
+    },
+    "Opt-General,119": {
+        "0": "Gameplay Settings",
+        "13": "\u6e38\u620f\u8bbe\u7f6e"
+    },
+    "Opt-General,120": {
+        "0": "Night Vision Cams",
+        "13": "\u591c\u89c6\u6444\u50cf\u5934"
+    },
+    "Opt-General,121": {
+        "0": "Random Maps",
+        "13": "\u968f\u673a\u5730\u56fe"
+    },
+    "Opt-General,122": {
+        "0": "Hide After Death Modifiers",
+        "13": "\u6b7b\u4ea1\u540e\u9690\u85cf\u9644\u52a0\u804c\u4e1a\u6548\u679c"
     },
     "Color,1": {
         "0": "Salmon",
@@ -1701,7 +1753,7 @@
     "Role-Name,45": {
         "0": "Evil Yasuna",
         "11": "\u30a4\u30d3\u30eb\u30e4\u30b9\u30ca",
-        "13": "\u90aa\u6076\u7684\u51b3\u88c1\u8005"
+        "13": "\u90aa\u6076\u7684\u88c1\u51b3\u8005"
     },
     "Role-IntroDesc,45": {
         "0": "Exile smart crewmates",
@@ -1716,7 +1768,7 @@
     "Role-Name,46": {
         "0": "Yasuna",
         "11": "\u30e4\u30b9\u30ca",
-        "13": "\u6b63\u4e49\u7684\u51b3\u88c1\u8005"
+        "13": "\u6b63\u4e49\u7684\u88c1\u51b3\u8005"
     },
     "Role-IntroDesc,46": {
         "0": "Exile suspicious crewmates",
@@ -2118,20 +2170,32 @@
         "0": "You forgor",
         "13": "\u7a83\u53d6\u6b7b\u4ea1\u73a9\u5bb6\u7684\u804c\u4e1a"
     },
+    "Role-Name,74": {
+        "0": "Disperser",
+        "13": "\u5206\u6563\u8005"
+    },
+    "Role-IntroDesc,74": {
+        "0": "Separate the Crew",
+        "13": "\u5206\u6563\u8239\u5458"
+    },
+    "Role-ShortDesc,74": {
+        "0": "Separate the Crew",
+        "13": "\u5206\u6563\u8239\u5458"
+    },
     "Opt-Yasuna,1": {
         "0": "Chance That The Yasuna Is An Impostor",
         "11": "\u30a4\u30d3\u30eb\u30e4\u30b9\u30ca\u306b\u306a\u308b\u78ba\u7387",
-        "13": "\u51b3\u88c1\u8005\u662f\u5185\u9b3c\u7684\u6982\u7387"
+        "13": "\u88c1\u51b3\u8005\u662f\u5185\u9b3c\u7684\u6982\u7387"
     },
     "Opt-Yasuna,2": {
         "0": "Yasuna Number Of Special Votes",
         "11": "\u5f37\u5236\u6295\u7968\u6a5f\u80fd\u306e\u4f7f\u7528\u53ef\u80fd\u56de\u6570",
-        "13": "\u51b3\u88c1\u8005\u5f3a\u5236\u6295\u7968\u53ef\u7528\u6b21\u6570"
+        "13": "\u88c1\u51b3\u8005\u5f3a\u5236\u6295\u7968\u53ef\u7528\u6b21\u6570"
     },
     "Opt-Yasuna,3": {
         "0": "Yasuna-specific Message Mode",
         "11": "\u30e4\u30b9\u30ca\u7279\u6709\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u3092\u6709\u52b9\u5316",
-        "13": "\u542f\u7528\u51b3\u88c1\u8005\u7279\u6709\u4fe1\u606f\u6a21\u5f0f"
+        "13": "\u542f\u7528\u88c1\u51b3\u8005\u7279\u6709\u4fe1\u606f\u6a21\u5f0f"
     },
     "Opt-YasunaJr,1": {
         "0": "Yasuna Jr. Number Of Special Votes",
@@ -3262,6 +3326,14 @@
         "11": "\u8ffd\u653e\u6642\u30af\u30eb\u30fc\u3092\u8ffd\u653e\u3059\u308b",
         "13": "\u653e\u9010\u53db\u5f92\u65f6\u540c\u65f6\u653e\u9010\u4e00\u540d\u8239\u5458"
     },
+    "Opt-Disperser,1": {
+        "0": "Disperser Cooldown",
+        "13": "\u5206\u6563\u6280\u80fd\u51b7\u5374"
+    },
+    "Opt-Disperser,2": {
+        "0": "Number Of Uses",
+        "13": "\u53ef\u5206\u6563\u6570\u91cf"
+    },
     "Opt-Bloody,1": {
         "0": "Bloody Quantity",
         "11": "\u4eba\u6570",
@@ -3992,7 +4064,7 @@
     "Exile,2": {
         "0": "(Yasuna)",
         "11": "{0}\u3055\u3093\uff01\u3084\u308a\u307e\u3057\u305f\u306d\u3047\uff5e\uff01",
-        "13": " (\u51b3\u88c1\u8005)"
+        "13": " (\u88c1\u51b3\u8005)"
     },
     "Exile,3": {
         "0": "(Tiebreaker)",
@@ -4198,15 +4270,15 @@
     },
     "Credentials,5": {
         "0": "<size=60%>Modded by <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color></size>",
-        "13": "<size=60%>Modded by <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color></size>"
+        "13": "<size=60%>\u6a21\u7ec4\u4f5c\u8005: <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\n\u827a\u672f\u8bbe\u8ba1: <color=#FCCE03FF>Bavari</color> & <#BC01F6>\u4e71\u7801</color></size>"
     },
     "Credentials,6": {
         "0": "<size=60%> <color=#FCCE03FF>Special thanks to Smeggy & <b>Imp11</b></color></size>",
-        "13": "<size=60%> <color=#FCCE03FF>Special thanks to Smeggy & <b>Imp11</b></color></size>"
+        "13": "<size=60%> <color=#FCCE03FF>\u7279\u522b\u611f\u8c22 Smeggy & <b>Imp11</b></color></size>"
     },
     "Credentials,7": {
-        "0": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c Design by <color=#FCCE03FF>Bavari</color>",
-        "13": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c Design by <color=#FCCE03FF>Bavari</color>"
+        "0": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c Design by <color=#FCCE03FF>Bavari</color> & <#BC01F6>\u4e71\u7801</color>",
+        "13": "\u6a21\u7ec4\u4f5c\u8005: <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c \u827a\u672f\u8bbe\u8ba1: <color=#FCCE03FF>Bavari</color> & <#BC01F6>\u4e71\u7801</color>"
     },
     "Credentials,8": {
         "0": "Host",

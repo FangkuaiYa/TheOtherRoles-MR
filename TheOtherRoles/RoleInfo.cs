@@ -106,6 +106,7 @@ namespace TheOtherRoles
         public static RoleInfo taskRacer = new RoleInfo(TaskRacer.color, RoleId.TaskRacer);
 
         // Modifier
+        public static RoleInfo disperser = new RoleInfo(Color.red, RoleId.Disperser, false, true);
         public static RoleInfo bloody = new RoleInfo(Color.yellow, RoleId.Bloody, false, true);
         public static RoleInfo antiTeleport = new RoleInfo(Color.yellow, RoleId.AntiTeleport, false, true);
         public static RoleInfo tiebreaker = new RoleInfo(Color.yellow, RoleId.Tiebreaker, false, true);
@@ -182,6 +183,7 @@ namespace TheOtherRoles
             chameleon,
             armored,
             shifter,
+            disperser,
             yasuna,
             yasunaJr,
             evilYasuna,
@@ -219,6 +221,7 @@ namespace TheOtherRoles
                 if (Chameleon.chameleon.Any(x => x.PlayerId == p.PlayerId)) infos.Add(chameleon);
                 if (p == Armored.armored) infos.Add(armored);
                 if (p == Shifter.shifter) infos.Add(shifter);
+                if (p == Disperser.disperser) infos.Add(disperser);
             }
 
             int count = infos.Count;  // Save count after modifiers are added so that the role count can be checked

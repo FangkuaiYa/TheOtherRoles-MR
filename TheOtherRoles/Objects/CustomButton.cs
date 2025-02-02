@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TheOtherRoles.Modules;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -82,6 +83,7 @@ namespace TheOtherRoles.Objects
             button.OnClick = new Button.ButtonClickedEvent();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)onClickEvent);
 
+            setKeyBind();
             setActive(false);
         }
 
@@ -277,6 +279,32 @@ namespace TheOtherRoles.Objects
             {
                 OnClick = InitialOnClick;
             }
+        }
+        internal GameObject UsesIcon = null!;
+        public TMPro.TextMeshPro ShowUsesIcon(int iconVariation)
+        {
+            if (UsesIcon) GameObject.Destroy(UsesIcon);
+            UsesIcon = ButtonEffect.ShowUsesIcon(actionButton, iconVariation, out var text);
+            return text;
+        }
+
+        public void setKeyBind()
+        {
+            if (hotkey != null && hotkey != KeyCode.None && hotkey != KeyCode.KeypadPlus)
+            {
+                actionButtonGameObject.ForEachChild((Il2CppSystem.Action<GameObject>)((c) => { if (c.name.Equals("HotKeyGuide")) GameObject.Destroy(c); }));
+                ButtonEffect.SetKeyGuide(actionButtonGameObject, (KeyCode)hotkey, action: showButtonText && buttonText != "" ? buttonText : "Action");
+            }
+        }
+
+        public void resetKeyBind()
+        {
+            bool isVampire = Sprite == Vampire.getButtonSprite();
+            if (buttonText == "" && !isVampire) return; // English or something that doesn't require an update, return
+            // Specify vampire as not to override things with English language
+            if ((buttonText != "" || isVampire)) return;
+            actionButtonGameObject.ForEachChild((Il2CppSystem.Action<GameObject>)((c) => { if (c.name.Equals("HotKeyGuide")) GameObject.Destroy(c); }));
+            setKeyBind();
         }
     }
 }

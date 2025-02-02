@@ -92,6 +92,7 @@ namespace TheOtherRoles
         Chameleon,
         Armored,
         Shifter,
+        Disperser,
         Prop,
         // Task Vs Mode ---
         TaskRacer,
@@ -191,6 +192,7 @@ namespace TheOtherRoles
         AmnesiacTakeRole,
         TurnToImpostor,
         TurnToCrewmate,
+        Disperse,
 
         YasunaSpecialVote,
         YasunaJrSpecialVote,
@@ -531,6 +533,9 @@ namespace TheOtherRoles
                     break;
                 case RoleId.Sunglasses:
                     Sunglasses.sunglasses.Add(player);
+                    break;
+                case RoleId.Disperser:
+                    Disperser.disperser = player;
                     break;
                 case RoleId.Mini:
                     Mini.mini = player;
@@ -1063,22 +1068,48 @@ namespace TheOtherRoles
 
                     if (PlayerControl.LocalPlayer == Kataomoi.kataomoi)
                     {
-                        Vector3 bottomLeft = new Vector3(-FastDestroyableSingleton<HudManager>.Instance.UseButton.transform.localPosition.x, FastDestroyableSingleton<HudManager>.Instance.UseButton.transform.localPosition.y, FastDestroyableSingleton<HudManager>.Instance.UseButton.transform.localPosition.z) + new Vector3(-0.25f, 1f, 0);
+                        Vector3 bottomLeft = new Vector3(-FastDestroyableSingleton<HudManager>.Instance.UseButton.transform.localPosition.x, FastDestroyableSingleton<HudManager>.Instance.UseButton.transform.localPosition.y, FastDestroyableSingleton<HudManager>.Instance.UseButton.transform.localPosition.z);
                         Kataomoi.stareText = UnityEngine.Object.Instantiate<TMPro.TextMeshPro>(FastDestroyableSingleton<HudManager>.Instance.KillButton.cooldownTimerText, FastDestroyableSingleton<HudManager>.Instance.transform);
                         Kataomoi.stareText.alignment = TMPro.TextAlignmentOptions.Center;
-                        Kataomoi.stareText.transform.localPosition = bottomLeft + new Vector3(0f, -1f, -1f);
-                        Kataomoi.stareText.gameObject.SetActive(true);
+                        Kataomoi.stareText.transform.localPosition = bottomLeft + new Vector3(0f, -0.35f, -62f);
+                        Kataomoi.stareText.transform.localScale = Vector3.one * 0.4f;
+                        Kataomoi.stareText.gameObject.SetActive(!MeetingHud.Instance);
 
-                        foreach (PlayerControl p in PlayerControl.AllPlayerControls)
+                        Kataomoi.gaugeRenderer[0] = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.KillButton.graphic, FastDestroyableSingleton<HudManager>.Instance.transform);
+                        var killButton = Kataomoi.gaugeRenderer[0].GetComponent<KillButton>();
+                        killButton.SetCoolDown(0.00000001f, 0.00000001f);
+                        killButton.SetFillUp(0.00000001f, 0.00000001f);
+                        killButton.SetDisabled();
+                        Helpers.hideGameObjects(Kataomoi.gaugeRenderer[0].gameObject);
+                        var components = killButton.GetComponents<Component>();
+                        foreach (var c in components)
                         {
-                            if (TORMapOptions.playerIcons.ContainsKey(p.PlayerId))
-                            {
-                                TORMapOptions.playerIcons[p.PlayerId].setSemiTransparent(false);
-                                TORMapOptions.playerIcons[p.PlayerId].transform.localPosition = bottomLeft + new Vector3(0f, -1f, 0);
-                                TORMapOptions.playerIcons[p.PlayerId].transform.localScale = Vector3.one * 0.4f;
-                                TORMapOptions.playerIcons[p.PlayerId].gameObject.SetActive(false);
-                            }
+                            if ((c as KillButton) == null && (c as SpriteRenderer) == null)
+                                GameObject.Destroy(c);
                         }
+
+                        Kataomoi.gaugeRenderer[0].sprite = Kataomoi.getLoveGaugeSprite(0);
+                        Kataomoi.gaugeRenderer[0].color = new Color32(175, 175, 176, 255);
+                        Kataomoi.gaugeRenderer[0].size = new Vector2(300f, 64f);
+                        Kataomoi.gaugeRenderer[0].gameObject.SetActive(true);
+                        Kataomoi.gaugeRenderer[0].transform.localPosition = new Vector3(-3.354069f, -2.429999f, -8f);
+                        Kataomoi.gaugeRenderer[0].transform.localScale = Vector3.one;
+
+                        Kataomoi.gaugeRenderer[1] = UnityEngine.Object.Instantiate(Kataomoi.gaugeRenderer[0], FastDestroyableSingleton<HudManager>.Instance.transform);
+                        Kataomoi.gaugeRenderer[1].sprite = Kataomoi.getLoveGaugeSprite(1);
+                        Kataomoi.gaugeRenderer[1].size = new Vector2(261f, 7f);
+                        Kataomoi.gaugeRenderer[1].color = Kataomoi.color;
+                        Kataomoi.gaugeRenderer[1].transform.localPosition = new Vector3(-3.482069f, -2.626999f, -8.1f);
+                        Kataomoi.gaugeRenderer[1].transform.localScale = Vector3.one;
+
+                        Kataomoi.gaugeRenderer[2] = UnityEngine.Object.Instantiate(Kataomoi.gaugeRenderer[0], FastDestroyableSingleton<HudManager>.Instance.transform);
+                        Kataomoi.gaugeRenderer[2].sprite = Kataomoi.getLoveGaugeSprite(2);
+                        Kataomoi.gaugeRenderer[2].color = Kataomoi.gaugeRenderer[0].color;
+                        Kataomoi.gaugeRenderer[2].size = new Vector2(300f, 64f);
+                        Kataomoi.gaugeRenderer[2].transform.localPosition = new Vector3(-3.354069f, -2.429999f, -8.2f);
+                        Kataomoi.gaugeRenderer[2].transform.localScale = Vector3.one;
+
+                        Kataomoi.gaugeTimer = 1.0f;
                     }
                     break;
                 case RoleId.Yasuna:
@@ -1496,6 +1527,7 @@ namespace TheOtherRoles
                 if (Bloody.bloody.Any(x => x.PlayerId == player.PlayerId)) Bloody.bloody.RemoveAll(x => x.PlayerId == player.PlayerId);
                 if (AntiTeleport.antiTeleport.Any(x => x.PlayerId == player.PlayerId)) AntiTeleport.antiTeleport.RemoveAll(x => x.PlayerId == player.PlayerId);
                 if (Sunglasses.sunglasses.Any(x => x.PlayerId == player.PlayerId)) Sunglasses.sunglasses.RemoveAll(x => x.PlayerId == player.PlayerId);
+                if (player == Disperser.disperser) Disperser.clearAndReload();
                 if (player == Tiebreaker.tiebreaker) Tiebreaker.clearAndReload();
                 if (player == Mini.mini) Mini.clearAndReload();
                 if (Vip.vip.Any(x => x.PlayerId == player.PlayerId)) Vip.vip.RemoveAll(x => x.PlayerId == player.PlayerId);
@@ -1592,6 +1624,42 @@ namespace TheOtherRoles
             position.x = BitConverter.ToSingle(buff, 0 * sizeof(float));
             position.y = BitConverter.ToSingle(buff, 1 * sizeof(float));
             new JackInTheBox(position);
+        }
+
+        public static void disperse()
+        {
+            AntiTeleport.setPosition();
+            Helpers.showFlash(Cleaner.color, 1f);
+            if (AntiTeleport.antiTeleport.FindAll(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId).Count == 0 && !PlayerControl.LocalPlayer.Data.IsDead)
+            {
+                foreach (PlayerControl player in PlayerControl.AllPlayerControls)
+                {
+                    if (MapBehaviour.Instance)
+                        MapBehaviour.Instance.Close();
+                    if (Minigame.Instance)
+                        Minigame.Instance.ForceClose();
+                    if (PlayerControl.LocalPlayer.inVent)
+                    {
+                        PlayerControl.LocalPlayer.MyPhysics.RpcExitVent(Vent.currentVent.Id);
+                        PlayerControl.LocalPlayer.MyPhysics.ExitAllVents();
+                    }
+                    PlayerControl.LocalPlayer.transform.position = FindVentPoss()[rnd.Next(FindVentPoss().Count)];
+                }
+                Disperser.remainingDisperses--;
+                //if (TORMapOptions.enableSoundEffects) SoundManager.Instance.PlaySound(CustomMain.customZips.disperserDisperse, false, 0.8f);
+            }
+        }
+
+        public static List<Vector3> FindVentPoss()
+        {
+            var poss = new List<Vector3>();
+            foreach (var vent in DestroyableSingleton<ShipStatus>.Instance.AllVents)
+            {
+                var Transform = vent.transform;
+                var position = Transform.position;
+                poss.Add(new Vector3(position.x, position.y + 0.2f, position.z - 50));
+            }
+            return poss;
         }
 
         public static void lightsOut()
@@ -2650,6 +2718,9 @@ namespace TheOtherRoles
                     break;
                 case (byte)CustomRPC.TurnToCrewmate:
                     RPCProcedure.turnToCrewmate(reader.ReadByte());
+                    break;
+                case (byte)CustomRPC.Disperse:
+                    RPCProcedure.disperse();
                     break;
 
                 // Game mode

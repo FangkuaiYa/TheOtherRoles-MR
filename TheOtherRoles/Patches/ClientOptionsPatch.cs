@@ -34,11 +34,11 @@ namespace TheOtherRoles.Patches
         static ToggleButtonBehaviour buttonPrefab;
         static Vector3? _origin;
         static ToggleButtonBehaviour moreOptions;
-        static TextMeshPro optionTitle;
+        static TextMeshPro optionTitle = null;
         const string PresetNameTitle = "PresetName,";
 
 
-        public class PresetInfo
+        /*public class PresetInfo
         {
             public string presetName { get; set; }
             public long registTime { get; set; }
@@ -193,7 +193,7 @@ namespace TheOtherRoles.Patches
                     int v = option.defaultSelection;
                     if (optionValueTable.TryGetValue(option.id, out string value))
                         int.TryParse(value, out v);
-                    option.updateSelection(v);
+                    option.updateSelection(v, false);
                 }
                 CustomOption.ShareOptionSelections();
                 PlayerControl.LocalPlayer.RpcSyncSettings(GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameOptionsManager.Instance.currentGameOptions, false)); // Hmm?Need not it?
@@ -234,33 +234,33 @@ namespace TheOtherRoles.Patches
 
             string filePath;
             Dictionary<int, string> optionValueTable = new();
-        }
+        }*/
 
-        const int PresetInfoOnePageViewMax = 4;
+        //const int PresetInfoOnePageViewMax = 4;
         static OptionsMenuBehaviour _instance = null;
-        static List<PresetInfo> presetInfoList = new List<PresetInfo>();
-        static List<GameObject> presetInfoObjList = new List<GameObject>();
-        static int presetInfoPageNow = 0;
-        static int presetInfoPageMax = 0;
-        static TextMeshPro presetTitle = null;
-        static GameObject presetRoot = null;
-        static SelectionBehaviour prevPresetPageInfo = null;
-        static SelectionBehaviour nextPresetPageInfo = null;
-        static SelectionBehaviour createNewPresetInfo = null;
-        static GameObject createNewPresetPopUp = null;
-        public static EditName createNewPresetEditName = null;
-        static GameObject renamePresetPopUp = null;
-        static EditName renamePresetEditName = null;
+        //static List<PresetInfo> presetInfoList = new List<PresetInfo>();
+        //static List<GameObject> presetInfoObjList = new List<GameObject>();
+        //static int presetInfoPageNow = 0;
+        //static int presetInfoPageMax = 0;
+        //static TextMeshPro presetTitle = null;
+        //static GameObject presetRoot = null;
+        //static SelectionBehaviour prevPresetPageInfo = null;
+        //static SelectionBehaviour nextPresetPageInfo = null;
+        //static SelectionBehaviour createNewPresetInfo = null;
+        //static GameObject createNewPresetPopUp = null;
+        //public static EditName createNewPresetEditName = null;
+        //static GameObject renamePresetPopUp = null;
+        //static EditName renamePresetEditName = null;
 
         //static Dictionary<BepInEx.Configuration.ConfigDefinition, string> orphanedEntries = null;
 
-        static SelectionBehaviourObservable tabObservable = new SelectionBehaviourObservable();
+        /*static SelectionBehaviourObservable tabObservable = new SelectionBehaviourObservable();
         static SelectionBehaviour optionTabInfo = null;
         static SelectionBehaviour presetTabInfo = null;
 
         static SelectionBehaviour.InitDesc optionButtonDesc;
         static SelectionBehaviour.InitDesc presetButtonDesc;
-        static SelectionBehaviour.InitDesc tabDesc;
+        static SelectionBehaviour.InitDesc tabDesc;*/
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
@@ -298,7 +298,7 @@ namespace TheOtherRoles.Patches
                 buttonPrefab.gameObject.SetActive(false);
             }
 
-            SetUpOptions();
+            //SetUpOptions();
             InitializeMoreButton(__instance);
         }
 
@@ -322,11 +322,11 @@ namespace TheOtherRoles.Patches
             if (optionTitle != null)
                 optionTitle.text = ModTranslation.GetString("MainMenu", 18);
 
-            tabObservable.Clear();
-            UpdateOptionContents();
-            UpdatePresetButtons();
-            UpdateOptionTabs();
-            UpdatePresetInfo();
+            //tabObservable.Clear();
+            //UpdateOptionContents();
+            //UpdatePresetButtons();
+            //UpdateOptionTabs();
+            //UpdatePresetInfo();
         }
 
         static void CreateCustom(OptionsMenuBehaviour prefab)
@@ -389,7 +389,7 @@ namespace TheOtherRoles.Patches
         {
             popUp.gameObject.SetActive(false);
             popUp.gameObject.SetActive(true);
-            SetUpOptions();
+            //SetUpOptions();
         }
 
         static void OnMoreButton(OptionsMenuBehaviour __instance)
@@ -414,7 +414,7 @@ namespace TheOtherRoles.Patches
                 __instance.Close();
         }
 
-        static void SetUpOptions()
+        /*static void SetUpOptions()
         {
             if (popUp.transform.GetComponentInChildren<ToggleButtonBehaviour>())
             {
@@ -423,10 +423,10 @@ namespace TheOtherRoles.Patches
                     isOpenPreset = false;
                     presetTabInfo.Select();
                 }
-                if (createNewPresetInfo != null)
-                {
-                    createNewPresetInfo.SetActive(AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started);
-                }
+                //if (createNewPresetInfo != null)
+                //{
+                //    createNewPresetInfo.SetActive(AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started);
+                //}
                 UpdatePresetInfo();
                 return;
             }
@@ -576,9 +576,9 @@ namespace TheOtherRoles.Patches
             optionTabInfo.Initialize(tabDesc);
             tabDesc.pos = new Vector3(.7f, 2.35f, -.5f);
             presetTabInfo.Initialize(tabDesc);
-        }
+        }*/
 
-        static void UpdatePresetButtons()
+        /*static void UpdatePresetButtons()
         {
             if (presetButtonDesc == null)
                 return;
@@ -838,7 +838,7 @@ namespace TheOtherRoles.Patches
             prevPresetPageInfo._transform.gameObject.SetActive(presetInfoPageMax > 1);
             nextPresetPageInfo._transform.gameObject.SetActive(presetInfoPageMax > 1);
             presetTitle.text = String.Format(ModTranslation.GetString("MainMenu", 27), presetInfoPageNow, presetInfoPageMax);
-        }
+        }*/
 
         static IEnumerable<GameObject> GetAllChilds(this GameObject Go)
         {

@@ -563,7 +563,8 @@ namespace TheOtherRoles.Patches
                 RoleId.Invert,
                 RoleId.Chameleon,
                 RoleId.Armored,
-                RoleId.Shifter
+                RoleId.Shifter,
+                RoleId.Disperser
             });
 
             if (rnd.Next(1, 101) <= CustomOptionHolder.modifierLover.getSelection() * 10)
@@ -714,6 +715,14 @@ namespace TheOtherRoles.Patches
                 playerList.RemoveAll(x => x.PlayerId == playerId);
                 modifiers.RemoveAll(x => x == RoleId.Shifter);
             }
+            if (modifiers.Contains(RoleId.Disperser))
+            {
+                List<PlayerControl> impPlayer = new List<PlayerControl>(playerList);
+                impPlayer.RemoveAll(x => !x.Data.Role.IsImpostor);
+                playerId = setModifierToRandomPlayer((byte)RoleId.Disperser, impPlayer);
+                playerList.RemoveAll(x => x.PlayerId == playerId);
+                modifiers.RemoveAll(x => x == RoleId.Disperser);
+            }
             if (modifiers.Contains(RoleId.Sunglasses))
             {
                 int sunglassesCount = 0;
@@ -779,6 +788,9 @@ namespace TheOtherRoles.Patches
                     break;
                 case RoleId.Shifter:
                     selection = CustomOptionHolder.modifierShifter.getSelection();
+                    break;
+                case RoleId.Disperser:
+                    selection = CustomOptionHolder.modifierDisperser.getSelection();
                     break;
             }
 
