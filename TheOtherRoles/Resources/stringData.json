@@ -269,7 +269,11 @@
     },
     "Button,65": {
         "0": "Disperse",
-        "13": "\u5206\u6563"
+        "13": "\u56de\u5fc6"
+    },
+    "Button,66": {
+        "0": "Alert",
+        "13": "\u8b66\u6212"
     },
     "GameModeText,1": {
         "0": "TOR Guesser",
@@ -2182,6 +2186,18 @@
         "0": "Separate the Crew",
         "13": "\u5206\u6563\u8239\u5458"
     },
+    "Role-Name,75": {
+        "0": "Veteran",
+        "13": "\u8001\u5175"
+    },
+    "Role-IntroDesc,75": {
+        "0": "Protect yourself from other",
+        "13": "\u4f60\u7684\u5b89\u5168\u4f7f\u7528\u522b\u4eba\u6362\u6765\u7684"
+    },
+    "Role-ShortDesc,75": {
+        "0": "Protect yourself from others",
+        "13": "\u65f6\u523b\u4fdd\u6301\u8b66\u89c9"
+    },
     "Opt-Yasuna,1": {
         "0": "Chance That The Yasuna Is An Impostor",
         "11": "\u30a4\u30d3\u30eb\u30e4\u30b9\u30ca\u306b\u306a\u308b\u78ba\u7387",
@@ -2741,6 +2757,18 @@
     "Opt-Engineer,4": {
         "0": "Engineer Fix",
         "13": "\u5de5\u7a0b\u5e08\u4fee\u590d\u7834\u574f"
+    },
+    "Opt-Veteran,1": {
+        "0": "Veteran Alert Cooldown",
+        "13": "\u8001\u5175\u8b66\u6212\u51b7\u5374"
+    },
+    "Opt-Veteran,2": {
+        "0": "Veteran Alert Duration",
+        "13": "\u8001\u5175\u8b66\u6212\u6301\u7eed\u65f6\u95f4"
+    },
+    "Opt-Veteran,3": {
+        "0": "Veteran Number Of Alerts",
+        "13": "\u8001\u5175\u8b66\u6212\u6570\u91cf"
     },
     "Opt-Sheriff,1": {
         "0": "Sheriff Cooldown",
@@ -4269,16 +4297,16 @@
         "13": "\u53d8\u5f62\u72e9\u730e"
     },
     "Credentials,5": {
-        "0": "<size=60%>Modded by <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color></size>",
-        "13": "<size=60%>\u6a21\u7ec4\u4f5c\u8005: <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>\n<color=#FCCE03FF>EndOfFile</color>\uff0c<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\n\u827a\u672f\u8bbe\u8ba1: <color=#FCCE03FF>Bavari</color> & <#BC01F6>\u4e71\u7801</color></size>"
+        "0": "<size=60%>Modded by <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>\nBase on <color=#FCCE03FF>TheOtherRoles</color>\nDesign by <color=#FCCE03FF>Bavari</color>, <#BC01F6>\u4e71\u7801</color> & <color=#ffa500>Super</color><color=#ff0000>New</color><color=#00ff00>Roles</color></size>",
+        "13": "<size=60%>\u6a21\u7ec4\u4f5c\u8005: <color=#00FFFF>FangKuai</color>, <color=#FCCE03FF>miru-y</color>\n\u57fa\u4e8e<color=#FCCE03FF>TheOtherRoles</color>\n\u827a\u672f\u8bbe\u8ba1: <color=#FCCE03FF>Bavari</color>, <#BC01F6>\u4e71\u7801</color> & <color=#ffa500>Super</color><color=#ff0000>New</color><color=#00ff00>Roles</color></size>"
     },
     "Credentials,6": {
         "0": "<size=60%> <color=#FCCE03FF>Special thanks to Smeggy & <b>Imp11</b></color></size>",
         "13": "<size=60%> <color=#FCCE03FF>\u7279\u522b\u611f\u8c22 Smeggy & <b>Imp11</b></color></size>"
     },
     "Credentials,7": {
-        "0": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c Design by <color=#FCCE03FF>Bavari</color> & <#BC01F6>\u4e71\u7801</color>",
-        "13": "\u6a21\u7ec4\u4f5c\u8005: <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>, <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color>\n& <color=#FCCE03FF>Gendelo</color>\uff0c \u827a\u672f\u8bbe\u8ba1: <color=#FCCE03FF>Bavari</color> & <#BC01F6>\u4e71\u7801</color>"
+        "0": "Modded by <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>\nBase on<color=#FCCE03FF>TheOtherRoles</color>\nDesign by <color=#FCCE03FF>Bavari</color>, <#BC01F6>\u4e71\u7801</color> & <color=#ffa500>Super</color><color=#ff0000>New</color><color=#00ff00>Roles</color>",
+        "13": "\u6a21\u7ec4\u4f5c\u8005: <color=#00FFFF>FangKuai</color>\uff0c<color=#FCCE03FF>miru-y</color>\n\u57fa\u4e8e<color=#FCCE03FF>TheOtherRoles</color>\n\u827a\u672f\u8bbe\u8ba1: <color=#FCCE03FF>Bavari</color>, <#BC01F6>\u4e71\u7801</color> & <color=#ffa500>Super</color><color=#ff0000>New</color><color=#00ff00>Roles</color>"
     },
     "Credentials,8": {
         "0": "Host",
