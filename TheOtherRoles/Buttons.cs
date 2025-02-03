@@ -610,7 +610,6 @@ namespace TheOtherRoles
             shifterShiftButton = new CustomButton(
                 () =>
                 {
-                    if (Helpers.checkSuspendAction(Shifter.shifter, Shifter.currentTarget)) return;
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetFutureShifted, Hazel.SendOption.Reliable, -1);
                     writer.Write(Shifter.currentTarget.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
