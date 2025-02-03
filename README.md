@@ -1,6 +1,6 @@
 # The Other Roles: MR Edition
-**Button Resources: The current mod button resources are drawn by FangKuai and 乱码, while the TOR button resources without text are drawn by FangKuai**  
-**按钮资源：现在的模组技能图片由FangKuai和乱码绘制，TOR不带文字的技能图片由FangKuai绘制**  
+**Button Resources: The current mod button resources are drawn by FangKuai and 乱码 and use some SNR button resources, while the TOR button resources without text are drawn by FangKuai**  
+**按钮资源：现在的模组技能图片由FangKuai和乱码绘制还是用了部分SNR的图片，TOR不带文字的技能图片由FangKuai绘制**  
 This mod is The Other Roles extension mod which implements new roles and systems based on [The Other Roles](https://github.com/Eisbison/TheOtherRoles)/[The Other Roles+](https://github.com/tomarai/TheOtherRoles).
 - **New Roles**
   - [Yasuna](#yasuna-mr-edition-only)/[Evil Yasuna](#yasuna-mr-edition-only) by [miru-y](https://github.com/miru-y)

@@ -207,6 +207,17 @@ namespace TheOtherRoles.Patches
             return b;
         }
     }
+    [HarmonyPatch(typeof(ModManager), nameof(ModManager.LateUpdate))]
+    public static class ModStampPatch
+    {
+        public static void Postfix(ModManager __instance)
+        {
+            if (__instance.ModStamp.enabled)
+            {
+                __instance.ModStamp.transform.position = AspectPosition.ComputeWorldPosition(__instance.localCamera, AspectPosition.EdgeAlignments.LeftTop, new Vector3(0.6f, 0.6f, __instance.localCamera.nearClipPlane + 0.1f));
+            }
+        }
+    }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
     class VentButtonVisibilityPatch
