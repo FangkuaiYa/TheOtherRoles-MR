@@ -355,6 +355,11 @@ namespace TheOtherRoles
         public static CustomOption taskMasterExtraShortTasks;
         public static CustomOption taskMasterExtraLongTasks;
 
+        public static CustomOption veteranSpawnRate;
+        public static CustomOption veteranCooldown;
+        public static CustomOption veteranAlertDuration;
+        public static CustomOption veteranAlertNumber;
+
         //public static CustomOption doorHackerSpawnRate;
         //public static CustomOption doorHackerNumberOfUses;
         //public static CustomOption doorHackerCooldown;
@@ -870,6 +875,11 @@ namespace TheOtherRoles
             hackerToolsNumber = CustomOption.Create(174, Types.Crewmate, new TranslationInfo("Opt-Hacker", 4), 5f, 1f, 30f, 1f, hackerSpawnRate);
             hackerRechargeTasksNumber = CustomOption.Create(175, Types.Crewmate, new TranslationInfo("Opt-Hacker", 5), 2f, 1f, 5f, 1f, hackerSpawnRate);
             hackerNoMove = CustomOption.Create(176, Types.Crewmate, new TranslationInfo("Opt-Hacker", 6), true, hackerSpawnRate);
+            
+            veteranSpawnRate = CustomOption.Create(180, Types.Crewmate, new TranslationInfo(RoleId.Veteran, Veteran.color), rates, null, true);
+            veteranCooldown = CustomOption.Create(181, Types.Crewmate, new TranslationInfo("Opt-Veteran", 1), 30f, 10f, 60f, 2.5f, veteranSpawnRate);
+            veteranAlertDuration = CustomOption.Create(182, Types.Crewmate, new TranslationInfo("Opt-Veteran", 2), 3f, 1f, 20f, 1f, veteranSpawnRate);
+            veteranAlertNumber = CustomOption.Create(183, Types.Crewmate, new TranslationInfo("Opt-Veteran", 3), 5f, 1f, 15f, 1f, veteranSpawnRate);
 
             trackerSpawnRate = CustomOption.Create(200, Types.Crewmate, new TranslationInfo(RoleId.Tracker, Tracker.color), rates, null, true);
             trackerUpdateIntervall = CustomOption.Create(201, Types.Crewmate, new TranslationInfo("Opt-Tracker", 1), 5f, 1f, 30f, 1f, trackerSpawnRate);

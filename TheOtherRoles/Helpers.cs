@@ -23,6 +23,7 @@ namespace TheOtherRoles
         PerformKill,
         SuppressKill,
         BlankKill,
+        ReverseKill,
         DelayVampireKill
     }
 
@@ -738,6 +739,15 @@ namespace TheOtherRoles
                 return MurderAttemptResult.SuppressKill;
             }
 
+            // Kill the killer if Veteran is on alert
+            else if (Veteran.veteran != null && Veteran.alertActive && Veteran.veteran == target)
+            {
+                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)CustomRPC.VeteranAlert, Hazel.SendOption.Reliable, -1);
+                AmongUsClient.Instance.FinishRpcImmediately(writer);
+                RPCProcedure.veteranAlert();
+                return MurderAttemptResult.ReverseKill;
+            }
+
             // Thief if hit crew only kill if setting says so, but also kill the thief.
             else if (Thief.isFailedThiefKill(target, killer, targetRole))
             {
@@ -805,6 +815,11 @@ namespace TheOtherRoles
                     }
                 })));
             }
+            if (murder == MurderAttemptResult.ReverseKill)
+            {
+                checkMurderAttemptAndKill(target, killer, isMeetingStart);
+            }
+
             return murder;
         }
 
@@ -833,6 +848,20 @@ namespace TheOtherRoles
             }
 
             return team;
+        }
+        public static bool checkSuspendAction(PlayerControl player, PlayerControl target)
+        {
+            if (player == null || target == null) return false;
+            if (Veteran.veteran != null && target == Veteran.veteran && Veteran.alertActive)
+            {
+                if (isEvil(player))
+                {
+                    _ = checkMuderAttempt(player, target);  // Gives the Veteran the achievement
+                    checkMurderAttemptAndKill(target, player);
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static bool isNeutral(PlayerControl player)

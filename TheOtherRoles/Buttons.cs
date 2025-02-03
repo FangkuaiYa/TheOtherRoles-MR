@@ -41,6 +41,7 @@ namespace TheOtherRoles
         private static CustomButton trackerTrackCorpsesButton;
         public static CustomButton vampireKillButton;
         public static CustomButton garlicButton;
+        public static CustomButton veteranAlertButton;
         public static CustomButton jackalKillButton;
         public static CustomButton sidekickKillButton;
         private static CustomButton jackalSidekickButton;
@@ -97,6 +98,7 @@ namespace TheOtherRoles
         public static TMPro.TMP_Text pursuerButtonBlanksText;
         public static TMPro.TMP_Text hackerAdminTableChargesText;
         public static TMPro.TMP_Text hackerVitalsChargesText;
+        public static TMPro.TMP_Text veteranButtonAlertText;
         public static TMPro.TMP_Text vultureRemainingText;
         public static TMPro.TMP_Text engineerRepairText;
         public static TMPro.TMP_Text portalmakerButtonNumText;
@@ -141,6 +143,7 @@ namespace TheOtherRoles
             vampireKillButton.MaxTimer = Vampire.cooldown;
             trackerTrackPlayerButton.MaxTimer = 0f;
             garlicButton.MaxTimer = 0f;
+            veteranAlertButton.MaxTimer = Veteran.cooldown;
             jackalKillButton.MaxTimer = Jackal.cooldown;
             sidekickKillButton.MaxTimer = Sidekick.cooldown;
             jackalSidekickButton.MaxTimer = Jackal.createSidekickCooldown;
@@ -193,6 +196,7 @@ namespace TheOtherRoles
             hackerAdminTableButton.EffectDuration = Hacker.duration;
             vampireKillButton.EffectDuration = Vampire.delay;
             lighterButton.EffectDuration = Lighter.duration;
+            veteranAlertButton.EffectDuration = Veteran.alertDuration;
             camouflagerButton.EffectDuration = Camouflager.duration;
             morphlingButton.EffectDuration = Morphling.duration;
             lightsOutButton.EffectDuration = Trickster.lightsOutDuration;
@@ -606,6 +610,7 @@ namespace TheOtherRoles
             shifterShiftButton = new CustomButton(
                 () =>
                 {
+                    if (Helpers.checkSuspendAction(Shifter.shifter, Shifter.currentTarget)) return;
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetFutureShifted, Hazel.SendOption.Reliable, -1);
                     writer.Write(Shifter.currentTarget.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -671,6 +676,7 @@ namespace TheOtherRoles
                     }
                     else if (Morphling.currentTarget != null)
                     {
+                        if (Helpers.checkSuspendAction(Morphling.morphling, Morphling.currentTarget)) return;
                         Morphling.sampledTarget = Morphling.currentTarget;
                         morphlingButton.Sprite = Morphling.getMorphSprite();
                         morphlingButton.EffectDuration = 1f;
@@ -789,6 +795,7 @@ namespace TheOtherRoles
             evilHackerCreatesMadmateButton = new CustomButton(
                 () =>
                 {
+                    if (Helpers.checkSuspendAction(EvilHacker.evilHacker, EvilHacker.currentTarget)) return;
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.EvilHackerCreatesMadmate, Hazel.SendOption.Reliable, -1);
                     writer.Write(EvilHacker.currentTarget.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -1014,6 +1021,7 @@ namespace TheOtherRoles
             vampireKillButton = new CustomButton(
                 () =>
                 {
+                    if (Helpers.checkSuspendAction(Vampire.vampire, Vampire.currentTarget)) return;
                     MurderAttemptResult murder = Helpers.checkMuderAttempt(Vampire.vampire, Vampire.currentTarget);
                     if (murder == MurderAttemptResult.PerformKill)
                     {
@@ -1303,10 +1311,46 @@ namespace TheOtherRoles
             portalmakerButtonText2.transform.localScale = Vector3.one * 0.5f;
             portalmakerButtonText2.transform.localPosition += new Vector3(-0.05f, 0.55f, -1f);
 
+            // Veteran Alert
+            veteranAlertButton = new CustomButton(
+                () =>
+                {
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VeteranAlert, Hazel.SendOption.Reliable, -1);
+                    AmongUsClient.Instance.FinishRpcImmediately(writer);
+                    RPCProcedure.veteranAlert();
+
+                    Veteran.remainingAlerts--;
+                    SoundEffectsManager.play("veteranAlert");
+                },
+                () => { return Veteran.veteran != null && Veteran.veteran == PlayerControl.LocalPlayer && !PlayerControl.LocalPlayer.Data.IsDead; },
+                () =>
+                {
+                    if (veteranButtonAlertText != null) veteranButtonAlertText.text = $"{Veteran.remainingAlerts}";
+                    return PlayerControl.LocalPlayer.CanMove && Veteran.remainingAlerts > 0;
+                },
+                () =>
+                {
+                    veteranAlertButton.Timer = veteranAlertButton.MaxTimer;
+                    veteranAlertButton.isEffectActive = false;
+                    veteranAlertButton.actionButton.cooldownTimerText.color = Palette.EnabledColor;
+                },
+                Veteran.getButtonSprite(),
+                CustomButton.ButtonPositions.lowerRowRight, //brb
+                __instance,
+                KeyCode.F,
+                true,
+                Veteran.alertDuration,
+                () => { veteranAlertButton.Timer = veteranAlertButton.MaxTimer; },
+                buttonText: ModTranslation.GetString("Button", 66),
+                abilityTexture: true
+            );
+            veteranButtonAlertText = veteranAlertButton.ShowUsesIcon(3);
+
             // Jackal Sidekick Button
             jackalSidekickButton = new CustomButton(
                 () =>
                 {
+                    if (Helpers.checkSuspendAction(Jackal.jackal, Jackal.currentTarget)) return;
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.JackalCreatesSidekick, Hazel.SendOption.Reliable, -1);
                     writer.Write(Jackal.currentTarget.PlayerId);
                     AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -1417,6 +1461,7 @@ namespace TheOtherRoles
             eraserButton = new CustomButton(
                 () =>
                 {
+                    if (Helpers.checkSuspendAction(Eraser.eraser, Eraser.currentTarget)) return;
                     eraserButton.MaxTimer += 10;
                     eraserButton.Timer = eraserButton.MaxTimer;
 
@@ -1546,6 +1591,7 @@ namespace TheOtherRoles
                 {
                     if (Warlock.curseVictim == null)
                     {
+                        if (Helpers.checkSuspendAction(Warlock.warlock, Warlock.currentTarget)) return;
                         // Apply Curse
                         Warlock.curseVictim = Warlock.currentTarget;
                         warlockCurseButton.Sprite = Warlock.getCurseKillButtonSprite();
@@ -1755,6 +1801,7 @@ namespace TheOtherRoles
                     }
                     else if (Arsonist.currentTarget != null)
                     {
+                        if (Helpers.checkSuspendAction(Arsonist.arsonist, Arsonist.currentTarget)) return;
                         Arsonist.douseTarget = Arsonist.currentTarget;
                         arsonistButton.HasEffect = true;
                         SoundEffectsManager.play("arsonistDouse");
@@ -2135,6 +2182,7 @@ namespace TheOtherRoles
                 {
                     if (Pursuer.target != null)
                     {
+                        if (Helpers.checkSuspendAction(Pursuer.pursuer, Pursuer.target)) return;
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SetBlanked, Hazel.SendOption.Reliable, -1);
                         writer.Write(Pursuer.target.PlayerId);
                         writer.Write(Byte.MaxValue);
@@ -2173,6 +2221,7 @@ namespace TheOtherRoles
             witchSpellButton = new CustomButton(
                 () =>
                 {
+                    if (Helpers.checkSuspendAction(Witch.witch, Witch.currentTarget)) return;
                     if (Witch.currentTarget != null)
                     {
                         Witch.spellCastingTarget = Witch.currentTarget;
@@ -2243,6 +2292,11 @@ namespace TheOtherRoles
                     {
                         // Murder attempt with teleport
                         MurderAttemptResult attempt = Helpers.checkMuderAttempt(Ninja.ninja, Ninja.ninjaMarked);
+                        if (attempt == MurderAttemptResult.ReverseKill)
+                        {
+                            Helpers.checkMurderAttemptAndKill(Veteran.veteran, Ninja.ninja);
+                            return;
+                        }
                         if (attempt == MurderAttemptResult.PerformKill)
                         {
                             // Create first trace before killing
@@ -2300,6 +2354,7 @@ namespace TheOtherRoles
                     }
                     if (Ninja.currentTarget != null)
                     {
+                        if (Helpers.checkSuspendAction(Ninja.ninja, Ninja.currentTarget)) return;
                         Ninja.ninjaMarked = Ninja.currentTarget;
                         ninjaButton.Timer = 5f;
                         SoundEffectsManager.play("warlockCurse");
@@ -2814,7 +2869,8 @@ namespace TheOtherRoles
                     return KillerCreator.killerCreator != null &&
                       KillerCreator.killerCreator == PlayerControl.LocalPlayer &&
                       MadmateKiller.madmateKiller == null &&
-                      !PlayerControl.LocalPlayer.Data.IsDead;
+                      !PlayerControl.LocalPlayer.Data.IsDead &&
+                      KillerCreator.killerCreator != Veteran.veteran;
                 },
                 () => { return KillerCreator.currentTarget && PlayerControl.LocalPlayer.CanMove; },
                 () => { },

@@ -94,6 +94,7 @@ namespace TheOtherRoles
         public static RoleInfo medium = new RoleInfo(Medium.color, RoleId.Medium);
         public static RoleInfo trapper = new RoleInfo(Trapper.color, RoleId.Trapper);
         public static RoleInfo taskMaster = new RoleInfo(TaskMaster.color, RoleId.TaskMaster);
+        public static RoleInfo veteran = new RoleInfo(Veteran.color, RoleId.Veteran);
         public static RoleInfo crewmate = new RoleInfo(Color.white, RoleId.Crewmate);
 
         // Custom Game Mode Role
@@ -143,6 +144,7 @@ namespace TheOtherRoles
             lover,
             jester,
             arsonist,
+            veteran,
             jackal,
             sidekick,
             vulture,
@@ -257,6 +259,7 @@ namespace TheOtherRoles
             if (p == Hacker.hacker) infos.Add(hacker);
             if (p == Tracker.tracker) infos.Add(tracker);
             if (p == Snitch.snitch) infos.Add(snitch);
+            if (p == Veteran.veteran) infos.Add(veteran);
             if (p == Jackal.jackal || (Jackal.formerJackals != null && Jackal.formerJackals.Any(x => x.PlayerId == p.PlayerId))) infos.Add(jackal);
             if (p == Sidekick.sidekick) infos.Add(sidekick);
             if (p == Spy.spy) infos.Add(spy);

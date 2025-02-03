@@ -44,6 +44,7 @@ namespace TheOtherRoles
         Tracker,
         Vampire,
         Snitch,
+        Veteran,
         Jackal,
         Sidekick,
         Eraser,
@@ -193,6 +194,8 @@ namespace TheOtherRoles
         TurnToImpostor,
         TurnToCrewmate,
         Disperse,
+        VeteranAlert,
+        VeteranKill,
 
         YasunaSpecialVote,
         YasunaJrSpecialVote,
@@ -396,6 +399,9 @@ namespace TheOtherRoles
                             break;
                         case RoleId.Snitch:
                             Snitch.snitch = player;
+                            break;
+                        case RoleId.Veteran:
+                            Veteran.veteran = player;
                             break;
                         case RoleId.Jackal:
                             Jackal.jackal = player;
@@ -1139,6 +1145,11 @@ namespace TheOtherRoles
                     Mayor.mayor = amnesiac;
                     Amnesiac.clearAndReload();
                     break;
+                case RoleId.Veteran:
+                    if (Amnesiac.resetRole) Veteran.clearAndReload();
+                    Veteran.veteran = amnesiac;
+                    Amnesiac.clearAndReload();
+                    break;
                 case RoleId.Portalmaker:
                     if (Amnesiac.resetRole) Portalmaker.clearAndReload();
                     Portalmaker.portalmaker = amnesiac;
@@ -1475,6 +1486,7 @@ namespace TheOtherRoles
             if (player == Yasuna.yasuna) Yasuna.clearAndReload();
             if (player == YasunaJr.yasunaJr) YasunaJr.clearAndReload();
             if (player == TaskMaster.taskMaster) TaskMaster.clearAndReload();
+            if (player == Veteran.veteran) Veteran.clearAndReload();
 
             // Impostor roles
             if (player == Morphling.morphling) Morphling.clearAndReload();
@@ -1669,6 +1681,22 @@ namespace TheOtherRoles
             if (Helpers.hasImpVision(GameData.Instance.GetPlayerById(PlayerControl.LocalPlayer.PlayerId)))
             {
                 new CustomMessage(ModTranslation.GetString("Game-Trickster", 1), Trickster.lightsOutDuration);
+            }
+        }
+        public static void veteranAlert()
+        {
+            Veteran.alertActive = true;
+            FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Veteran.alertDuration, new Action<float>((p) => {
+                if (p == 1f) Veteran.alertActive = false;
+            })));
+        }
+
+        public static void veteranKill(byte targetId)
+        {
+            if (PlayerControl.LocalPlayer == Veteran.veteran)
+            {
+                PlayerControl player = Helpers.playerById(targetId);
+                Helpers.checkMurderAttemptAndKill(Veteran.veteran, player);
             }
         }
 
@@ -2659,6 +2687,12 @@ namespace TheOtherRoles
                     playerId = reader.ReadByte();
                     RPCProcedure.doorHackerDone(playerId);
                     break;*/
+                case (byte)CustomRPC.VeteranAlert:
+                    RPCProcedure.veteranAlert();
+                    break;
+                case (byte)CustomRPC.VeteranKill:
+                    RPCProcedure.veteranKill(reader.ReadByte());
+                    break;
                 case (byte)CustomRPC.KataomoiSetTarget:
                     playerId = reader.ReadByte();
                     RPCProcedure.kataomoiSetTarget(playerId);
