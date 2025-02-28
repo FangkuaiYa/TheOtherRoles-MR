@@ -1,30 +1,37 @@
-using HarmonyLib;
 using System;
-using TheOtherRoles.Utilities;
+using HarmonyLib;
 using Hazel;
 using TheOtherRoles.Patches;
-using TheOtherRoles.Players;
+using TheOtherRoles.Utilities;
 
-namespace TheOtherRoles {
+namespace TheOtherRoles
+{
     [HarmonyPatch]
-    public static class TasksHandler {
+    public static class TasksHandler
+    {
 
-        public static Tuple<int, int> taskInfo(GameData.PlayerInfo playerInfo, bool madmateCount = false, bool isResult = false) {
+        public static Tuple<int, int> taskInfo(NetworkedPlayerInfo playerInfo, bool madmateCount = false, bool isResult = false)
+        {
             int TotalTasks = 0;
             int CompletedTasks = 0;
-            bool isMadmate = madmateCount && playerInfo.Object == Madmate.madmate && CachedPlayer.LocalPlayer.PlayerControl == Madmate.madmate;
-            if (!playerInfo.Disconnected && playerInfo.Tasks != null &&
+            bool isMadmate = madmateCount && playerInfo.Object == Madmate.madmate && PlayerControl.LocalPlayer == Madmate.madmate;
+            if (playerInfo != null && !playerInfo.Disconnected && playerInfo.Tasks != null &&
                 playerInfo.Object &&
                 playerInfo.Role && playerInfo.Role.TasksCountTowardProgress &&
                 (playerInfo.Object != Madmate.madmate || isMadmate) &&
-                !playerInfo.Object.hasFakeTasks()
-                ) {
+                !playerInfo.Object.hasFakeTasks() && !playerInfo.Role.IsImpostor
+                )
+            {
                 bool isOldTaskMasterEx = TaskMaster.taskMaster && TaskMaster.oldTaskMasterPlayerId == playerInfo.PlayerId;
                 bool isTaskMasterEx = TaskMaster.taskMaster && TaskMaster.taskMaster == playerInfo.Object && TaskMaster.isTaskComplete;
-                if (isOldTaskMasterEx || (!isResult && isTaskMasterEx)) {
-                    TotalTasks = CompletedTasks = PlayerControl.GameOptions.NumCommonTasks + PlayerControl.GameOptions.NumLongTasks + PlayerControl.GameOptions.NumShortTasks;
-                } else {
-                    foreach (var playerInfoTask in playerInfo.Tasks.GetFastEnumerator()) {
+                if (isOldTaskMasterEx || (!isResult && isTaskMasterEx))
+                {
+                    TotalTasks = CompletedTasks = GameOptionsManager.Instance.currentNormalGameOptions.NumCommonTasks + GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks + GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks;
+                }
+                else
+                {
+                    foreach (var playerInfoTask in playerInfo.Tasks.GetFastEnumerator())
+                    {
                         if (playerInfoTask.Complete) CompletedTasks++;
                         TotalTasks++;
                     }
@@ -36,13 +43,15 @@ namespace TheOtherRoles {
         }
 
         [HarmonyPatch(typeof(GameData), nameof(GameData.RecomputeTaskCounts))]
-        private static class GameDataRecomputeTaskCountsPatch {
-            private static bool Prefix(GameData __instance) {
-               
+        private static class GameDataRecomputeTaskCountsPatch
+        {
+            private static bool Prefix(GameData __instance)
+            {
+
 
                 var totalTasks = 0;
                 var completedTasks = 0;
-                
+
                 foreach (var playerInfo in GameData.Instance.AllPlayers.GetFastEnumerator())
                 {
                     if (playerInfo.Object
@@ -56,7 +65,7 @@ namespace TheOtherRoles {
                     totalTasks += playerTotal;
                     completedTasks += playerCompleted;
                 }
-                
+
                 __instance.TotalTasks = totalTasks;
                 __instance.CompletedTasks = completedTasks;
                 return false;
@@ -64,28 +73,36 @@ namespace TheOtherRoles {
         }
 
         [HarmonyPatch(typeof(GameData), nameof(GameData.CompleteTask))]
-        private static class GameDataCompleteTaskPatch {
-            private static void Postfix(GameData __instance, [HarmonyArgument(0)] PlayerControl pc, [HarmonyArgument(1)] uint taskId) {
+        private static class GameDataCompleteTaskPatch
+        {
+            private static void Postfix(GameData __instance, [HarmonyArgument(0)] PlayerControl pc, [HarmonyArgument(1)] uint taskId)
+            {
 
-                if (TaskRacer.isValid()) {
+                if (TaskRacer.isValid())
+                {
                     TaskRacer.updateTask(pc);
                 }
 
-                if (AmongUsClient.Instance.AmHost && !pc.Data.IsDead && TaskMaster.isTaskMaster(pc.PlayerId)) {
+                if (AmongUsClient.Instance.AmHost && !pc.Data.IsDead && TaskMaster.isTaskMaster(pc.PlayerId))
+                {
                     byte clearTasks = 0;
-                    for (int i = 0; i < pc.Data.Tasks.Count; ++i) {
+                    for (int i = 0; i < pc.Data.Tasks.Count; ++i)
+                    {
                         if (pc.Data.Tasks[i].Complete)
                             ++clearTasks;
                     }
                     bool allTasksCompleted = clearTasks == pc.Data.Tasks.Count;
-                    Action action = () => {
-                        if (TaskMaster.isTaskComplete) {
+                    Action action = () =>
+                    {
+                        if (TaskMaster.isTaskComplete)
+                        {
                             byte clearTasks = 0;
-                            for (int i = 0; i < pc.Data.Tasks.Count; ++i) {
+                            for (int i = 0; i < pc.Data.Tasks.Count; ++i)
+                            {
                                 if (pc.Data.Tasks[i].Complete)
                                     ++clearTasks;
                             }
-                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.TaskMasterUpdateExTasks, Hazel.SendOption.Reliable, -1);
+                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TaskMasterUpdateExTasks, Hazel.SendOption.Reliable, -1);
                             writer.Write(clearTasks);
                             writer.Write((byte)pc.Data.Tasks.Count);
                             AmongUsClient.Instance.FinishRpcImmediately(writer);
@@ -93,21 +110,27 @@ namespace TheOtherRoles {
                         }
                     };
 
-                    if (allTasksCompleted) {
-                        if (!TaskMaster.isTaskComplete) {
+                    if (allTasksCompleted)
+                    {
+                        if (!TaskMaster.isTaskComplete)
+                        {
                             byte[] taskTypeIds = TaskMasterTaskHelper.GetTaskMasterTasks(pc);
-                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(CachedPlayer.LocalPlayer.PlayerControl.NetId, (byte)CustomRPC.TaskMasterSetExTasks, Hazel.SendOption.Reliable, -1);
+                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TaskMasterSetExTasks, Hazel.SendOption.Reliable, -1);
                             writer.Write(pc.PlayerId);
                             writer.Write(byte.MaxValue);
                             writer.Write(taskTypeIds);
                             AmongUsClient.Instance.FinishRpcImmediately(writer);
                             RPCProcedure.taskMasterSetExTasks(pc.PlayerId, byte.MaxValue, taskTypeIds);
                             action();
-                        } else if (!TaskMaster.triggerTaskMasterWin) {
+                        }
+                        else if (!TaskMaster.triggerTaskMasterWin)
+                        {
                             action();
                             TaskMaster.triggerTaskMasterWin = true;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         action();
                     }
                 }

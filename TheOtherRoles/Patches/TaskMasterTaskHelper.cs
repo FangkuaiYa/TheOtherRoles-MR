@@ -1,12 +1,11 @@
-using HarmonyLib;
 using System;
-using static TheOtherRoles.TheOtherRoles;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using TheOtherRoles.Utilities;
+using UnityEngine;
 
-namespace TheOtherRoles.Patches {
+namespace TheOtherRoles.Patches
+{
     class TaskMasterTaskHelper
     {
         static int taskMasterAddCommonTasks = 0;
@@ -36,7 +35,7 @@ namespace TheOtherRoles.Patches {
                 Mathf.RoundToInt(CustomOptionHolder.taskMasterExtraLongTasks.getFloat()));
             taskMasterAddShortTasks = SetTasksToList(
                 ref list,
-                MapUtilities.CachedShipStatus.NormalTasks.ToList(),
+                MapUtilities.CachedShipStatus.ShortTasks.ToList(),
                 Mathf.RoundToInt(CustomOptionHolder.taskMasterExtraShortTasks.getFloat()));
 
             return list.ToArray();
@@ -53,7 +52,8 @@ namespace TheOtherRoles.Patches {
             playerTasks.Shuffle();
             int count = 0;
             int numTasks = Math.Min(playerTasks.Count, numConfiguredTasks);
-            for (int i = 0; i < playerTasks.Count; i++) {
+            for (int i = 0; i < playerTasks.Count; i++)
+            {
                 if (taskTypesList.Contains(playerTasks[i].TaskType))
                     continue;
                 taskTypesList.Add(playerTasks[i].TaskType);
@@ -62,7 +62,7 @@ namespace TheOtherRoles.Patches {
                 if (count >= numTasks)
                     break;
             }
-            return count; 
+            return count;
         }
     }
 }

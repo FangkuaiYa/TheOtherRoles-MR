@@ -2,14 +2,16 @@ using System.Collections.Generic;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 
-namespace TheOtherRoles.Objects {
-    public class BirthdayCake {
+namespace TheOtherRoles.Objects
+{
+    public class BirthdayCake
+    {
         public enum CakeType
-		{
+        {
             Default,
             Yasuna,
             sizeof_CakeType,
-		}
+        }
 
         public GameObject cakeObj { get; private set; }
 
@@ -34,9 +36,9 @@ namespace TheOtherRoles.Objects {
 
             // Add cake parts.
             switch (cakeType)
-			{
-				case CakeType.Yasuna:
-					{
+            {
+                case CakeType.Yasuna:
+                    {
                         var cakeChildObj = new GameObject("cake_child");
                         cakeChildObj.transform.SetParent(cakeObj.transform);
                         cakeChildObj.transform.localPosition = Vector3.zero;
@@ -56,7 +58,7 @@ namespace TheOtherRoles.Objects {
         }
 
         public void SetColorId(PlayerControl p)
-		{
+        {
             foreach (var r in cakeRendList)
                 p.SetPlayerMaterialColors(r);
         }

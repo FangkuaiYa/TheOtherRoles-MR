@@ -3,14 +3,14 @@ name: AutoBuild .NET
 on:
   push:
     branches:
-      - main
+      - main-mr
 
 jobs:
   build:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.nuget/packages
@@ -18,21 +18,20 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.x
 
       - name: Build
         run: dotnet build TheOtherRoles/TheOtherRoles.csproj --configuration Release
 
-      - name: Upload TheOtherRoles
-        uses: actions/upload-artifact@v2
+      - name: Upload TheOtherRolesMR
+        uses: actions/upload-artifact@v4
         with:
-          name: TheOtherRoles.dll
-          path: TheOtherRoles/bin/Release/netstandard2.1/TheOtherRoles.dll
+          name: TheOtherRolesMR.dll
+          path: TheOtherRoles/bin/Release/net6.0/TheOtherRolesMR.dll

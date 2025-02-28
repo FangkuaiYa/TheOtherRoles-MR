@@ -57,11 +57,11 @@ namespace TheOtherRoles
         {
             if (AudioClipName == null) return null;
 
-            if (audioClips == null) audioClips = UnityEngine.Object.FindObjectsOfTypeAll(AudioClip.GetIl2CppType());
+            if (audioClips == null) audioClips = UnityEngine.Object.FindObjectsOfTypeAll(AudioClip?.GetIl2CppType());
 
             if (AudioClip != null) return AudioClip;
 
-            AudioClip = audioClips.FirstOrDefault<UnityEngine.Object>((audio) => audio && audio.name == AudioClipName).TryCast<AudioClip>();
+            AudioClip = audioClips?.FirstOrDefault((audio) => audio && audio.name == AudioClipName)?.TryCast<AudioClip>();
             return AudioClip;
         }
 

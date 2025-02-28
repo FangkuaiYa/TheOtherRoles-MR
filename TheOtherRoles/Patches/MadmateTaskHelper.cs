@@ -1,28 +1,26 @@
-using HarmonyLib;
 using System;
-using static TheOtherRoles.TheOtherRoles;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using TheOtherRoles.Players;
 using TheOtherRoles.Utilities;
+using UnityEngine;
 
-namespace TheOtherRoles.Patches {
+namespace TheOtherRoles.Patches
+{
     class MadmateTaskHelper
     {
         public static int madmateTasks { get; private set; }
 
         public static void Reset()
-		{
+        {
             madmateTasks = 0;
-		}
+        }
 
         public static void SetMadmateTasks()
         {
-            PlayerControl me = CachedPlayer.LocalPlayer.PlayerControl;
+            PlayerControl me = PlayerControl.LocalPlayer;
             if (me == null)
                 return;
-            GameData.PlayerInfo playerById = GameData.Instance.GetPlayerById(me.PlayerId);
+            NetworkedPlayerInfo playerById = GameData.Instance.GetPlayerById(me.PlayerId);
             if (playerById == null)
                 return;
             me.clearAllTasks();
@@ -37,17 +35,19 @@ namespace TheOtherRoles.Patches {
                 Mathf.RoundToInt(CustomOptionHolder.madmateLongTasks.getFloat()));
             SetTasksToList2(
                 ref list,
-                MapUtilities.CachedShipStatus.NormalTasks.ToList<NormalPlayerTask>(),
+                MapUtilities.CachedShipStatus.ShortTasks.ToList<NormalPlayerTask>(),
                 Mathf.RoundToInt(CustomOptionHolder.madmateShortTasks.getFloat()));
 
             byte[] taskTypeIds = list.ToArray();
-            playerById.Tasks = new Il2CppSystem.Collections.Generic.List<GameData.TaskInfo>(taskTypeIds.Length);
-            for (int i = 0; i < taskTypeIds.Length; i++) {
-                playerById.Tasks.Add(new GameData.TaskInfo(taskTypeIds[i], (uint)i));
+            playerById.Tasks = new Il2CppSystem.Collections.Generic.List<NetworkedPlayerInfo.TaskInfo>(taskTypeIds.Length);
+            for (int i = 0; i < taskTypeIds.Length; i++)
+            {
+                playerById.Tasks.Add(new NetworkedPlayerInfo.TaskInfo(taskTypeIds[i], (uint)i));
                 playerById.Tasks[i].Id = (uint)i;
             }
-            for (int i = 0; i < playerById.Tasks.Count; i++) {
-                GameData.TaskInfo taskInfo = playerById.Tasks[i];
+            for (int i = 0; i < playerById.Tasks.Count; i++)
+            {
+                NetworkedPlayerInfo.TaskInfo taskInfo = playerById.Tasks[i];
                 NormalPlayerTask normalPlayerTask = UnityEngine.Object.Instantiate<NormalPlayerTask>(MapUtilities.CachedShipStatus.GetTaskById(taskInfo.TypeId), me.transform);
                 normalPlayerTask.Id = taskInfo.Id;
                 normalPlayerTask.Owner = me;
@@ -64,7 +64,8 @@ namespace TheOtherRoles.Patches {
         {
             playerTasks.Shuffle(0);
             int numTasks = Math.Min(playerTasks.Count, numConfiguredTasks);
-            for (int i = 0; i < numTasks; i++) {
+            for (int i = 0; i < numTasks; i++)
+            {
                 list.Add((byte)playerTasks[i].Index);
             }
         }
@@ -81,7 +82,8 @@ namespace TheOtherRoles.Patches {
             playerTasks.Shuffle();
             int count = 0;
             int numTasks = Math.Min(playerTasks.Count, numConfiguredTasks);
-            for (int i = 0; i < playerTasks.Count; i++) {
+            for (int i = 0; i < playerTasks.Count; i++)
+            {
                 if (taskTypesList.Contains(playerTasks[i].TaskType))
                     continue;
                 taskTypesList.Add(playerTasks[i].TaskType);
@@ -97,7 +99,8 @@ namespace TheOtherRoles.Patches {
     {
         public static void Shuffle<T>(this IList<T> self, int startAt = 0)
         {
-            for (int i = startAt; i < self.Count - 1; i++) {
+            for (int i = startAt; i < self.Count - 1; i++)
+            {
                 T value = self[i];
                 int index = UnityEngine.Random.Range(i, self.Count);
                 self[i] = self[index];
@@ -107,7 +110,8 @@ namespace TheOtherRoles.Patches {
 
         public static void Shuffle<T>(this System.Random r, IList<T> self)
         {
-            for (int i = 0; i < self.Count; i++) {
+            for (int i = 0; i < self.Count; i++)
+            {
                 T value = self[i];
                 int index = r.Next(self.Count);
                 self[i] = self[index];

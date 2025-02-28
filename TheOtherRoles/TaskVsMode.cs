@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AmongUs.GameOptions;
 using BepInEx.Configuration;
 
 namespace TheOtherRoles
@@ -22,11 +23,11 @@ namespace TheOtherRoles
             int key = CustomOptionHolder.taskVsMode_EnabledBurgerMakeMode.getBool() ? GetBurgerRecordKey() : GetRecordKey();
             Get(key).Set(time);
         }
-
+        public static GameOptionsData GameHostOptions;
         static int GetRecordKey()
         {
-            var optionData = AmongUsClient.Instance.AmHost ? GameOptionsData.hostOptionsData : GameOptionsData.GameHostOptions;
-            return optionData.MapId * 1000000 + PlayerControl.GameOptions.NumLongTasks * 10000 + PlayerControl.GameOptions.NumCommonTasks * 100 + PlayerControl.GameOptions.NumShortTasks;
+            var optionData = AmongUsClient.Instance.AmHost ? GameOptionsManager.Instance.normalGameHostOptions : GameOptionsManager.Instance.currentNormalGameOptions;
+            return optionData.MapId * 1000000 + GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks * 10000 + GameOptionsManager.Instance.currentNormalGameOptions.NumCommonTasks * 100 + GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks;
         }
 
         static int GetBurgerRecordKey()

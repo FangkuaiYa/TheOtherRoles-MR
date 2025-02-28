@@ -51,14 +51,16 @@ namespace TheOtherRoles.Patches
         ButtonClickedEvent onButtonClick;
         string buttonName;
 
-        public SelectionBehaviour(TranslationInfo title, Func<bool> onClick, bool defaultValue = false, GameObject contents = null) {
+        public SelectionBehaviour(TranslationInfo title, Func<bool> onClick, bool defaultValue = false, GameObject contents = null)
+        {
             this.title = title;
             this.onClick = onClick;
             this.contents = contents;
             this.defaultValue = defaultValue;
         }
 
-        public void Initialize(InitDesc desc) {
+        public void Initialize(InitDesc desc)
+        {
             if (button == null)
                 button = UnityEngine.Object.Instantiate(desc.buttonPrefab, desc.parent);
 
@@ -94,7 +96,8 @@ namespace TheOtherRoles.Patches
             passiveButton.OnMouseOut = new UnityEvent();
             passiveButton.OnMouseOver = new UnityEvent();
 
-            passiveButton.OnClick.AddListener((Action)(() => {
+            passiveButton.OnClick.AddListener((Action)(() =>
+            {
                 if (ChangeButtonState(onClick()))
                     observable?.OnChanged(this);
             }));
@@ -108,38 +111,45 @@ namespace TheOtherRoles.Patches
             observable?.Subscribe(this);
         }
 
-        public Color GetBackgroundColor() {
+        public Color GetBackgroundColor()
+        {
             return button.onState ? selectColor : unselectColor;
         }
 
-        public void Select() {
+        public void Select()
+        {
             onButtonClick?.Invoke();
         }
 
-        public void Notify(SelectionBehaviour value) {
+        public void Notify(SelectionBehaviour value)
+        {
             if (this == value)
                 return;
             if (value.button.onState)
                 ChangeButtonState(false);
         }
 
-        public bool ChangeButtonState(bool onState) {
+        public bool ChangeButtonState(bool onState)
+        {
             button.onState = onState;
             UpdateUI();
             return true;
         }
 
-        public void SetActive(bool isActive) {
+        public void SetActive(bool isActive)
+        {
             if (_transform == null) return;
             if (_transform.gameObject == null) return;
             _transform.gameObject.SetActive(isActive);
         }
 
-        public void UpdateText() {
+        public void UpdateText()
+        {
             button.Text.text = string.IsNullOrEmpty(buttonName) ? title.GetString() : buttonName;
         }
 
-        void UpdateUI() {
+        void UpdateUI()
+        {
             button.Background.color = GetBackgroundColor();
             if (contents != null)
                 contents.SetActive(button.onState);
@@ -151,18 +161,22 @@ namespace TheOtherRoles.Patches
     {
         private List<IObserver<SelectionBehaviour>> observerList = new List<IObserver<SelectionBehaviour>>();
 
-        public void Subscribe(IObserver<SelectionBehaviour> observer) {
+        public void Subscribe(IObserver<SelectionBehaviour> observer)
+        {
             if (!observerList.Contains(observer))
                 observerList.Add(observer);
         }
 
-        public void OnChanged(SelectionBehaviour value) {
-            foreach (var observer in observerList) {
+        public void OnChanged(SelectionBehaviour value)
+        {
+            foreach (var observer in observerList)
+            {
                 observer.Notify(value);
             }
         }
 
-        public void Clear() {
+        public void Clear()
+        {
             observerList.Clear();
         }
     }

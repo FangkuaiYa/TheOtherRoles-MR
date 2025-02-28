@@ -13,14 +13,14 @@ namespace TheOtherRoles.Patches
         static int layers = -1;
 
         public static void reset()
-		{
+        {
             layers = -1;
         }
 
         public static void Postfix(BurgerMinigame __instance, [HarmonyArgument(0)] PlayerTask task)
         {
             if (layers == -1)
-			{
+            {
                 if (CustomOptionHolder.enabledTaskVsMode.getBool() && CustomOptionHolder.taskVsMode_EnabledBurgerMakeMode.getBool())
                 {
                     layers = CustomOptionHolder.taskVsMode_BurgerMakeMode_BurgerLayers.getInt();

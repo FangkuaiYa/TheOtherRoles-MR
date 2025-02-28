@@ -9,15 +9,15 @@ using UnityEngine;
 
 namespace TheOtherRoles
 {
-	public class TranslationInfo
-	{
+    public class TranslationInfo
+    {
         public TranslationInfo(string text)
             : this(text, Color.white)
         {
         }
 
         public TranslationInfo(string text, Color color)
-		{
+        {
             this.text = text;
             this.color = color;
         }
@@ -28,7 +28,7 @@ namespace TheOtherRoles
         }
 
         public TranslationInfo(string category, int id, Color color)
-		{
+        {
             this.category = category;
             this.id = id;
             this.color = color;
@@ -46,7 +46,7 @@ namespace TheOtherRoles
         }
 
         public void AddHeadText(string text)
-		{
+        {
             headText = text;
         }
         public void AddTailText(string text)
@@ -55,13 +55,13 @@ namespace TheOtherRoles
         }
 
         public string GetString()
-		{
+        {
             if (!string.IsNullOrEmpty(text))
                 return Helpers.cs(color, headText + text + tailText);
             if (roleId != RoleId.Max)
                 return Helpers.cs(color, headText + ModTranslation.GetRoleName(roleId, color) + tailText);
             return Helpers.cs(color, headText + ModTranslation.GetString(category, id) + tailText);
-		}
+        }
 
         public override string ToString()
         {
@@ -78,7 +78,7 @@ namespace TheOtherRoles
     }
 
 
-	
+
     public class ModTranslation
     {
         // Dictionary<Category, Dictionary<Category-Id, Dictionary<Lang-Id, Str>>>
@@ -105,10 +105,10 @@ namespace TheOtherRoles
                     int index = categoryStr.IndexOf(",");
                     string categoryName = categoryStr.Substring(0, index);
                     int categoryId = int.Parse(categoryStr.Substring(index + 1));
-                    
+
                     if (!stringTable.TryGetValue(categoryName, out var t))
-					{
-						t = new();
+                    {
+                        t = new();
                         stringTable.Add(categoryName, t);
                     }
 
@@ -163,82 +163,89 @@ namespace TheOtherRoles
         }
 
         static int GetRoleStringId(RoleId roleId)
-		{
+        {
             int id = -1;
             switch (roleId)
-			{
-                case RoleId.Jester:        id = 1; break;
-                case RoleId.Mayor:         id = 2; break;
-                case RoleId.Portalmaker:   id = 3; break;
-                case RoleId.Engineer:      id = 4; break;
-                case RoleId.Sheriff:       id = 5; break;
-                case RoleId.Deputy:        id = 6; break;
-                case RoleId.Lighter:       id = 7; break;
-                case RoleId.Godfather:     id = 8; break;
-                case RoleId.Mafioso:       id = 9; break;
-                case RoleId.Janitor:       id = 10; break;
-                case RoleId.Detective:     id = 11; break;
-                case RoleId.TimeMaster:    id = 12; break;
-                case RoleId.Medic:         id = 13; break;
-                case RoleId.Swapper:       id = 14; break;
-                case RoleId.Seer:          id = 15; break;
-                case RoleId.Morphling:     id = 16; break;
-                case RoleId.Camouflager:   id = 17; break;
-                case RoleId.EvilHacker:    id = 18; break;
-                case RoleId.Hacker:        id = 19; break;
-                case RoleId.Tracker:       id = 20; break;
-                case RoleId.Vampire:       id = 21; break;
-                case RoleId.Snitch:        id = 22; break;
-                case RoleId.Jackal:        id = 23; break;
-                case RoleId.Sidekick:      id = 24; break;
-                case RoleId.Eraser:        id = 25; break;
-                case RoleId.Spy:           id = 26; break;
-                case RoleId.Trickster:     id = 27; break;
-                case RoleId.Cleaner:       id = 28; break;
-                case RoleId.Warlock:       id = 29; break;
+            {
+                case RoleId.Jester: id = 1; break;
+                case RoleId.Mayor: id = 2; break;
+                case RoleId.Portalmaker: id = 3; break;
+                case RoleId.Engineer: id = 4; break;
+                case RoleId.Sheriff: id = 5; break;
+                case RoleId.Deputy: id = 6; break;
+                case RoleId.Lighter: id = 7; break;
+                case RoleId.Godfather: id = 8; break;
+                case RoleId.Mafioso: id = 9; break;
+                case RoleId.Janitor: id = 10; break;
+                case RoleId.Detective: id = 11; break;
+                case RoleId.TimeMaster: id = 12; break;
+                case RoleId.Medic: id = 13; break;
+                case RoleId.Swapper: id = 14; break;
+                case RoleId.Seer: id = 15; break;
+                case RoleId.Morphling: id = 16; break;
+                case RoleId.Camouflager: id = 17; break;
+                case RoleId.EvilHacker: id = 18; break;
+                case RoleId.Hacker: id = 19; break;
+                case RoleId.Tracker: id = 20; break;
+                case RoleId.Vampire: id = 21; break;
+                case RoleId.Snitch: id = 22; break;
+                case RoleId.Jackal: id = 23; break;
+                case RoleId.Sidekick: id = 24; break;
+                case RoleId.Eraser: id = 25; break;
+                case RoleId.Spy: id = 26; break;
+                case RoleId.Trickster: id = 27; break;
+                case RoleId.Cleaner: id = 28; break;
+                case RoleId.Warlock: id = 29; break;
                 case RoleId.SecurityGuard: id = 30; break;
-                case RoleId.Arsonist:      id = 31; break;
-                case RoleId.EvilGuesser:   id = 32; break;
-                case RoleId.NiceGuesser:   id = 33; break;
-                case RoleId.BountyHunter:  id = 34; break;
-                case RoleId.Vulture:       id = 35; break;
-                case RoleId.Medium:        id = 36; break;
-                case RoleId.Trapper:       id = 37; break;
-                case RoleId.Madmate:       id = 38; break;
-                case RoleId.Lawyer:        id = 39; break;
-                case RoleId.Prosecutor:    id = 40; break;
-                case RoleId.Pursuer:       id = 41; break;
-                case RoleId.Witch:         id = 42; break;
-                case RoleId.Ninja:         id = 43; break;
-                case RoleId.Thief:         id = 44; break;
-                case RoleId.EvilYasuna:    id = 45; break;
-                case RoleId.Yasuna:        id = 46; break;
-                case RoleId.YasunaJr:      id = 47; break;
-                case RoleId.TaskMaster:    id = 48; break;
-                case RoleId.DoorHacker:    id = 49; break;
-                case RoleId.Kataomoi:      id = 50; break;
+                case RoleId.Arsonist: id = 31; break;
+                case RoleId.EvilGuesser: id = 32; break;
+                case RoleId.NiceGuesser: id = 33; break;
+                case RoleId.BountyHunter: id = 34; break;
+                case RoleId.Vulture: id = 35; break;
+                case RoleId.Medium: id = 36; break;
+                case RoleId.Trapper: id = 37; break;
+                case RoleId.Madmate: id = 38; break;
+                case RoleId.Lawyer: id = 39; break;
+                case RoleId.Prosecutor: id = 40; break;
+                case RoleId.Pursuer: id = 41; break;
+                case RoleId.Witch: id = 42; break;
+                case RoleId.Ninja: id = 43; break;
+                case RoleId.Thief: id = 44; break;
+                case RoleId.EvilYasuna: id = 45; break;
+                case RoleId.Yasuna: id = 46; break;
+                case RoleId.YasunaJr: id = 47; break;
+                case RoleId.TaskMaster: id = 48; break;
+                //case RoleId.DoorHacker: id = 49; break;
+                case RoleId.Kataomoi: id = 50; break;
                 case RoleId.KillerCreator: id = 51; break;
                 case RoleId.MadmateKiller: id = 52; break;
-                case RoleId.Crewmate:      id = 53; break;
-                case RoleId.Impostor:      id = 54; break;
-                case RoleId.Lover:         id = 55; break;
-                case RoleId.Bait:          id = 56; break;
-                case RoleId.Bloody:        id = 57; break;
-                case RoleId.AntiTeleport:  id = 58; break;
-                case RoleId.Tiebreaker:    id = 59; break;
-                case RoleId.Sunglasses:    id = 60; break;
-                case RoleId.Mini:          id = 61; break;
-                case RoleId.Vip:           id = 62; break;
-                case RoleId.Invert:        id = 63; break;
-                case RoleId.Chameleon:     id = 64; break;
-                case RoleId.Shifter:       id = 65; break;
-                case RoleId.TaskRacer:     id = 66; break;
-                case RoleId.Hunter:        id = 10000; break;
-                case RoleId.Hunted:        id = 10001; break;
+                case RoleId.Crewmate: id = 53; break;
+                case RoleId.Impostor: id = 54; break;
+                case RoleId.Lover: id = 55; break;
+                case RoleId.Bait: id = 56; break;
+                case RoleId.Bloody: id = 57; break;
+                case RoleId.AntiTeleport: id = 58; break;
+                case RoleId.Tiebreaker: id = 59; break;
+                case RoleId.Sunglasses: id = 60; break;
+                case RoleId.Mini: id = 61; break;
+                case RoleId.Vip: id = 62; break;
+                case RoleId.Invert: id = 63; break;
+                case RoleId.Chameleon: id = 64; break;
+                case RoleId.Shifter: id = 65; break;
+                case RoleId.TaskRacer: id = 66; break;
+                case RoleId.Bomber: id = 67; break;
+                case RoleId.Hunter: id = 68; break;
+                case RoleId.Hunted: id = 69; break;
+                case RoleId.Prop: id = 70; break;
+                case RoleId.Yoyo: id = 71; break;
+                case RoleId.Armored: id = 72; break;
+                case RoleId.Amnesiac: id = 73; break;
+                case RoleId.Disperser: id = 74; break;
+                case RoleId.Veteran: id = 75; break;
             }
 
             return id;
-		}
+        }
 
         const string blankText = "[BLANK]";
         const int defaultLangId = (int)SupportedLangs.English;

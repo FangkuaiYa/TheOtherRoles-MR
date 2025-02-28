@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 
-namespace TheOtherRoles{
-    static class MapOptions {
+namespace TheOtherRoles
+{
+    static class TORMapOptions
+    {
         // Set values
         public static int maxNumberOfMeetings = 10;
         public static bool blockSkippingInEmergencyMeetings = false;
@@ -12,7 +14,7 @@ namespace TheOtherRoles{
         public static bool hideOutOfSightNametags = false;
         public static bool ghostsSeeRoles = true;
         public static bool ghostsSeeModifier = true;
-        public static bool ghostsSeeTasks = true;
+        public static bool ghostsSeeInformation = true;
         public static bool ghostsSeeVotes = true;
         public static bool showRoleSummary = true;
         public static bool allowParallelMedBayScans = false;
@@ -20,6 +22,8 @@ namespace TheOtherRoles{
         public static bool enableSoundEffects = true;
         public static bool enableHorseMode = false;
         public static bool shieldFirstKill = false;
+        public static bool ShowVentsOnMap = true;
+        public static bool ShowChatNotifications = true;
         public static CustomGamemodes gameMode = CustomGamemodes.Classic;
 
         // Updating values
@@ -30,16 +34,17 @@ namespace TheOtherRoles{
         public static float adminTimer = 0f;
         public static float vitalsTimer = 0f;
         public static float securityCameraTimer = 0f;
-        public static TMPro.TextMeshPro adminTimerText = null;
         public static string firstKillName;
         public static PlayerControl firstKillPlayer;
-        public static TMPro.TextMeshPro vitalsTimerText = null;
-        public static TMPro.TextMeshPro securityCameraTimerText = null;
+        public static TMPro.TextMeshPro vitalsTimerText;
+        public static TMPro.TextMeshPro securityCameraTimerText;
+        public static TMPro.TextMeshPro adminTimerText;
 
         const float TimerUIBaseX = -3.5f;
         const float TimerUIMoveX = 2.5f;
 
-        public static void clearAndReloadMapOptions() {
+        public static void clearAndReloadTORMapOptions()
+        {
             reloadPluginOptions();
 
             meetingsCount = 0;
@@ -63,16 +68,19 @@ namespace TheOtherRoles{
             firstKillPlayer = null;
         }
 
-        public static void reloadPluginOptions() {
+        public static void reloadPluginOptions()
+        {
             ghostsSeeRoles = TheOtherRolesPlugin.GhostsSeeRoles.Value;
             ghostsSeeModifier = TheOtherRolesPlugin.GhostsSeeModifier.Value;
-            ghostsSeeTasks = TheOtherRolesPlugin.GhostsSeeTasks.Value;
+            ghostsSeeInformation = TheOtherRolesPlugin.GhostsSeeInformation.Value;
             ghostsSeeVotes = TheOtherRolesPlugin.GhostsSeeVotes.Value;
             showRoleSummary = TheOtherRolesPlugin.ShowRoleSummary.Value;
             showLighterDarker = TheOtherRolesPlugin.ShowLighterDarker.Value;
             enableSoundEffects = TheOtherRolesPlugin.EnableSoundEffects.Value;
             enableHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value;
-            Patches.ShouldAlwaysHorseAround.isHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value;
+            ShowVentsOnMap = TheOtherRolesPlugin.ShowVentsOnMap.Value;
+            ShowChatNotifications = TheOtherRolesPlugin.ShowChatNotifications.Value;
+            //Patches.ShouldAlwaysHorseAround.isHorseMode = TheOtherRolesPlugin.EnableHorseMode.Value;
         }
 
         public static void MeetingEndedUpdate()
@@ -86,11 +94,11 @@ namespace TheOtherRoles{
                 return viewIndex;
             if (FastDestroyableSingleton<HudManager>.Instance == null)
                 return viewIndex;
-            adminTimerText = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.TaskText, FastDestroyableSingleton<HudManager>.Instance.transform);
+            adminTimerText = UnityEngine.Object.Instantiate<TMPro.TextMeshPro>(FastDestroyableSingleton<HudManager>.Instance.TaskPanel.taskText, FastDestroyableSingleton<HudManager>.Instance.transform);
             adminTimerText.color = CustomOptionHolder.AdminColor;
             adminTimerText.transform.localPosition = new Vector3(TimerUIBaseX + TimerUIMoveX * viewIndex, -4.0f, 0);
             if (adminTimer > 0)
-                adminTimerText.text = string.Format(ModTranslation.GetString("Game-General", 1), adminTimer);
+                adminTimerText.text = string.Format(ModTranslation.GetString("Game-General", 1), TORMapOptions.adminTimer);
             else
                 adminTimerText.text = ModTranslation.GetString("Game-General", 2);
             adminTimerText.gameObject.SetActive(true);
@@ -106,12 +114,13 @@ namespace TheOtherRoles{
             adminTimerText = null;
         }
 
-        public static int UpdateVitalsTimerText(int viewIndex) {
-            if (!CustomOptionHolder.enabledVitalsTimer.getBool() || !CustomOptionHolder.viewVitalsTimer.getBool() ||  CustomOptionHolder.enabledTaskVsMode.getBool())
+        public static int UpdateVitalsTimerText(int viewIndex)
+        {
+            if (!CustomOptionHolder.enabledVitalsTimer.getBool() || !CustomOptionHolder.viewVitalsTimer.getBool() || CustomOptionHolder.enabledTaskVsMode.getBool())
                 return viewIndex;
             if (FastDestroyableSingleton<HudManager>.Instance == null)
                 return viewIndex;
-            vitalsTimerText = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.TaskText, FastDestroyableSingleton<HudManager>.Instance.transform);
+            vitalsTimerText = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.TaskPanel.taskText, FastDestroyableSingleton<HudManager>.Instance.transform);
             vitalsTimerText.color = CustomOptionHolder.VitalColor;
             vitalsTimerText.transform.localPosition = new Vector3(TimerUIBaseX + TimerUIMoveX * viewIndex, -4.0f, 0);
             if (vitalsTimer > 0)
@@ -123,7 +132,8 @@ namespace TheOtherRoles{
             return viewIndex + 1;
         }
 
-        private static void ClearVitalsTimerText() {
+        private static void ClearVitalsTimerText()
+        {
             if (vitalsTimerText == null)
                 return;
             UnityEngine.Object.Destroy(vitalsTimerText);
@@ -131,12 +141,13 @@ namespace TheOtherRoles{
         }
 
 
-        public static int UpdateSecurityCameraTimerText(int viewIndex) {
-            if (!CustomOptionHolder.enabledSecurityCameraTimer.getBool() || !CustomOptionHolder.viewSecurityCameraTimer.getBool() ||  CustomOptionHolder.enabledTaskVsMode.getBool())
+        public static int UpdateSecurityCameraTimerText(int viewIndex)
+        {
+            if (!CustomOptionHolder.enabledSecurityCameraTimer.getBool() || !CustomOptionHolder.viewSecurityCameraTimer.getBool() || CustomOptionHolder.enabledTaskVsMode.getBool())
                 return viewIndex;
             if (FastDestroyableSingleton<HudManager>.Instance == null)
                 return viewIndex;
-            securityCameraTimerText = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.TaskText, FastDestroyableSingleton<HudManager>.Instance.transform);
+            securityCameraTimerText = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.TaskPanel.taskText, FastDestroyableSingleton<HudManager>.Instance.transform);
             securityCameraTimerText.color = CustomOptionHolder.SecurityCameraColor;
             securityCameraTimerText.transform.localPosition = new Vector3(TimerUIBaseX + TimerUIMoveX * viewIndex, -4.0f, 0);
             if (securityCameraTimer > 0)
@@ -148,7 +159,8 @@ namespace TheOtherRoles{
             return viewIndex + 1;
         }
 
-        private static void ClearSecurityCameraTimerText() {
+        private static void ClearSecurityCameraTimerText()
+        {
             if (securityCameraTimerText == null)
                 return;
             UnityEngine.Object.Destroy(securityCameraTimerText);
@@ -156,18 +168,21 @@ namespace TheOtherRoles{
         }
 
 
-        private static void UpdateTimer() {
+        private static void UpdateTimer()
+        {
 
             int viewIndex = 0;
             ClearAdminTimerText();
             viewIndex = UpdateAdminTimerText(viewIndex);
 
-            if (Helpers.existVitals()) {
+            if (Helpers.existVitals())
+            {
                 ClearVitalsTimerText();
                 viewIndex = UpdateVitalsTimerText(viewIndex);
             }
 
-            if (Helpers.existSecurityCamera()) {
+            if (Helpers.existSecurityCamera())
+            {
                 ClearSecurityCameraTimerText();
                 viewIndex = UpdateSecurityCameraTimerText(viewIndex);
             }
