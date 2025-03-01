@@ -38,7 +38,7 @@ namespace TheOtherRoles.Objects
             if (portalFgAnimationSprites == null || portalFgAnimationSprites.Length == 0) return null;
             index = Mathf.Clamp(index, 0, portalFgAnimationSprites.Length - 1);
             if (portalFgAnimationSprites[index] == null)
-                portalFgAnimationSprites[index] = (Helpers.loadSpriteFromResources($"TheOtherRoles.Resources.PortalAnimation.portal_{(index):000}.png", 115f));
+                portalFgAnimationSprites[index] = (Helpers.loadSpriteFromResources($"PortalAnimation.portal_{(index):000}.png", 115f));
             return portalFgAnimationSprites[index];
         }
 
@@ -119,7 +119,7 @@ namespace TheOtherRoles.Objects
             {
                 secondPortal = this;
             }
-            var lastRoom = FastDestroyableSingleton<HudManager>.Instance?.roomTracker.LastRoom.RoomId;
+            var lastRoom = FastDestroyableSingleton<HudManager>.Instance?.roomTracker?.LastRoom?.RoomId;
             this.room = lastRoom != null ? DestroyableSingleton<TranslationController>.Instance.GetString((SystemTypes)lastRoom) : "Open Field";
         }
 
@@ -169,7 +169,7 @@ namespace TheOtherRoles.Objects
             {
                 getFgAnimationSprite(i);
             }
-            portalSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.PortalAnimation.plattform.png", 115f);
+            portalSprite = Helpers.loadSpriteFromResources("PortalAnimation.plattform.png", 115f);
         }
 
         public static void clearPortals()

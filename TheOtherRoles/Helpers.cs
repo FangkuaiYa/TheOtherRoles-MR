@@ -7,10 +7,8 @@ using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
 using TheOtherRoles.CustomGameModes;
-using TheOtherRoles.Modules;
 using TheOtherRoles.Patches;
 using TheOtherRoles.Utilities;
-using Unity.Services.Core.Telemetry.Internal;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 using UnityObject = UnityEngine.Object;
@@ -46,6 +44,7 @@ namespace TheOtherRoles
 
     public static class Helpers
     {
+        public static string previousEndGameSummary = "";
 
         public static Dictionary<string, Sprite> CachedSprites = new();
 
@@ -64,6 +63,7 @@ namespace TheOtherRoles
 
         public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit, bool cache = true)
         {
+            path = "TheOtherRoles.Resources." + path;
             try
             {
                 if (cache && CachedSprites.TryGetValue(path + pixelsPerUnit, out var sprite)) return sprite;
@@ -906,8 +906,8 @@ namespace TheOtherRoles
             {
                 var rend = tzGO.transform.Find("Inactive").GetComponent<SpriteRenderer>();
                 var rendActive = tzGO.transform.Find("Active").GetComponent<SpriteRenderer>();
-                rend.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Plus_Button.png", 100f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Minus_Button.png", 100f);
-                rendActive.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Plus_ButtonActive.png", 100f) : Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Minus_ButtonActive.png", 100f);
+                rend.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("Plus_Button.png", 100f) : Helpers.loadSpriteFromResources("Minus_Button.png", 100f);
+                rendActive.sprite = zoomOutStatus ? Helpers.loadSpriteFromResources("Plus_ButtonActive.png", 100f) : Helpers.loadSpriteFromResources("Minus_ButtonActive.png", 100f);
                 tzGO.transform.localScale = new Vector3(1.2f, 1.2f, 1f) * (zoomOutStatus ? 4 : 1);
             }
         }

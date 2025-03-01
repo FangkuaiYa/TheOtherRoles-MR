@@ -994,8 +994,9 @@ namespace TheOtherRoles.Patches
                             if (!trap.revealed) continue;
                             string message = string.Format(ModTranslation.GetString("Game-Trapper", 1), trap.instanceId);
                             trap.trappedPlayer = trap.trappedPlayer.OrderBy(x => rnd.Next()).ToList();
-                            foreach (PlayerControl p in trap.trappedPlayer)
+                            foreach (byte playerId in trap.trappedPlayer)
                             {
+                                PlayerControl p = Helpers.playerById(playerId);
                                 if (Trapper.infoType == 0) message += RoleInfo.GetRolesString(p, false, false, true) + "\n";
                                 else if (Trapper.infoType == 1)
                                 {
@@ -1008,7 +1009,7 @@ namespace TheOtherRoles.Patches
                         }
                     }
 
-                    Trapper.playersOnMap = new List<PlayerControl>();
+                    Trapper.playersOnMap = new ();
 
                     // Remove revealed traps
                     Trap.clearRevealedTraps();

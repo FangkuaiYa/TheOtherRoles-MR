@@ -16,7 +16,7 @@ namespace TheOtherRoles.Objects
         public static Sprite getTraceSprite()
         {
             if (TraceSprite) return TraceSprite;
-            TraceSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.NinjaTraceW.png", 225f);
+            TraceSprite = Helpers.loadSpriteFromResources("NinjaTraceW.png", 225f);
             return TraceSprite;
         }
 

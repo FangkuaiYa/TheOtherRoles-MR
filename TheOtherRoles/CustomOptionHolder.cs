@@ -29,8 +29,18 @@ namespace TheOtherRoles
         public static CustomOption modifiersCountMin;
         public static CustomOption modifiersCountMax;
 
+        public static CustomOption isDraftMode;
+        public static CustomOption draftModeAmountOfChoices;
+        public static CustomOption draftModeTimeToChoose;
+        public static CustomOption draftModeShowRoles;
+        public static CustomOption draftModeHideImpRoles;
+        public static CustomOption draftModeHideNeutralRoles;
+
         public static CustomOption anyPlayerCanStopStart;
         public static CustomOption enableEventMode;
+        public static CustomOption eventReallyNoMini;
+        public static CustomOption eventKicksPerRound;
+        public static CustomOption eventHeavyAge;
         public static CustomOption deadImpsBlockSabotage;
 
         // MR ========================================================
@@ -436,6 +446,7 @@ namespace TheOtherRoles
         public static CustomOption modifierArmored;
 
         public static CustomOption modifierShifter;
+        public static CustomOption modifierShifterShiftsMedicShield;
 
         public static CustomOption maxNumberOfMeetings;
         public static CustomOption blockSkippingInEmergencyMeetings;
@@ -567,6 +578,13 @@ namespace TheOtherRoles
             presetSelection = CustomOption.Create(0, Types.General, new TranslationInfo("Opt-General", 6, new Color(204f / 255f, 204f / 255f, 0, 1f)), presets, null, true);
 
             if (Utilities.EventUtility.canBeEnabled) enableEventMode = CustomOption.Create(10423, Types.General, new TranslationInfo("Opt-General", 102, Color.green), true, null, true);
+
+            isDraftMode = CustomOption.Create(600, Types.General, new TranslationInfo("Opt-RoleDraft", 2, Color.yellow), false, null, true, null, new TranslationInfo("Opt-RoleDraft", 1));
+            draftModeAmountOfChoices = CustomOption.Create(601, Types.General, new TranslationInfo("Opt-RoleDraft", 3, Color.yellow), 5f, 2f, 15f, 1f, isDraftMode, false);
+            draftModeTimeToChoose = CustomOption.Create(602, Types.General, new TranslationInfo("Opt-RoleDraft", 4, Color.yellow), 5f, 3f, 20f, 1f, isDraftMode, false);
+            draftModeShowRoles = CustomOption.Create(603, Types.General, new TranslationInfo("Opt-RoleDraft", 5, Color.yellow), false, isDraftMode, false);
+            draftModeHideImpRoles = CustomOption.Create(604, Types.General, new TranslationInfo("Opt-RoleDraft", 6, Color.yellow), false, draftModeShowRoles, false);
+            draftModeHideNeutralRoles = CustomOption.Create(605, Types.General, new TranslationInfo("Opt-RoleDraft", 7, Color.yellow), false, draftModeShowRoles, false);
 
             // Using new id's for the options to not break compatibilty with older versions
             //activateRoles = CustomOption.Create(1, Types.General, new TranslationInfo("Opt-General", 7, new Color(204f / 255f, 204f / 255f, 0, 1f)), true, null, true);
@@ -983,6 +1001,12 @@ namespace TheOtherRoles
             modifierMini = CustomOption.Create(1061, Types.Modifier, new TranslationInfo(RoleId.Mini, Color.yellow), rates, null, true);
             modifierMiniGrowingUpDuration = CustomOption.Create(1062, Types.Modifier, new TranslationInfo("Opt-Mini", 1), 400f, 100f, 1500f, 100f, modifierMini);
             modifierMiniGrowingUpInMeeting = CustomOption.Create(1063, Types.Modifier, new TranslationInfo("Opt-Mini", 2), true, modifierMini);
+            if (Utilities.EventUtility.canBeEnabled || Utilities.EventUtility.isEnabled)
+            {
+                eventKicksPerRound = CustomOption.Create(10424, Types.Modifier, new TranslationInfo("Opt-Mini", 3, Color.green), 4f, 0f, 14f, 1f, modifierMini);
+                eventHeavyAge = CustomOption.Create(10425, Types.Modifier, new TranslationInfo("Opt-Mini", 4, Color.green), 12f, 6f, 18f, 0.5f, modifierMini);
+                eventReallyNoMini = CustomOption.Create(10426, Types.Modifier, new TranslationInfo("Opt-Mini", 5, Color.green), false, modifierMini, invertedParent: true);
+            }
 
             modifierVip = CustomOption.Create(1070, Types.Modifier, new TranslationInfo(RoleId.Vip, Color.yellow), rates, null, true);
             modifierVipQuantity = CustomOption.Create(1071, Types.Modifier, new TranslationInfo("Opt-Vip", 1, Color.yellow), ratesModifier, modifierVip);
@@ -1001,6 +1025,7 @@ namespace TheOtherRoles
             modifierArmored = CustomOption.Create(1101, Types.Modifier, new TranslationInfo(RoleId.Armored, Color.yellow), rates, null, true);
 
             modifierShifter = CustomOption.Create(1100, Types.Modifier, new TranslationInfo(RoleId.Shifter, Color.yellow), rates, null, true);
+            modifierShifterShiftsMedicShield = CustomOption.Create(1102, Types.Modifier, new TranslationInfo("Opt-Shifter", 1), false, modifierShifter);
 
             // Guesser Gamemode (2000 - 2999)
             guesserGamemodeCrewNumber = CustomOption.Create(2001, Types.Guesser, new TranslationInfo("Opt-Guessers-General", 1, Guesser.color), 15f, 0f, 15f, 1f, null, true, heading: new TranslationInfo("Opt-General", 111));

@@ -538,7 +538,7 @@ namespace TheOtherRoles.Patches
                             cakeEmoObj.transform.localScale = Vector3.one;
 
                             var spriteRenderer = cakeEmoObj.AddComponent<SpriteRenderer>();
-                            spriteRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.BirthdayCake_Emo.png", 200f);
+                            spriteRenderer.sprite = Helpers.loadSpriteFromResources("BirthdayCake_Emo.png", 200f);
                         }
                     }
                 }
@@ -754,6 +754,7 @@ namespace TheOtherRoles.Patches
                     var roleSummaryTextMeshRectTransform = roleSummaryTextMesh.GetComponent<RectTransform>();
                     roleSummaryTextMeshRectTransform.anchoredPosition = new Vector2(position.x + 3.5f, position.y - 0.1f);
                     roleSummaryTextMesh.text = roleSummaryText.ToString();
+                    Helpers.previousEndGameSummary = $"<size=110%>{roleSummaryText.ToString()}</size>";
                 }
                 AdditionalTempData.clear();
 

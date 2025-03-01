@@ -73,10 +73,10 @@ namespace TheOtherRoles.Objects
             switch (idx)
             {
                 case 0:
-                    sprite[idx] = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.BirthdayCake00.png", 300f);
+                    sprite[idx] = Helpers.loadSpriteFromResources("BirthdayCake00.png", 300f);
                     break;
                 case 1:
-                    sprite[idx] = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.BirthdayCake01.png", 300f);
+                    sprite[idx] = Helpers.loadSpriteFromResources("BirthdayCake01.png", 300f);
                     break;
             }
             return sprite[idx];

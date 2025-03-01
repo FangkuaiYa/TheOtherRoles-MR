@@ -61,7 +61,7 @@ namespace TheOtherRoles
         public static ConfigEntry<ushort> Port { get; set; }
         public static ConfigEntry<string> ShowPopUpVersion { get; set; }
 
-        //public static Sprite CustomPreset;
+        public static Sprite CustomPreset;
 
         public static IRegionInfo[] defaultRegions;
 
@@ -144,13 +144,13 @@ namespace TheOtherRoles
             SubmergedCompatibility.Initialize();
             AddComponent<ModUpdater>();
             MainMenuPatch.addSceneChangeCallbacks();
-            //BasicOptions.Init();
-            //InheritCustomPreset();
+            BasicOptions.Init();
+            InheritCustomPreset();
             AddToKillDistanceSetting.addKillDistance();
             TheOtherRolesPlugin.Logger.LogInfo("Loading TOR completed!");
         }
 
-        /*public static void InheritCustomPreset()
+        public static void InheritCustomPreset()
         {
             // Create CustomPreset Folder
             string path = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
@@ -198,8 +198,8 @@ namespace TheOtherRoles
         public static Sprite GetCustomPreset()
         {
             if (CustomPreset) return CustomPreset;
-            return CustomPreset = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CustomPreset.png", 150f);
-        }*/
+            return CustomPreset = Helpers.loadSpriteFromResources("CustomPreset.png", 150f);
+        }
     }
 
     // Deactivate bans, since I always leave my local testing game and ban myself

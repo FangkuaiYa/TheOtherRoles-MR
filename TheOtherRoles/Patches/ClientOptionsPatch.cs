@@ -24,7 +24,11 @@ namespace TheOtherRoles.Patches
             new SelectionBehaviour(new TranslationInfo("MainMenu", 5), () => TORMapOptions.ghostsSeeModifier = TheOtherRolesPlugin.GhostsSeeModifier.Value = !TheOtherRolesPlugin.GhostsSeeModifier.Value, TheOtherRolesPlugin.GhostsSeeModifier.Value),
             new SelectionBehaviour(new TranslationInfo("MainMenu", 6), () => TORMapOptions.showRoleSummary = TheOtherRolesPlugin.ShowRoleSummary.Value = !TheOtherRolesPlugin.ShowRoleSummary.Value, TheOtherRolesPlugin.ShowRoleSummary.Value),
             new SelectionBehaviour(new TranslationInfo("MainMenu", 7), () => TORMapOptions.showLighterDarker = TheOtherRolesPlugin.ShowLighterDarker.Value = !TheOtherRolesPlugin.ShowLighterDarker.Value, TheOtherRolesPlugin.ShowLighterDarker.Value),
-            new SelectionBehaviour(new TranslationInfo("MainMenu", 8), () => TORMapOptions.enableSoundEffects = TheOtherRolesPlugin.EnableSoundEffects.Value = !TheOtherRolesPlugin.EnableSoundEffects.Value, TheOtherRolesPlugin.EnableSoundEffects.Value),
+            new SelectionBehaviour(new TranslationInfo("MainMenu", 8), () =>  {
+                TORMapOptions.enableSoundEffects = TheOtherRolesPlugin.EnableSoundEffects.Value = !TheOtherRolesPlugin.EnableSoundEffects.Value;
+                if (!TORMapOptions.enableSoundEffects) SoundEffectsManager.stopAll();
+                 return TORMapOptions.enableSoundEffects;
+                }, TheOtherRolesPlugin.EnableSoundEffects.Value),
             new SelectionBehaviour(new TranslationInfo("MainMenu", 29), () => TORMapOptions.ShowVentsOnMap = TheOtherRolesPlugin.ShowVentsOnMap.Value = !TheOtherRolesPlugin.ShowVentsOnMap.Value, TheOtherRolesPlugin.ShowVentsOnMap.Value),
         };
 
@@ -38,7 +42,7 @@ namespace TheOtherRoles.Patches
         const string PresetNameTitle = "PresetName,";
 
 
-        /*public class PresetInfo
+        public class PresetInfo
         {
             public string presetName { get; set; }
             public long registTime { get; set; }
@@ -234,33 +238,33 @@ namespace TheOtherRoles.Patches
 
             string filePath;
             Dictionary<int, string> optionValueTable = new();
-        }*/
+        }
 
-        //const int PresetInfoOnePageViewMax = 4;
+        const int PresetInfoOnePageViewMax = 4;
         static OptionsMenuBehaviour _instance = null;
-        //static List<PresetInfo> presetInfoList = new List<PresetInfo>();
-        //static List<GameObject> presetInfoObjList = new List<GameObject>();
-        //static int presetInfoPageNow = 0;
-        //static int presetInfoPageMax = 0;
-        //static TextMeshPro presetTitle = null;
-        //static GameObject presetRoot = null;
-        //static SelectionBehaviour prevPresetPageInfo = null;
-        //static SelectionBehaviour nextPresetPageInfo = null;
-        //static SelectionBehaviour createNewPresetInfo = null;
-        //static GameObject createNewPresetPopUp = null;
-        //public static EditName createNewPresetEditName = null;
-        //static GameObject renamePresetPopUp = null;
-        //static EditName renamePresetEditName = null;
+        static List<PresetInfo> presetInfoList = new List<PresetInfo>();
+        static List<GameObject> presetInfoObjList = new List<GameObject>();
+        static int presetInfoPageNow = 0;
+        static int presetInfoPageMax = 0;
+        static TextMeshPro presetTitle = null;
+        static GameObject presetRoot = null;
+        static SelectionBehaviour prevPresetPageInfo = null;
+        static SelectionBehaviour nextPresetPageInfo = null;
+        static SelectionBehaviour createNewPresetInfo = null;
+        static GameObject createNewPresetPopUp = null;
+        public static EditName createNewPresetEditName = null;
+        static GameObject renamePresetPopUp = null;
+        static EditName renamePresetEditName = null;
 
         //static Dictionary<BepInEx.Configuration.ConfigDefinition, string> orphanedEntries = null;
 
-        /*static SelectionBehaviourObservable tabObservable = new SelectionBehaviourObservable();
+        static SelectionBehaviourObservable tabObservable = new SelectionBehaviourObservable();
         static SelectionBehaviour optionTabInfo = null;
         static SelectionBehaviour presetTabInfo = null;
 
         static SelectionBehaviour.InitDesc optionButtonDesc;
         static SelectionBehaviour.InitDesc presetButtonDesc;
-        static SelectionBehaviour.InitDesc tabDesc;*/
+        static SelectionBehaviour.InitDesc tabDesc;
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start))]
@@ -322,11 +326,11 @@ namespace TheOtherRoles.Patches
             if (optionTitle != null)
                 optionTitle.text = ModTranslation.GetString("MainMenu", 18);
 
-            //tabObservable.Clear();
-            //UpdateOptionContents();
-            //UpdatePresetButtons();
-            //UpdateOptionTabs();
-            //UpdatePresetInfo();
+            tabObservable.Clear();
+            UpdateOptionContents();
+            UpdatePresetButtons();
+            UpdateOptionTabs();
+            UpdatePresetInfo();
         }
 
         static void CreateCustom(OptionsMenuBehaviour prefab)
@@ -389,7 +393,7 @@ namespace TheOtherRoles.Patches
         {
             popUp.gameObject.SetActive(false);
             popUp.gameObject.SetActive(true);
-            //SetUpOptions();
+            SetUpOptions();
         }
 
         static void OnMoreButton(OptionsMenuBehaviour __instance)
@@ -414,7 +418,7 @@ namespace TheOtherRoles.Patches
                 __instance.Close();
         }
 
-        /*static void SetUpOptions()
+        static void SetUpOptions()
         {
             if (popUp.transform.GetComponentInChildren<ToggleButtonBehaviour>())
             {
@@ -576,9 +580,9 @@ namespace TheOtherRoles.Patches
             optionTabInfo.Initialize(tabDesc);
             tabDesc.pos = new Vector3(.7f, 2.35f, -.5f);
             presetTabInfo.Initialize(tabDesc);
-        }*/
+        }
 
-        /*static void UpdatePresetButtons()
+        static void UpdatePresetButtons()
         {
             if (presetButtonDesc == null)
                 return;
@@ -838,7 +842,7 @@ namespace TheOtherRoles.Patches
             prevPresetPageInfo._transform.gameObject.SetActive(presetInfoPageMax > 1);
             nextPresetPageInfo._transform.gameObject.SetActive(presetInfoPageMax > 1);
             presetTitle.text = String.Format(ModTranslation.GetString("MainMenu", 27), presetInfoPageNow, presetInfoPageMax);
-        }*/
+        }
 
         static IEnumerable<GameObject> GetAllChilds(this GameObject Go)
         {

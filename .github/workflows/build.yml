@@ -2,8 +2,8 @@ name: AutoBuild .NET
 
 on:
   push:
-    branches:
-      - main-mr
+    #branches:
+    #  - main-mr
 
 jobs:
   build:

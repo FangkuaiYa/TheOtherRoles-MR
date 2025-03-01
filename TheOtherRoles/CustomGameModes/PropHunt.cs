@@ -13,8 +13,6 @@ using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
-using static TheOtherRoles.Snitch;
-using static UnityEngine.GraphicsBuffer;
 
 namespace TheOtherRoles.CustomGameModes {
     [HarmonyPatch]
@@ -78,7 +76,6 @@ namespace TheOtherRoles.CustomGameModes {
         public static float dangerMeterActive = 0f;
 
         private static List<GameObject> duplicatedCollider = new();
-        private static GameObject introObject = null;
 
         public static void clearAndReload() {
             remainingShots.Clear();
@@ -122,7 +119,7 @@ namespace TheOtherRoles.CustomGameModes {
         }
 
         public static Sprite getIntroSprite(int index) {
-            return Helpers.loadSpriteFromResources($"TheOtherRoles.Resources.IntroAnimation.intro_{index + 1000}.png", 150f, cache: false);
+            return Helpers.loadSpriteFromResources($"IntroAnimation.intro_{index + 1000}.png", 150f, cache: false);
         }
 
         public static void updateWhitelistedObjects(bool debug=false) {
@@ -172,7 +169,7 @@ namespace TheOtherRoles.CustomGameModes {
                 poolablesBackground = new GameObject("poolablesBackground");
                 poolablesBackground.AddComponent<SpriteRenderer>();
                 poolablesBackground.layer = LayerMask.NameToLayer("UI");
-                if (poolablesBackgroundSprite == null) poolablesBackgroundSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.poolablesBackground.jpg", 200f);
+                if (poolablesBackgroundSprite == null) poolablesBackgroundSprite = Helpers.loadSpriteFromResources("poolablesBackground.jpg", 200f);
             }
             poolablesBackground.transform.SetParent(HudManager.Instance.transform);
             poolablesBackground.transform.localPosition = IntroCutsceneOnDestroyPatch.bottomLeft + new Vector3(-1.45f, -0.05f, 0) + Vector3.right * PlayerControl.AllPlayerControls.Count * 0.2f;
@@ -321,35 +318,35 @@ namespace TheOtherRoles.CustomGameModes {
 
         public static Sprite getDisguiseButtonSprite() {
             if (disguiseButtonSprite) return disguiseButtonSprite;
-            disguiseButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.DisguiseButton.png", 115f);
+            disguiseButtonSprite = Helpers.loadSpriteFromResources("DisguiseButton.png", 115f);
             return disguiseButtonSprite;
         }
 
         public static Sprite getUnstuckButtonSprite() {
             if (unstuckButtonSprite) return unstuckButtonSprite;
-            unstuckButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.UnStuck.png", 115f);
+            unstuckButtonSprite = Helpers.loadSpriteFromResources("UnStuck.png", 115f);
             return unstuckButtonSprite;
         }
         public static Sprite getRevealButtonSprite() {
             if (revealButtonSprite) return revealButtonSprite;
-            revealButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Reveal.png", 115f);
+            revealButtonSprite = Helpers.loadSpriteFromResources("Reveal.png", 115f);
             return revealButtonSprite;
         }
 
         public static Sprite getInvisButtonSprite() {
             if (invisButtonSprite) return invisButtonSprite;
-            invisButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.InvisButton.png", 115f);
+            invisButtonSprite = Helpers.loadSpriteFromResources("InvisButton.png", 115f);
             return invisButtonSprite;
         }
 
         public static Sprite getFindButtonSprite() {
             if (findButtonSprite) return findButtonSprite;
-            findButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.FindButton.png", 115f);
+            findButtonSprite = Helpers.loadSpriteFromResources("FindButton.png", 115f);
             return findButtonSprite;
         }
         public static Sprite getSpeedboostButtonSprite() {
             if (speedboostButtonSprite) return speedboostButtonSprite;
-            speedboostButtonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.SpeedboostButton.png", 115f);
+            speedboostButtonSprite = Helpers.loadSpriteFromResources("SpeedboostButton.png", 115f);
             return speedboostButtonSprite;
         }
 
@@ -368,7 +365,7 @@ namespace TheOtherRoles.CustomGameModes {
                     }
                     bool whiteListed = false;
                     foreach (var whiteListedWord in whitelistedObjects) {
-                        if (collider.gameObject.name.Contains(whiteListedWord)) whiteListed = true;
+                        if ((bool)(collider.gameObject?.name?.Contains(whiteListedWord))) whiteListed = true;
                     }
                     if (collider.GetComponent<Console>() != null || whiteListed) {
                         float dist = Vector2.Distance(origin.transform.position, collider.transform.position);
@@ -379,7 +376,9 @@ namespace TheOtherRoles.CustomGameModes {
                     }
                 }
                 return bestCollider.gameObject;
-            } catch { return null; }
+            } catch (Exception e) {
+                TheOtherRolesPlugin.Logger.LogError($"Error in find closest disguise object: {e}");
+                return null; }
         }
 
         public static GameObject FindPropByNameAndPos(string propName, float posX) {
@@ -450,7 +449,6 @@ namespace TheOtherRoles.CustomGameModes {
                     HudManager.Instance.FullScreen.enabled = false;
                     videoPlayer.Destroy();
                     assetBundle.Unload(false);
-                    introObject.Destroy();
                 } else {
                     HudManager.Instance.FullScreen.enabled = true;
                     HudManager.Instance.FullScreen.gameObject.SetActive(true);
@@ -523,14 +521,15 @@ namespace TheOtherRoles.CustomGameModes {
         [HarmonyPostfix]
         public static void MapSetPostfix() {  // Make sure the map in the settings is in sync with the map from li
             if (TORMapOptions.gameMode != CustomGamemodes.PropHunt && TORMapOptions.gameMode != CustomGamemodes.HideNSeek || AmongUsClient.Instance.IsGameStarted) return;
-            int map = GameOptionsManager.Instance.currentGameOptions.MapId;
+            int? map = GameOptionsManager.Instance?.currentGameOptions?.MapId;
+            if (map == null) return;
             if (map > 3) map--;
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
                 if (CustomOptionHolder.hideNSeekMap.selection != map)
-                    CustomOptionHolder.hideNSeekMap.updateSelection(map);
+                    CustomOptionHolder.hideNSeekMap.updateSelection((int)map);
             if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
                 if (CustomOptionHolder.propHuntMap.selection != map)
-                    CustomOptionHolder.propHuntMap.updateSelection(map);
+                    CustomOptionHolder.propHuntMap.updateSelection((int)map);
         }
 
 

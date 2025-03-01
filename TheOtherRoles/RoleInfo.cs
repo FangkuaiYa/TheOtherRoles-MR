@@ -14,6 +14,8 @@ namespace TheOtherRoles
         public RoleId roleId { get; private set; }
         public bool isNeutral { get; private set; }
         public bool isModifier { get; private set; }
+        public bool isImpostor => color == Palette.ImpostorRed && !(roleId == RoleId.Spy);
+        public static Dictionary<RoleId, RoleInfo> roleInfoById = new();
         public string name { get { return name_ != null ? name_.GetString() : ""; } }
         public string introDescription { get { return introDescription_ != null ? introDescription_.GetString() : ""; } }
         public string shortDescription { get { return shortDescription_ != null ? shortDescription_.GetString() : ""; } }
@@ -27,6 +29,7 @@ namespace TheOtherRoles
             this.roleId = roleId;
             this.isNeutral = isNeutral;
             this.isModifier = isModifier;
+            roleInfoById.TryAdd(roleId, this);
         }
 
         TranslationInfo name_ = null;

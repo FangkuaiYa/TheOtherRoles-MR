@@ -19,20 +19,20 @@ namespace TheOtherRoles.Objects
         public static Sprite getBombSprite()
         {
             if (bombSprite) return bombSprite;
-            bombSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Bomb.png", 300f);
+            bombSprite = Helpers.loadSpriteFromResources("Bomb.png", 300f);
             return bombSprite;
         }
         public static Sprite getBackgroundSprite()
         {
             if (backgroundSprite) return backgroundSprite;
-            backgroundSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.BombBackground.png", 110f / Bomber.hearRange);
+            backgroundSprite = Helpers.loadSpriteFromResources("BombBackground.png", 110f / Bomber.hearRange);
             return backgroundSprite;
         }
 
         public static Sprite getDefuseSprite()
         {
             if (defuseSprite) return defuseSprite;
-            defuseSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Bomb_Button_Defuse.png", 115f);
+            defuseSprite = Helpers.loadSpriteFromResources("Bomb_Button_Defuse.png", 115f);
             return defuseSprite;
         }
 
@@ -71,7 +71,14 @@ namespace TheOtherRoles.Objects
                 {
                     bomb.SetActive(true);
                     background.SetActive(true);
-                    SoundEffectsManager.playAtPosition("bombFuseBurning", p, Bomber.destructionTime, Bomber.hearRange, true);
+                    try
+                    {
+                        SoundEffectsManager.playAtPosition("bombExplosion", position, maxDuration: 1.6f, range: Bomber.hearRange);
+                    }
+                    catch (Exception e)
+                    {
+                        TheOtherRolesPlugin.Logger.LogWarning($"Exception in Sound Effect for Bomb explosion: {e}");
+                    }
                     Bomber.isActive = true;
 
                     FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Bomber.destructionTime, new Action<float>((x) =>

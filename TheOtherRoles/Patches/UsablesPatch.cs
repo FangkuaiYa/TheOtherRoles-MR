@@ -128,7 +128,7 @@ namespace TheOtherRoles.Patches
                 Deputy.setHandcuffedKnows();
                 return false;
             }
-            if (Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer)) return false;
+            if (Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer.PlayerId)) return false;
 
             bool canUse;
             bool couldUse;
@@ -136,7 +136,7 @@ namespace TheOtherRoles.Patches
             if (!canUse) return false; // No need to execute the native method as using is disallowed anyways
 
             bool isEnter = !PlayerControl.LocalPlayer.inVent;
-            bool canMoveInVents = PlayerControl.LocalPlayer != Spy.spy && !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer);
+            bool canMoveInVents = PlayerControl.LocalPlayer != Spy.spy && !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer.PlayerId);
             if (canMoveInVents) canMoveInVents = PlayerControl.LocalPlayer != Madmate.madmate;
             if (canMoveInVents)
             {
@@ -196,7 +196,7 @@ namespace TheOtherRoles.Patches
     {
         public static bool Prefix(Vent otherVent)
         {
-            bool b = !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer);
+            bool b = !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer.PlayerId);
             if (b && PlayerControl.LocalPlayer.cosmetics.Visible)
             {
                 RPCProcedure.ventMoveInvisible(PlayerControl.LocalPlayer.PlayerId);
@@ -205,17 +205,6 @@ namespace TheOtherRoles.Patches
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
             return b;
-        }
-    }
-    [HarmonyPatch(typeof(ModManager), nameof(ModManager.LateUpdate))]
-    public static class ModStampPatch
-    {
-        public static void Postfix(ModManager __instance)
-        {
-            if (__instance.ModStamp.enabled)
-            {
-                __instance.ModStamp.transform.position = AspectPosition.ComputeWorldPosition(__instance.localCamera, AspectPosition.EdgeAlignments.LeftTop, new Vector3(0.6f, 0.6f, __instance.localCamera.nearClipPlane + 0.1f));
-            }
         }
     }
 
@@ -801,7 +790,7 @@ namespace TheOtherRoles.Patches
         private static int page = 0;
         private static float timer = 0f;
         public static List<GameObject> nightVisionOverlays = null;
-        private static Sprite overlaySprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.NightVisionOverlay.png", 350f);
+        private static Sprite overlaySprite = Helpers.loadSpriteFromResources("NightVisionOverlay.png", 350f);
         public static bool nightVisionIsActive = false;
         private static bool isLightsOut;
         [HarmonyPatch(typeof(SurveillanceMinigame), nameof(SurveillanceMinigame.Begin))]
@@ -1294,7 +1283,7 @@ namespace TheOtherRoles.Patches
         static Sprite GetKataomoiMarkSprite()
         {
             if (kataomoiMarkSprite) return kataomoiMarkSprite;
-            kataomoiMarkSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.KataomoiMark.png", 115f);
+            kataomoiMarkSprite = Helpers.loadSpriteFromResources("KataomoiMark.png", 115f);
             return kataomoiMarkSprite;
         }
     }

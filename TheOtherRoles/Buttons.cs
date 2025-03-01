@@ -82,6 +82,7 @@ namespace TheOtherRoles
         private static CustomButton propHuntSpeedboostButton;
         public static CustomButton propHuntAdminButton;
         public static CustomButton propHuntFindButton;
+        public static CustomButton eventKickButton;
 
         //public static CustomButton doorHackerButton;
         public static CustomButton taskVsModeRetireButton;
@@ -871,7 +872,7 @@ namespace TheOtherRoles
                Hacker.getAdminSprite(),
                CustomButton.ButtonPositions.lowerRowRight,
                __instance,
-               KeyCode.Q,
+               KeyCode.G,
                true,
                0f,
                () =>
@@ -941,7 +942,7 @@ namespace TheOtherRoles
                Hacker.getVitalsSprite(),
                CustomButton.ButtonPositions.lowerRowCenter,
                __instance,
-               KeyCode.Q,
+               KeyCode.H,
                true,
                0f,
                () =>
@@ -1006,7 +1007,7 @@ namespace TheOtherRoles
                 Tracker.getTrackCorpsesButtonSprite(),
                 CustomButton.ButtonPositions.lowerRowCenter,
                 __instance,
-                KeyCode.Q,
+                KeyCode.G,
                 true,
                 Tracker.corpsesTrackingDuration,
                 () =>
@@ -1765,7 +1766,7 @@ namespace TheOtherRoles
                 SecurityGuard.getCamSprite(),
                  CustomButton.ButtonPositions.upperRowLeft,
                 __instance,
-                KeyCode.Q,
+                KeyCode.G,
                 true,
                 0f,
                 () =>
@@ -3218,6 +3219,27 @@ namespace TheOtherRoles
                 },
                 buttonText: ModTranslation.GetString("Button", 26)
                 );
+
+            eventKickButton = new CustomButton(
+            () => {
+                EventUtility.kickTarget();
+            },
+            () => { return EventUtility.isEnabled && Mini.mini != null && !Mini.mini.Data.IsDead && PlayerControl.LocalPlayer != Mini.mini; },
+            () => { return EventUtility.currentTarget != null; },
+            () => { },
+            EventUtility.getKickButtonSprite(),
+            CustomButton.ButtonPositions.highRowRight,
+            __instance,
+            KeyCode.K,
+            true,
+            3f,
+            () => {
+                // onEffectEnds
+                eventKickButton.Timer = 69;
+            },
+            buttonText: ModTranslation.GetString("Button", 67)
+            );
+
 
             // Set the default (or settings from the previous game) timers/durations when spawning the buttons
             initialized = true;

@@ -22,7 +22,7 @@ namespace TheOtherRoles.Objects
         public static Sprite getSilhouetteSprite()
         {
             if (SilhouetteSprite) return SilhouetteSprite;
-            SilhouetteSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Silhouette.png", 225f);
+            SilhouetteSprite = Helpers.loadSpriteFromResources("Silhouette.png", 225f);
             return SilhouetteSprite;
         }
         public Silhouette(Vector3 p, float duration = 1f, bool visibleForEveryOne = true)

@@ -6,8 +6,7 @@ using AmongUs.GameOptions;
 
 namespace TheOtherRoles
 {
-    // Remove in 2025.2.1
-    /*public static class BasicOptions
+    public static class BasicOptions
     {
         public static void Save(Dictionary<int, string> optionTable, StreamWriter sw)
         {
@@ -326,5 +325,5 @@ namespace TheOtherRoles
         static Option<bool> anonymousVotes;
         static Option<TaskBarMode> taskBarMode;
         static Option<bool> isDefaults;
-    }*/
+    }
 }

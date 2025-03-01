@@ -275,6 +275,10 @@
         "0": "Alert",
         "13": "\u8b66\u6212"
     },
+    "Button,67": {
+        "0": "Kick",
+        "13": "\u8e22\u51fa"
+    },
     "GameModeText,1": {
         "0": "TOR Guesser",
         "13": "\u8d4c\u602a\u6a21\u5f0f"
@@ -631,7 +635,7 @@
         "13": "\u201c\u505a\u4efb\u52a1\u201d\u65f6\u505c\u6b62\u6d88\u8017\u51fb\u6740\u51b7\u5374\u65f6\u95f4"
     },
     "Opt-General,39": {
-        "0": "Enable Randomization In FixWiring Task",
+        "0": "Enable Randomization In Fix Wiring Task",
         "11": "\u914d\u7dda\u30bf\u30b9\u30af\u306e\u9806\u756a\u3092\u30e9\u30f3\u30c0\u30e0\u5316",
         "13": "\u5c06\u5e03\u7ebf\u4efb\u52a1\u7684\u987a\u5e8f\u968f\u673a\u5316"
     },
@@ -3432,6 +3436,18 @@
         "11": "\u4f1a\u8b70\u4e2d\u3082\u6210\u9577\u3059\u308b",
         "13": "\u8ff7\u4f60\u8239\u5458\u5728\u4f1a\u8bae\u4e2d\u6210\u957f"
     },
+    "Opt-Mini,3": {
+        "0": "Maximum Kicks Mini Suffers",
+        "13": "\u8ff7\u4f60\u8239\u5458\u6700\u5927\u53ef\u627f\u53d7\u8e22\u51fa\u6b21\u6570"
+    },
+    "Opt-Mini,4": {
+        "0": "Age At Which Mini Is Heavy",
+        "13": "\u8ff7\u4f60\u8239\u5458\u6210\u5e74\u5e74\u9f84"
+    },
+    "Opt-Mini,5": {
+        "0": "Really No Mini :(",
+        "13": "\u4e0d\u662f\u771f\u7684\u8ff7\u4f60\u8239\u5458"
+    },
     "Opt-Vip,1": {
         "0": "VIP Quantity",
         "11": "\u4eba\u6570",
@@ -3471,6 +3487,10 @@
         "0": "Minimum Visibility",
         "11": "\u900f\u904e\u7387",
         "13": "\u6700\u4f4e\u80fd\u89c1\u5ea6"
+    },
+    "Opt-Shifter,1": {
+        "0": "Can Shift Medic Shield",
+        "13": "\u53ef\u4ee5\u4ea4\u6362\u533b\u751f\u62a4\u76fe"
     },
     "Opt-Guessers-General,1": {
         "0": "Number of Crew Guessers",
@@ -3761,6 +3781,74 @@
         "0": "Speedboost Ratio",
         "13": "\u75be\u8dd1\u65f6\u901f\u5ea6\u63d0\u5347\u500d\u6570"
     },
+    "Opt-RoleDraft,1": {
+        "0": "Role Draft",
+        "13": "\u8f6e\u62bd\u9009\u89d2"
+    },
+    "Opt-RoleDraft,2": {
+        "0": "Enable Role Draft",
+        "13": "\u542f\u7528\u8f6e\u62bd\u9009\u89d2"
+    },
+    "Opt-RoleDraft,3": {
+        "0": "Max Amount Of Roles\nTo Choose From",
+        "13": "\u6700\u5927\u53ef\u9009\u62e9\u804c\u4e1a\u6570"
+    },
+    "Opt-RoleDraft,4": {
+        "0": "Time For Selection",
+        "13": "\u804c\u4e1a\u9009\u53d6\u5355\u4eba\u65f6\u957f"
+    },
+    "Opt-RoleDraft,5": {
+        "0": "Show Picked Roles",
+        "13": "\u663e\u793a\u5df2\u9009\u62e9\u804c\u4e1a"
+    },
+    "Opt-RoleDraft,6": {
+        "0": "Hide Impostor Roles",
+        "13": "\u9690\u85cf\u5185\u9b3c\u804c\u4e1a"
+    },
+    "Opt-RoleDraft,7": {
+        "0": "Hide Neutral Roles",
+        "13": "\u9690\u85cf\u4e2d\u7acb\u804c\u4e1a"
+    },
+    "Game-RoleDraft,1": {
+        "0": "Player's Picks:",
+        "13": "\u73a9\u5bb6\u7684\u9009\u62e9\uff1a"
+    },
+    "Game-RoleDraft,2": {
+        "0": "Currently Picking:",
+        "13": "\u6b63\u5728\u6311\u9009\u7684\u73a9\u5bb6\uff1a"
+    },
+    "Game-RoleDraft,3": {
+        "0": "You!",
+        "13": "\u4f60\uff01"
+    },
+    "Game-RoleDraft,4": {
+        "0": "Anonymous Player {0}",
+        "13": "\u533f\u540d\u73a9\u5bb6 {0}"
+    },
+    "Game-RoleDraft,5": {
+        "0": "Welcome to the Role Draft!",
+        "13": "\u533f\u540d\u73a9\u5bb6 {0}"
+    },
+    "Game-RoleDraft,6": {
+        "0": "({0} rounds until your turn)",
+        "13": "(\u8fd8\u6709{0}\u540d\u73a9\u5bb6\u5230\u4f60\u9009\u62e9)"
+    },
+    "Game-RoleDraft,7": {
+        "0": "Random Selection In...",
+        "13": "\u968f\u673a\u9009\u62e9\u4e2d..."
+    },
+    "Game-RoleDraft,8": {
+        "0": "Unknown Role",
+        "13": "\u672a\u77e5\u804c\u4e1a"
+    },
+    "Game-RoleDraft,9": {
+        "0": "Impostor Role",
+        "13": "\u5185\u9b3c\u804c\u4e1a"
+    },
+    "Game-RoleDraft,10": {
+        "0": "Neutral Role",
+        "13": "\u4e2d\u7acb\u804c\u4e1a"
+    },
     "Game-General,1": {
         "0": "Admin: {0:#0.0} sec remaining",
         "11": "\u30a2\u30c9\u30df\u30f3: \u6b8b\u308a{0:#0.0}\u79d2",
@@ -4033,6 +4121,10 @@
         "11": "\n\u30b7\u30a7\u30ea\u30d5\u306f{0}",
         "13": "\n\u4f60\u7684\u8b66\u957f\u662f{0}"
     },
+    "Intro,8": {
+        "0": "Crewmate",
+        "13": "\u8239\u5458"
+    },
     "GameStart,1": {
         "0": "<color=#FF0000FF>{0} has a different or no version of The Other Roles\n</color>",
         "11": "<color=#FF0000FF>{0}\uff1aTheOtherRoles\u304c\u6b63\u5e38\u306b\u5c0e\u5165\u3055\u308c\u3066\u3044\u306a\u3044\n</color>",
@@ -4215,15 +4307,15 @@
     },
     "EndGame,24": {
         "0": "Impostors Win - By Kill",
-        "13": "\u4f2a\u88c5\u8005\u9635\u8425\u80dc\u5229 - \u4eba\u6570\u4f18\u52bf(\u51fb\u6740)"
+        "13": "\u5185\u9b3c\u9635\u8425\u80dc\u5229 - \u4eba\u6570\u4f18\u52bf(\u51fb\u6740)"
     },
     "EndGame,25": {
         "0": "Impostors Win - By Sabotage",
-        "13": "\u4f2a\u88c5\u8005\u9635\u8425\u80dc\u5229 - \u7834\u574f\u80dc\u5229"
+        "13": "\u5185\u9b3c\u9635\u8425\u80dc\u5229 - \u7834\u574f\u80dc\u5229"
     },
     "EndGame,26": {
         "0": "Impostors Win - By Vote, Guess or DC",
-        "13": "\u4f2a\u88c5\u8005\u9635\u8425\u80dc\u5229 - \u4eba\u6570\u4f18\u52bf(\u9a71\u9010,\u731c\u6d4b\u6216\u65ad\u8fde)"
+        "13": "\u5185\u9b3c\u9635\u8425\u80dc\u5229 - \u4eba\u6570\u4f18\u52bf(\u9a71\u9010,\u731c\u6d4b\u6216\u65ad\u8fde)"
     },
     "EndGame,27": {
         "0": "Crew Wins - Task Win",

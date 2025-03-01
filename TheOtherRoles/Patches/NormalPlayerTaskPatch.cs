@@ -7,15 +7,7 @@ using TheOtherRoles.Utilities;
 
 namespace TheOtherRoles.Patches
 {
-    public class PatchInstaller
-    {
-        public void Install()
-        {
-            var harmony = new Harmony("com.example.patch");
-            var method = typeof(NormalPlayerTask).GetMethod(nameof(NormalPlayerTask.PickRandomConsoles), BindingFlags.Public | BindingFlags.Instance, null, new Type[] { typeof(TaskTypes), typeof(byte[]) }, null);
-            harmony.Patch(method, postfix: new HarmonyMethod(typeof(NormalPlayerTaskPatch).GetMethod(nameof(NormalPlayerTaskPatch.Postfix))));
-        }
-    }
+    [HarmonyPatch(typeof(NormalPlayerTask), nameof(NormalPlayerTask.PickRandomConsoles), typeof(TaskTypes), typeof(Il2CppStructArray<byte>))]
     public class NormalPlayerTaskPatch
     {
         public static void Postfix(NormalPlayerTask __instance, TaskTypes taskType, byte[] consoleIds)

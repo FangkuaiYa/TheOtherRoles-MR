@@ -14,7 +14,7 @@ namespace TheOtherRoles.Objects
         public static Sprite getSprite()
         {
             if (sprite) return sprite;
-            sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Arrow.png", 200f);
+            sprite = Helpers.loadSpriteFromResources("Arrow.png", 200f);
             return sprite;
         }
 

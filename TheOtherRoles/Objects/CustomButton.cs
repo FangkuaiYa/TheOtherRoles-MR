@@ -1,3 +1,4 @@
+using Rewired;
 using System;
 using System.Collections.Generic;
 using TheOtherRoles.Modules;
@@ -11,6 +12,8 @@ namespace TheOtherRoles.Objects
     public class CustomButton
     {
         public static List<CustomButton> buttons = new List<CustomButton>();
+        public static KeyCode Action2Keycode = KeyCode.G; //TheOtherRolesPlugin.Instance.Config.Bind("Buttons", "Action2Keycode", KeyCode.G, "Second Ability Button Key").Value;
+        public static KeyCode Action3Keycode = KeyCode.H; // TheOtherRolesPlugin.Instance.Config.Bind("Buttons", "Action3Keycode", KeyCode.H, "Third Ability Button Key").Value;
         public ActionButton actionButton;
         public GameObject actionButtonGameObject;
         public SpriteRenderer actionButtonRenderer;
@@ -34,6 +37,7 @@ namespace TheOtherRoles.Objects
         public HudManager hudManager;
         public bool mirror;
         public KeyCode? hotkey;
+        public KeyCode? originalHotkey;
         public string buttonText = "";
         public bool isHandcuffed = false;
         private static readonly int Desat = Shader.PropertyToID("_Desat");
@@ -48,6 +52,7 @@ namespace TheOtherRoles.Objects
             public static readonly Vector3 upperRowCenter = new Vector3(-1f, 1f, 0f);  // Not usable for imps beacuse of new button positions!
             public static readonly Vector3 upperRowLeft = new Vector3(-2f, 1f, 0f);
             public static readonly Vector3 upperRowFarLeft = new Vector3(-3f, 1f, 0f);
+            public static readonly Vector3 highRowRight = new Vector3(0f, 2.06f, 0f);
         }
 
         public CustomButton(Action OnClick, Func<bool> HasButton, Func<bool> CouldUse, Action OnMeetingEnds, Sprite Sprite, Vector3 PositionOffset, HudManager hudManager, KeyCode? hotkey, bool HasEffect, float EffectDuration, Action OnEffectEnds, bool mirror = false, string buttonText = "", bool abilityTexture = false)
@@ -65,6 +70,7 @@ namespace TheOtherRoles.Objects
             this.Sprite = Sprite;
             this.mirror = mirror;
             this.hotkey = hotkey;
+            originalHotkey = hotkey;
             this.buttonText = buttonText;
             Timer = 16.2f;
             buttons.Add(this);
@@ -161,18 +167,41 @@ namespace TheOtherRoles.Objects
             }
         }
 
+        // Reload the rebound hotkeys from the among us settings.
+        public static void ReloadHotkeys()
+        {
+            foreach (var button in buttons)
+            {
+                // Q button is used only for killing! This rebinds every button that would use Q to use the currently set killing button in among us.
+                if (button.originalHotkey == KeyCode.Q)
+                {
+                    Player player = Rewired.ReInput.players.GetPlayer(0);
+                    string keycode = player.controllers.maps.GetFirstButtonMapWithAction(8, true).elementIdentifierName;
+                    button.hotkey = (KeyCode)Enum.Parse(typeof(KeyCode), keycode);
+                }
+                // F is the default ability button. All buttons that would use F now use the ability button.
+                if (button.originalHotkey == KeyCode.F)
+                {
+                    Player player = Rewired.ReInput.players.GetPlayer(0);
+                    string keycode = player.controllers.maps.GetFirstButtonMapWithAction(49, true).elementIdentifierName;
+                    button.hotkey = (KeyCode)Enum.Parse(typeof(KeyCode), keycode);
+                }
+
+                if (button.originalHotkey == KeyCode.G)
+                {
+                    button.hotkey = Action2Keycode;
+                }
+                if (button.originalHotkey == KeyCode.H)
+                {
+                    button.hotkey = Action3Keycode;
+                }
+            }
+        }
+
         public void setActive(bool isActive)
         {
-            if (isActive)
-            {
-                actionButtonGameObject.SetActive(true);
-                actionButtonRenderer.enabled = true;
-            }
-            else
-            {
-                actionButtonGameObject.SetActive(false);
-                actionButtonRenderer.enabled = false;
-            }
+            actionButtonGameObject.SetActive(isActive);
+            actionButtonRenderer.enabled = isActive;
         }
 
         public void Update()
@@ -237,8 +266,8 @@ namespace TheOtherRoles.Objects
                 actionButtonMat.SetFloat(Desat, 1f);
             }
 
-            if (Timer >= 0 && !stopCountdown)
-            {
+            if (Timer >= 0 && !RoleDraft.isRunning && !stopCountdown)
+            {  // Make sure role draft has finished or isnt running
                 bool always = CustomOptionHolder.alwaysConsumeKillCooldown.getBool();
                 bool exceptInVent = CustomOptionHolder.stopConsumeKillCooldownInVent.getBool() && PlayerControl.LocalPlayer.inVent;
                 bool exceptOnTask = CustomOptionHolder.stopConsumeKillCooldownOnSwitchingTask.getBool() && Patches.ElectricPatch.onTask;

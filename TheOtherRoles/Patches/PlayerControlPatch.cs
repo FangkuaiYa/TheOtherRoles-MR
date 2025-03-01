@@ -20,7 +20,7 @@ namespace TheOtherRoles.Patches
     public static class PlayerControlFixedUpdatePatch
     {
         // Helpers
-        static PlayerControl setTarget(bool onlyCrewmates = false, bool targetPlayersInVents = false, List<PlayerControl> untargetablePlayers = null, PlayerControl targetingPlayer = null)
+        public static PlayerControl setTarget(bool onlyCrewmates = false, bool targetPlayersInVents = false, List<PlayerControl> untargetablePlayers = null, PlayerControl targetingPlayer = null)
         {
             PlayerControl result = null;
             float num = AmongUs.GameOptions.GameOptionsData.KillDistances[Mathf.Clamp(GameOptionsManager.Instance.currentNormalGameOptions.KillDistance, 0, 2)];
@@ -62,7 +62,7 @@ namespace TheOtherRoles.Patches
             return result;
         }
 
-        static void setPlayerOutline(PlayerControl target, Color color)
+        public static void setPlayerOutline(PlayerControl target, Color color)
         {
             if (target == null || target.cosmetics?.currentBodySprite?.BodySprite == null) return;
 

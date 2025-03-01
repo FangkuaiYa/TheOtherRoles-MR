@@ -103,7 +103,7 @@ namespace TheOtherRoles.Patches
             }));
             onButtonClick = passiveButton.OnClick;
 
-            passiveButton.OnMouseOver.AddListener((Action)(() => button.Background.color = mouseOverColor));
+            passiveButton.OnMouseOver.AddListener((Action)(() => button.Background.color = button.onState ? new Color32(34, 139, 34, byte.MaxValue) : new Color32(139, 34, 34, byte.MaxValue)));
             passiveButton.OnMouseOut.AddListener((Action)(() => button.Background.color = GetBackgroundColor()));
             foreach (var spr in button.gameObject.GetComponentsInChildren<SpriteRenderer>())
                 spr.size = desc.colliderButtonSize;

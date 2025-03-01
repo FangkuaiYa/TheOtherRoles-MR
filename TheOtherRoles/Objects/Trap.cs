@@ -20,14 +20,14 @@ namespace TheOtherRoles.Objects
         public bool triggerable = false;
         private int usedCount = 0;
         private int neededCount = Trapper.trapCountToReveal;
-        public List<PlayerControl> trappedPlayer = new List<PlayerControl>();
+        public List<byte> trappedPlayer = new List<byte>();
         private Arrow arrow = new Arrow(Color.blue);
 
         private static Sprite trapSprite;
         public static Sprite getTrapSprite()
         {
             if (trapSprite) return trapSprite;
-            trapSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Trapper_Trap_Ingame.png", 300f);
+            trapSprite = Helpers.loadSpriteFromResources("Trapper_Trap_Ingame.png", 300f);
             return trapSprite;
         }
 
@@ -97,7 +97,7 @@ namespace TheOtherRoles.Objects
             }
             player.moveable = false;
             player.NetTransform.Halt();
-            Trapper.playersOnMap.Add(player);
+            Trapper.playersOnMap.Add(player.PlayerId);
             if (localIsTrapper) t.arrow.arrow.SetActive(true);
 
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Trapper.trapDuration, new Action<float>((p) =>
@@ -105,7 +105,7 @@ namespace TheOtherRoles.Objects
                 if (p == 1f)
                 {
                     player.moveable = true;
-                    Trapper.playersOnMap.RemoveAll(x => x == player);
+                    Trapper.playersOnMap.RemoveAll(x => x == player.PlayerId);
                     if (trapPlayerIdMap.ContainsKey(playerId)) trapPlayerIdMap.Remove(playerId);
                     t.arrow.arrow.SetActive(false);
                 }
@@ -116,7 +116,7 @@ namespace TheOtherRoles.Objects
                 t.revealed = true;
             }
 
-            t.trappedPlayer.Add(player);
+            t.trappedPlayer.Add(player.PlayerId);
             t.triggerable = true;
 
         }
@@ -134,7 +134,7 @@ namespace TheOtherRoles.Objects
             foreach (Trap trap in traps)
             {
                 if (trap.arrow.arrow.active) trap.arrow.Update();
-                if (trap.revealed || !trap.triggerable || trap.trappedPlayer.Contains(player)) continue;
+                if (trap.revealed || !trap.triggerable || trap.trappedPlayer.Contains(player.PlayerId)) continue;
                 if (player.inVent || !player.CanMove) continue;
                 float distance = Vector2.Distance(trap.trap.transform.position, player.GetTruePosition());
                 if (distance <= ud && distance < closestDistance)

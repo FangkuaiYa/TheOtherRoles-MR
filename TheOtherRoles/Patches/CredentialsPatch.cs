@@ -8,6 +8,7 @@ using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
+using static UnityEngine.UI.Button;
 
 namespace TheOtherRoles.Patches
 {
@@ -18,7 +19,7 @@ namespace TheOtherRoles.Patches
         [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
         public static class PingTrackerPatch
         {
-            /*public static GameObject customPreset;
+            public static GameObject customPreset;
             static void Prefix(PingTracker __instance)
             {
                 if (customPreset == null)
@@ -50,7 +51,7 @@ namespace TheOtherRoles.Patches
                     if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started && customPreset.gameObject.activeSelf)
                         customPreset.gameObject.SetActive(false);
                 }
-            }*/
+            }
 
             static void Postfix(PingTracker __instance)
             {
@@ -109,7 +110,7 @@ namespace TheOtherRoles.Patches
 
                 renderer = torLogo.AddComponent<SpriteRenderer>();
                 loadSprites();
-                renderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner.png", 300f);
+                renderer.sprite = Helpers.loadSpriteFromResources("Banner.png", 300f);
 
                 instance = __instance;
                 loadSprites();
@@ -143,9 +144,9 @@ namespace TheOtherRoles.Patches
 
             public static void loadSprites()
             {
-                if (bannerSprite == null) bannerSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner.png", 300f);
-                if (banner2Sprite == null) banner2Sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Banner2.png", 300f);
-                if (horseBannerSprite == null) horseBannerSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.bannerTheHorseRoles.png", 300f);
+                if (bannerSprite == null) bannerSprite = Helpers.loadSpriteFromResources("Banner.png", 300f);
+                if (banner2Sprite == null) banner2Sprite = Helpers.loadSpriteFromResources("Banner2.png", 300f);
+                if (horseBannerSprite == null) horseBannerSprite = Helpers.loadSpriteFromResources("bannerTheHorseRoles.png", 300f);
             }
 
             public static void updateSprite()

@@ -153,8 +153,12 @@ namespace TheOtherRoles.Patches
                         void StopStartFunc()
                         {
                             __instance.ResetStartState();
+                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.StopStart, Hazel.SendOption.Reliable, -1);
+                            writer.Write(PlayerControl.LocalPlayer.PlayerId);
+                            AmongUsClient.Instance.FinishRpcImmediately(writer);
                             copiedStartButton.Destroy();
                             startingTimer = 0;
+                            SoundManager.Instance.StopSound(GameStartManager.Instance.gameStartSound);
                         }
                         startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
                         __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
@@ -213,12 +217,13 @@ namespace TheOtherRoles.Patches
                         PassiveButton startButtonPassiveButton = copiedStartButton.GetComponent<PassiveButton>();
                         void StopStartFunc()
                         {
-                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.StopStart, Hazel.SendOption.Reliable, AmongUsClient.Instance.HostId);
+                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.StopStart, Hazel.SendOption.Reliable, -1);
                             writer.Write(PlayerControl.LocalPlayer.PlayerId);
                             AmongUsClient.Instance.FinishRpcImmediately(writer);
                             copiedStartButton.Destroy();
                             __instance.GameStartText.text = String.Empty;
                             startingTimer = 0;
+                            SoundManager.Instance.StopSound(GameStartManager.Instance.gameStartSound);
                             startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
                             __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
                                 startButtonText.text = "";

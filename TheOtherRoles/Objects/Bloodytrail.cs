@@ -17,9 +17,9 @@ namespace TheOtherRoles.Objects
         public static List<Sprite> getBloodySprites()
         {
             if (sprites.Count > 0) return sprites;
-            sprites.Add(Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Blood1.png", 700));
-            sprites.Add(Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Blood2.png", 500));
-            sprites.Add(Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Blood3.png", 300));
+            sprites.Add(Helpers.loadSpriteFromResources("Blood1.png", 700));
+            sprites.Add(Helpers.loadSpriteFromResources("Blood2.png", 500));
+            sprites.Add(Helpers.loadSpriteFromResources("Blood3.png", 300));
             return sprites;
         }
 
