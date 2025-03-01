@@ -285,8 +285,11 @@ namespace TheOtherRoles.Modules
                                 text.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Center;
                                 text.fontSize = 5;
                                 textHolder.layer = actionButton.gameObject.layer;
-                                text.outlineWidth = 0.1f;
-                                text.outlineColor = Color.white;
+                                if (AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.English)
+                                {
+                                    text.outlineWidth = 0.1f;
+                                    text.outlineColor = Color.white;
+                                }
                                 text.color = roleInfo.color;
                                 textHolder.transform.SetParent(actionButton.transform, false);
                                 textHolder.transform.localPosition = new Vector3(0, text.text.Contains("\n") ? -1.975f : -2.2f, -1);

@@ -1601,9 +1601,11 @@ namespace TheOtherRoles
             int j = 0;
             for (int i = 0; i < blocks.Length; i++)
             {
+                if (AmongUs.Data.DataManager.Settings.Language.CurrentLanguage != SupportedLangs.English)
+                    blocks[i] = "<line-height=97%>" + blocks[i] + "</line-height>";
                 curBlock = blocks[i];
-                if (Helpers.lineCount(curBlock) + Helpers.lineCount(curString) < 43)
-                {
+                if (Helpers.lineCount(curBlock) + Helpers.lineCount(curString) < (AmongUs.Data.DataManager.Settings.Language.CurrentLanguage == SupportedLangs.English ? 46 : 42))
+                { // original: 43
                     curString += curBlock + "\n\n";
                 }
                 else

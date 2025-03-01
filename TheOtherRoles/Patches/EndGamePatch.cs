@@ -733,13 +733,11 @@ namespace TheOtherRoles.Patches
                         roleSummaryText.AppendLine(ModTranslation.GetString("EndGame", 20));
                         foreach (var data in AdditionalTempData.playerRoles)
                         {
-                            //var roles = string.Join(" ", data.Roles.Select(x => Helpers.cs(x.color, x.name)));
                             string roles = data.RoleNames;
-                            if (data.IsGuesser) roles += ModTranslation.GetString("EndGame", 21);
-                            var taskInfo = data.TasksTotal > 0 ? $"<color=#FAD934FF>({data.TasksCompleted}/{data.TasksTotal})</color>" : "";
-                            var killInfo = data.Kills != null ? string.Format(ModTranslation.GetString("EndGame", 22), data.Kills) : "";
+                            var taskInfo = data.TasksTotal > 0 ? $" - <color=#FAD934FF>({data.TasksCompleted}/{data.TasksTotal})</color>" : "";
                             var taskInfo2 = data.ExTasksTotal > 0 ? $"Ex <color=#E1564BFF>({data.ExTasksCompleted}/{data.ExTasksTotal})</color>" : "";
-                            roleSummaryText.AppendLine($"{data.ExtraInfo}<pos=2%>{Helpers.cs(data.IsAlive ? Color.white : new Color(.7f, .7f, .7f), data.PlayerName)}<pos=22%>{(!string.IsNullOrEmpty(taskInfo) ? taskInfo : data.IsImpostor ? killInfo : "")}<pos=30%>{"   - " + roles + " " + (!data.IsImpostor && !string.IsNullOrEmpty(killInfo) ? killInfo : "") + " " + taskInfo2}");
+                            if (data.Kills != null) taskInfo += $" - <color=#FF0000FF>{string.Format(ModTranslation.GetString("EndGame", 22), data.Kills)}</color>";
+                            roleSummaryText.AppendLine($"{Helpers.cs(data.IsAlive ? Color.white : new Color(.7f, .7f, .7f), data.PlayerName)} - {roles}{taskInfo} {taskInfo2}");
                         }
                     }
 

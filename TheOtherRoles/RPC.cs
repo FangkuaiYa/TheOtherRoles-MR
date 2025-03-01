@@ -304,6 +304,7 @@ namespace TheOtherRoles
             LobbyViewSettingsPatch.currentButtons?.Clear();
             LobbyViewSettingsPatch.currentButtonTypes?.Clear();
         }
+
         public static void stopStart(byte playerId)
         {
             if (!CustomOptionHolder.anyPlayerCanStopStart.getBool())

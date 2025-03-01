@@ -47,7 +47,7 @@ namespace TheOtherRoles.Patches
                 float offset = (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started) ? 0.75f : 0f;
                 if (customPreset)
                 {
-                    customPreset.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + 3 * Vector3.left + new Vector3(0.5f, 0.8f, 0);
+                    customPreset.transform.position = FastDestroyableSingleton<HudManager>.Instance.MapButton.transform.position + 3 * Vector3.left + new Vector3(0.5f, 0, 0);
                     if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started && customPreset.gameObject.activeSelf)
                         customPreset.gameObject.SetActive(false);
                 }
