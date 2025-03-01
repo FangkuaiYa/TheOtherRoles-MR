@@ -215,7 +215,7 @@ namespace TheOtherRoles
                 case RoleId.Yasuna: id = 46; break;
                 case RoleId.YasunaJr: id = 47; break;
                 case RoleId.TaskMaster: id = 48; break;
-                //case RoleId.DoorHacker: id = 49; break;
+                case RoleId.DoorHacker: id = 49; break;
                 case RoleId.Kataomoi: id = 50; break;
                 case RoleId.KillerCreator: id = 51; break;
                 case RoleId.MadmateKiller: id = 52; break;

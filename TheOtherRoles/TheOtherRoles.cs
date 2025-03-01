@@ -5,10 +5,8 @@ using System.Text;
 using AmongUs.Data;
 using HarmonyLib;
 using Hazel;
-using Innersloth.DebugTool;
 using Reactor.Utilities.Extensions;
 using TheOtherRoles.CustomGameModes;
-using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Utilities;
 using UnityEngine;
@@ -71,7 +69,7 @@ namespace TheOtherRoles
             Yoyo.clearAndReload();
             Yasuna.clearAndReload();
             YasunaJr.clearAndReload();
-            //DoorHacker.clearAndReload();
+            DoorHacker.clearAndReload();
             Veteran.clearAndReload();
             Kataomoi.clearAndReload();
             KillerCreator.clearAndReload();
@@ -2202,7 +2200,7 @@ namespace TheOtherRoles
         }
     }
 
-    /*public static class DoorHacker
+    public static class DoorHacker
     {
         public static PlayerControl doorHacker;
         public static Color color = Palette.ImpostorRed;
@@ -2237,8 +2235,10 @@ namespace TheOtherRoles
                     for (int i = 0; i < doors.Count; ++i) {
                         enableDoors.Add(doors[i].myCollider.enabled);
                         doors[i].myCollider.enabled = false;
+                        enableDoors.Add(doors[i].shadowCollider.enabled);
+                        doors[i].shadowCollider.enabled = false;
+                    }
                 }
-            }
             } else {
                 doorHacker.Collider.isTrigger = true;
             }
@@ -2253,7 +2253,10 @@ namespace TheOtherRoles
             doorHacker.Collider.isTrigger = false;
             if (doors == null) return;
             for (int i = 0; i < doors.Count; ++i)
+            {
                 doors[i].myCollider.enabled = enableDoors[i];
+                doors[i].shadowCollider.enabled = enableDoors[i];
+            }
             enableDoors.Clear();
             doors = null;
         }
@@ -2267,7 +2270,7 @@ namespace TheOtherRoles
 
             ResetDoors();
         }
-    }*/
+    }
 
     [HarmonyPatch]
     public static class Kataomoi

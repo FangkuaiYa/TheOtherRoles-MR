@@ -84,7 +84,7 @@ namespace TheOtherRoles
         public static CustomButton propHuntFindButton;
         public static CustomButton eventKickButton;
 
-        //public static CustomButton doorHackerButton;
+        public static CustomButton doorHackerButton;
         public static CustomButton taskVsModeRetireButton;
         public static CustomButton killerCreatorCreatesKillerReserveButton;
 
@@ -109,7 +109,7 @@ namespace TheOtherRoles
         public static TMPro.TMP_Text portalmakerButtonText1;
         public static TMPro.TMP_Text portalmakerButtonText2;
         public static TMPro.TMP_Text huntedShieldCountText;
-        //public static TMPro.TMP_Text doorHackerButtonUsesText;
+        public static TMPro.TMP_Text doorHackerButtonUsesText;
 
         public static void setCustomButtonCooldowns()
         {
@@ -188,7 +188,7 @@ namespace TheOtherRoles
             propHuntAdminButton.MaxTimer = PropHunt.adminCooldown;
             propHuntFindButton.MaxTimer = PropHunt.findCooldown;
 
-            //doorHackerButton.MaxTimer = DoorHacker.cooldown;
+            doorHackerButton.MaxTimer = DoorHacker.cooldown;
             taskVsModeRetireButton.MaxTimer = TaskRacer.coolTime;
 
             timeMasterShieldButton.EffectDuration = TimeMaster.shieldDuration;
@@ -208,7 +208,7 @@ namespace TheOtherRoles
             mediumButton.EffectDuration = Medium.duration;
             trackerTrackCorpsesButton.EffectDuration = Tracker.corpsesTrackingDuration;
             witchSpellButton.EffectDuration = Witch.spellCastingDuration;
-            //doorHackerButton.EffectDuration = DoorHacker.duration;
+            doorHackerButton.EffectDuration = DoorHacker.duration;
             securityGuardCamButton.EffectDuration = SecurityGuard.duration;
             hunterLighterButton.EffectDuration = Hunter.lightDuration;
             hunterArrowButton.EffectDuration = Hunter.ArrowDuration;
@@ -2425,7 +2425,7 @@ namespace TheOtherRoles
 
 
             // DoorHacker button
-            /*doorHackerButton = new CustomButton(
+            doorHackerButton = new CustomButton(
                 () =>
                 {
                     MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.DoorHackerDone, Hazel.SendOption.Reliable, -1);
@@ -2456,11 +2456,7 @@ namespace TheOtherRoles
                 () => { doorHackerButton.Timer = doorHackerButton.MaxTimer; },
                 buttonText: ModTranslation.GetString("Button", 50)
             );
-            doorHackerButtonUsesText = GameObject.Instantiate(doorHackerButton.actionButton.cooldownTimerText, doorHackerButton.actionButton.cooldownTimerText.transform.parent);
-            doorHackerButtonUsesText.text = "";
-            doorHackerButtonUsesText.enableWordWrapping = false;
-            doorHackerButtonUsesText.transform.localScale = Vector3.one * 0.5f;
-            doorHackerButtonUsesText.transform.localPosition += new Vector3(0.5f, 0.3f, 0);*/
+            doorHackerButtonUsesText = doorHackerButton.ShowUsesIcon(0);
 
             // Task Vs Mode retire button
             taskVsModeRetireButton = new CustomButton(

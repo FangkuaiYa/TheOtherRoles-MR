@@ -165,7 +165,7 @@ namespace TheOtherRoles.Patches
             impSettings.Add((byte)RoleId.BountyHunter, CustomOptionHolder.bountyHunterSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.Witch, CustomOptionHolder.witchSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.Ninja, CustomOptionHolder.ninjaSpawnRate.getSelection());
-            //impSettings.Add((byte)RoleId.DoorHacker, CustomOptionHolder.doorHackerSpawnRate.getSelection());
+            impSettings.Add((byte)RoleId.DoorHacker, CustomOptionHolder.doorHackerSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.KillerCreator, CustomOptionHolder.killerCreatorSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.Bomber, CustomOptionHolder.bomberSpawnRate.getSelection());
             impSettings.Add((byte)RoleId.Yoyo, CustomOptionHolder.yoyoSpawnRate.getSelection());

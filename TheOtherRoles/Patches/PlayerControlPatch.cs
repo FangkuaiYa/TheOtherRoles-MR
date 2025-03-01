@@ -1125,7 +1125,7 @@ namespace TheOtherRoles.Patches
             setPlayerOutline(Thief.currentTarget, Thief.color);
         }
 
-        /*static void doorHackerUpdate()
+        static void doorHackerUpdate()
         {
             if (DoorHacker.doorHacker == null) return;
             float oldDoorHackerTimer = DoorHacker.doorHackerTimer;
@@ -1135,7 +1135,7 @@ namespace TheOtherRoles.Patches
             {
                 DoorHacker.ResetDoors(true);
             }
-        }*/
+        }
         static void baitUpdate()
         {
             if (!Bait.active.Any()) return;
@@ -1436,7 +1436,7 @@ namespace TheOtherRoles.Patches
                 trapperUpdate();
 
                 // DoorHacker
-                //doorHackerUpdate();
+                doorHackerUpdate();
                 // Kataomoi
                 kataomoiUpdate();
                 // KillerCreator

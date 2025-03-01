@@ -370,10 +370,10 @@ namespace TheOtherRoles
         public static CustomOption veteranAlertDuration;
         public static CustomOption veteranAlertNumber;
 
-        //public static CustomOption doorHackerSpawnRate;
-        //public static CustomOption doorHackerNumberOfUses;
-        //public static CustomOption doorHackerCooldown;
-        //public static CustomOption doorHackerDuration;
+        public static CustomOption doorHackerSpawnRate;
+        public static CustomOption doorHackerNumberOfUses;
+        public static CustomOption doorHackerCooldown;
+        public static CustomOption doorHackerDuration;
 
         public static CustomOption killerCreatorSpawnRate;
         public static CustomOption madmateKillerCanDieToSheriff;
@@ -680,10 +680,10 @@ namespace TheOtherRoles
             kataomoiSearchDuration = CustomOption.Create(910000308, Types.Neutral, new TranslationInfo("Opt-Kataomoi", 8), 10f, 1f, 30f, 1f, kataomoiSpawnRate);
 
             // DOOR HACKER (Impostor) Remove tin Among Us 2023.03.28
-            //doorHackerSpawnRate = CustomOption.Create(910000200, Types.Impostor, new TranslationInfo(RoleId.DoorHacker, DoorHacker.color), rates, null, true);
-            //doorHackerNumberOfUses = CustomOption.Create(910000203, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 1), 0f, 0f, 15, 1f, doorHackerSpawnRate);
-            //doorHackerCooldown = CustomOption.Create(910000201, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 2), 30f, 0f, 60f, 2.5f, doorHackerSpawnRate);
-            //doorHackerDuration = CustomOption.Create(910000202, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 3), 5f, 1f, 30f, 0.5f, doorHackerSpawnRate);
+            doorHackerSpawnRate = CustomOption.Create(910000200, Types.Impostor, new TranslationInfo(RoleId.DoorHacker, DoorHacker.color), rates, null, true);
+            doorHackerNumberOfUses = CustomOption.Create(910000203, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 1), 0f, 0f, 15, 1f, doorHackerSpawnRate);
+            doorHackerCooldown = CustomOption.Create(910000201, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 2), 30f, 0f, 60f, 2.5f, doorHackerSpawnRate);
+            doorHackerDuration = CustomOption.Create(910000202, Types.Impostor, new TranslationInfo("Opt-DoorHacker", 3), 5f, 1f, 30f, 0.5f, doorHackerSpawnRate);
 
             // KILLER CREATOR (Impostor)
             killerCreatorSpawnRate = CustomOption.Create(910000400, Types.Impostor, new TranslationInfo(RoleId.KillerCreator, KillerCreator.color), rates, null, true);

@@ -56,7 +56,7 @@ namespace TheOtherRoles
         public static RoleInfo yoyo = new RoleInfo(Yoyo.color, RoleId.Yoyo);
         public static RoleInfo madmate = new RoleInfo(Madmate.color, RoleId.Madmate);
         public static RoleInfo evilYasuna = new RoleInfo(Palette.ImpostorRed, RoleId.EvilYasuna);
-        //public static RoleInfo doorHacker = new RoleInfo(DoorHacker.color, RoleId.DoorHacker);
+        public static RoleInfo doorHacker = new RoleInfo(DoorHacker.color, RoleId.DoorHacker);
         public static RoleInfo killerCreator = new RoleInfo(KillerCreator.color, RoleId.KillerCreator);
         public static RoleInfo madmateKiller = new RoleInfo(MadmateKiller.color, RoleId.MadmateKiller);
 
@@ -193,7 +193,7 @@ namespace TheOtherRoles
             yasunaJr,
             evilYasuna,
             taskMaster,
-            //doorHacker,
+            doorHacker,
             kataomoi,
             killerCreator,
             madmateKiller,
@@ -283,7 +283,7 @@ namespace TheOtherRoles
             if (p == Yasuna.yasuna) infos.Add(p.Data.Role.IsImpostor ? evilYasuna : yasuna);
             if (p == YasunaJr.yasunaJr) infos.Add(yasunaJr);
             if (p == TaskMaster.taskMaster) infos.Add(taskMaster);
-            //if (p == DoorHacker.doorHacker) infos.Add(doorHacker);
+            if (p == DoorHacker.doorHacker) infos.Add(doorHacker);
             if (p == Kataomoi.kataomoi) infos.Add(kataomoi);
             if (p == KillerCreator.killerCreator) infos.Add(killerCreator);
             if (p == MadmateKiller.madmateKiller) infos.Add(madmateKiller);
