@@ -6,6 +6,7 @@ using System.Reflection;
 using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
+using Reactor.Utilities.Extensions;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Patches;
 using TheOtherRoles.Utilities;
@@ -627,11 +628,6 @@ namespace TheOtherRoles
                     player.cosmetics.nameText.color = Palette.ImpostorRed;
                 }
             }
-        }
-
-        public static void Destroy(this UnityObject obj)
-        {
-            UnityObject.Destroy(obj);
         }
 
         public static bool roleCanUseVents(this PlayerControl player)

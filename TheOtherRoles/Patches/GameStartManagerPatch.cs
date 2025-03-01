@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using Hazel;
+using Reactor.Utilities.Extensions;
 using TheOtherRoles.Utilities;
 using UnityEngine;
 

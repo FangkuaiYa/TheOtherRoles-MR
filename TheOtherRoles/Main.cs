@@ -16,6 +16,9 @@ using HarmonyLib;
 using Hazel;
 using Il2CppSystem.Security.Cryptography;
 using Il2CppSystem.Text;
+using Reactor;
+using Reactor.Networking;
+using Reactor.Networking.Attributes;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Modules.CustomHats;
 using TheOtherRoles.Patches;
@@ -26,6 +29,7 @@ using static TheOtherRoles.Patches.OnGameEndPatch;
 namespace TheOtherRoles
 {
     [BepInPlugin(Id, "The Other Roles MR", VersionString)]
+    [BepInDependency(ReactorPlugin.Id)]
     [BepInDependency(SubmergedCompatibility.SUBMERGED_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInProcess("Among Us.exe")]
     [ReactorModFlags(ModFlags.RequireOnAllClients)]

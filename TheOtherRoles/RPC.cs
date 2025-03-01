@@ -7,6 +7,7 @@ using Assets.CoreScripts;
 using HarmonyLib;
 using Hazel;
 using InnerNet;
+using Reactor.Utilities.Extensions;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;

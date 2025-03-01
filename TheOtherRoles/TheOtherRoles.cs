@@ -6,6 +6,7 @@ using AmongUs.Data;
 using HarmonyLib;
 using Hazel;
 using Innersloth.DebugTool;
+using Reactor.Utilities.Extensions;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
