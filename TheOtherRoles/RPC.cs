@@ -308,12 +308,12 @@ namespace TheOtherRoles
         {
             if (!CustomOptionHolder.anyPlayerCanStopStart.getBool())
                 return;
-            SoundManager.Instance.StopSound(GameStartManager.Instance.gameStartSound);
             if (AmongUsClient.Instance.AmHost)
             {
                 GameStartManager.Instance.ResetStartState();
                 PlayerControl.LocalPlayer.RpcSendChat(string.Format(ModTranslation.GetString("GameStart", 8), Helpers.playerById(playerId).Data.PlayerName));
             }
+            SoundManager.Instance.StopSound(GameStartManager.Instance.gameStartSound);
         }
         public static void workaroundSetRoles(byte numberOfRoles, MessageReader reader)
         {

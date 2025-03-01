@@ -2,7 +2,6 @@
 using AmongUs.Data;
 using Assets.InnerNet;
 using HarmonyLib;
-using TheOtherRoles.Patches;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;

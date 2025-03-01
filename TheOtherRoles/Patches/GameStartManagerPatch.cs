@@ -216,6 +216,7 @@ namespace TheOtherRoles.Patches
                         startButtonText.fontSizeMax = startButtonText.fontSize;
                         startButtonText.gameObject.transform.localPosition = Vector3.zero;
                         PassiveButton startButtonPassiveButton = copiedStartButton.GetComponent<PassiveButton>();
+
                         void StopStartFunc()
                         {
                             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.StopStart, Hazel.SendOption.Reliable, -1);
@@ -225,11 +226,11 @@ namespace TheOtherRoles.Patches
                             __instance.GameStartText.text = String.Empty;
                             startingTimer = 0;
                             SoundManager.Instance.StopSound(GameStartManager.Instance.gameStartSound);
-                            startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
-                            __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
-                                startButtonText.text = "";
-                            })));
                         }
+                        startButtonPassiveButton.OnClick.AddListener((Action)(() => StopStartFunc()));
+                        __instance.StartCoroutine(Effects.Lerp(.1f, new System.Action<float>((p) => {
+                            startButtonText.text = "";
+                        })));
                     }
 
                     // Task Vs Mode
