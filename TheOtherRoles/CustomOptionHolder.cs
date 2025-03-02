@@ -588,7 +588,7 @@ namespace TheOtherRoles
 
             // Using new id's for the options to not break compatibilty with older versions
             //activateRoles = CustomOption.Create(1, Types.General, new TranslationInfo("Opt-General", 7, new Color(204f / 255f, 204f / 255f, 0, 1f)), true, null, true);
-            crewmateRolesCountMin = CustomOption.Create(300, Types.General, new TranslationInfo("Opt-General", 8, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f, null, true);
+            crewmateRolesCountMin = CustomOption.Create(300, Types.General, new TranslationInfo("Opt-General", 8, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f, null, true, heading: new TranslationInfo("Opt-General", 75));
             crewmateRolesCountMax = CustomOption.Create(301, Types.General, new TranslationInfo("Opt-General", 9, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f);
             crewmateRolesFill = CustomOption.Create(308, Types.General, new TranslationInfo("Opt-General", 98, new Color(204f / 255f, 204f / 255f, 0, 1f)), false);
             neutralRolesCountMin = CustomOption.Create(302, Types.General, new TranslationInfo("Opt-General", 10, new Color(204f / 255f, 204f / 255f, 0, 1f)), 15f, 0f, 15f, 1f);

@@ -6,6 +6,7 @@
         <Authors>miru-y</Authors>
 		<LangVersion>latest</LangVersion>
         <DefineConstants>$(DefineConstants);STEAM</DefineConstants>
+		<!--<DebugType>embedded</DebugType>-->
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <PlatformTarget>x86</PlatformTarget>
